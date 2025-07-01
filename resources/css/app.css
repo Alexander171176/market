@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+/* Стили для всех скроллбаров */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #99f;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #66c;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: #33f;
+}
+
+/* Вертикальные скроллбары */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #99f #f1f1f1;
+}
+
+/* Глобальные стили для Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #99f #f1f1f1;
+}
+
+/* Стили для кастомных скроллбаров */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #CCCC00 #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #CCCC00; /* цвет скролла */
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #FF4747; /* Более насыщенный цвет при наведении */
+}
+
+.custom-scrollbar:active::-webkit-scrollbar-thumb {
+    background-color: #FF0000; /* Цвет при нажатии */
+}
+
+.tox .tox-promotion {
+    display: none !important;
+}

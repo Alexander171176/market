@@ -1,0 +1,41 @@
+# Laravel
+/vendor
+.env
+.env.*
+/storage/*.key
+/storage/debugbar
+/storage/logs
+/public/storage
+storage/docker/_mysql/
+
+# Laravel cache files
+/bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Vite
+/node_modules
+/public/hot
+
+# IDE и служебные
+/.idea
+/.vscode
+/.fleet
+
+# Логи и отладка
+npm-debug.log*
+yarn-error.log*
+.phpunit.result.cache
+/.phpunit.cache
+
+# Swagger и доки
+/storage/api-docs/*
+/storage/app/public/*
+
+# Homestead (если есть)
+Homestead.yaml
+Homestead.json
+
+# Docker (игнорируем только локальные кастомизации)
+docker-compose.override.yml
+.dockerignore
+docker/tmp/
