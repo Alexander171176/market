@@ -41,8 +41,9 @@ onMounted(() => {
 <template>
     <div class="flex flex-row items-center gap-2 w-auto">
         <div class="h-8 flex items-center justify-between w-full">
-            <LabelInput for="locale">
-                <span class="text-sm text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('localization') }}
+            <LabelInput for="locale" class="flex flex-row items-center">
+                <span class="text-sm text-red-500 dark:text-red-300 font-semibold mr-1">*</span>
+                {{ t('localization') }}
             </LabelInput>
         </div>
         <select

@@ -161,6 +161,10 @@ const submitForm = () => {
         main: data.main ? 1 : 0,
         right: data.right ? 1 : 0,
 
+        // Гарантированная установка "0", если поле пустое
+        views: data.views !== '' ? Number(data.views) : 0,
+        likes: data.likes !== '' ? Number(data.likes) : 0,
+
         images: form.images.map(image => {
             if (image.file) {
                 return { file: image.file, order: image.order, alt: image.alt, caption: image.caption }; // Новое изображение

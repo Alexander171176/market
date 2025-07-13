@@ -18,6 +18,7 @@ import InputNumber from '@/Components/Admin/Input/InputNumber.vue';
 import LabelInput from '@/Components/Admin/Input/LabelInput.vue';
 import InputText from '@/Components/Admin/Input/InputText.vue';
 import InputError from '@/Components/Admin/Input/InputError.vue';
+import DescriptionTextarea from '@/Components/Admin/Textarea/DescriptionTextarea.vue';
 import CKEditor from "@/Components/Admin/CKEditor/CKEditor.vue";
 import SelectLocale from "@/Components/Admin/Select/SelectLocale.vue";
 import TinyEditor from "@/Components/Admin/TinyEditor/TinyEditor.vue";
@@ -133,7 +134,7 @@ const submitForm = () => {
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="icon" :value="t('svg')"/>
-                        <MetaDescTextarea v-model="form.icon" class="w-full"/>
+                        <DescriptionTextarea v-model="form.icon" class="w-full"/>
                         <InputError class="mt-2" :message="form.errors.icon"/>
                     </div>
 

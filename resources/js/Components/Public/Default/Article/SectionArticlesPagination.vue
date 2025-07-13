@@ -60,33 +60,27 @@ const setViewMode = (mode) => {
 
 <template>
     <div>
-        <!-- НОВОЕ: Переключатель вида -->
-        <div class="flex justify-end items-center mb-4 mr-1 space-x-2">
-            <button
-                @click="setViewMode('grid')"
-                :class="[
-                    'p-1 border transition-colors duration-200',
-                    viewMode === 'grid'
-                        ? 'bg-blue-400 border-blue-700 text-white'
-                        : 'bg-slate-200 dark:bg-slate-700 border-slate-400 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 hover:border-slate-500 dark:hover:border-slate-500'
-                ]"
-                :title="t('gridView')"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        <!-- Переключатель вида -->
+        <div class="flex justify-end items-center space-x-2">
+            <button @click="setViewMode('grid')"
+                    :class="[
+                  'p-1 border transition-colors duration-200 rounded',
+                  viewMode === 'grid'
+                  ? 'border-slate-400 dark:border-slate-200 text-red-400 dark:text-red-200'
+                  : 'border-slate-300 dark:border-slate-400 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:border-slate-500 dark:hover:border-slate-500']">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
             </button>
-            <button
-                @click="setViewMode('horizontal')"
-                :class="[
-                     'p-1 border transition-colors duration-200',
-                     viewMode === 'horizontal'
-                         ? 'bg-blue-400 border-blue-700 text-white'
-                         : 'bg-slate-200 dark:bg-slate-700 border-slate-400 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 hover:border-slate-500 dark:hover:border-slate-500'
-                 ]"
-                :title="t('horizontalView')"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+            <button @click="setViewMode('horizontal')"
+                    :class="[
+                  'p-1 border transition-colors duration-200 rounded',
+                  viewMode === 'horizontal'
+                  ? 'border-slate-400 dark:border-slate-200 text-red-400 dark:text-red-200'
+                  : 'border-slate-300 dark:border-slate-400 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 hover:border-slate-500 dark:hover:border-slate-500']">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
@@ -238,34 +232,41 @@ const setViewMode = (mode) => {
                         </ul>
                     </div>
                 </template>
+
             </div>
         </div>
 
-        <!-- Элементы навигации пагинации -->
-        <div v-if="totalPages > 1" class="flex justify-center items-center mt-4">
-            <button @click="prevPage" :disabled="currentPage === 1" :title="t('previous')"
-                    class="px-3 py-1 rounded-l disabled:opacity-50
-                           hover:bg-gray-100 dark:hover:bg-gray-900
-                           text-red-500 dark:text-red-300 hover:text-slate-700 dark:hover:text-slate-100
-                           border-2 border-gray-400 dark:border-gray-200 hover:border-red-400 dark:hover:border-red-400">
+        <!-- Пагинация -->
+        <div v-if="totalPages > 1"
+             class="flex justify-center items-center mt-4 space-x-2 text-xs font-semibold">
+
+            <!-- Кнопка назад -->
+            <button @click="prevPage" :disabled="currentPage === 1"
+                    class="px-3 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                           border border-gray-400 dark:border-gray-200 disabled:opacity-50">
                 «
             </button>
-            <div class="px-2 font-semibold text-slate-700 dark:text-slate-200">
-                <span>{{ t('page') }}
-                    <span class="px-1 text-red-500 dark:text-red-300 border border-red-500 dark:border-red-300">
-                        {{ currentPage }}
-                    </span>
-                    {{ t('of') }} {{ totalPages }}
-                </span>
-            </div>
-            <button @click="nextPage" :disabled="currentPage === totalPages" :title="t('next')"
-                    class="px-3 py-1 rounded-r disabled:opacity-50
-                           hover:bg-gray-100 dark:hover:bg-gray-900
-                           text-red-500 dark:text-red-300 hover:text-slate-700 dark:hover:text-slate-100
-                           border-2 border-gray-400 dark:border-gray-200 hover:border-red-400 dark:hover:border-red-400">
+
+            <!-- Инпут страницы -->
+            <span class="text-gray-700 dark:text-gray-200">{{ t('page') }}</span>
+            <input
+                type="number"
+                v-model.number="currentPage"
+                :min="1"
+                :max="totalPages"
+                class="w-12 text-center px-1 py-1 border border-gray-400 dark:border-gray-200 rounded
+                       bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs"
+            />
+            <span class="text-gray-700 dark:text-gray-200">{{ t('of') }} {{ totalPages }}</span>
+
+            <!-- Кнопка вперёд -->
+            <button @click="nextPage" :disabled="currentPage === totalPages"
+                    class="px-3 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                           border border-gray-400 dark:border-gray-200 disabled:opacity-50">
                 »
             </button>
         </div>
+
     </div>
 </template>
 

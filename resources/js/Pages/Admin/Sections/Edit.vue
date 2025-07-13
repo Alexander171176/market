@@ -17,6 +17,7 @@ import ActivityCheckbox from '@/Components/Admin/Checkbox/ActivityCheckbox.vue';
 import InputNumber from '@/Components/Admin/Input/InputNumber.vue';
 import InputText from '@/Components/Admin/Input/InputText.vue';
 import LabelInput from '@/Components/Admin/Input/LabelInput.vue';
+import DescriptionTextarea from '@/Components/Admin/Textarea/DescriptionTextarea.vue';
 import CKEditor from "@/Components/Admin/CKEditor/CKEditor.vue";
 import SelectLocale from "@/Components/Admin/Select/SelectLocale.vue";
 import {useToast} from "vue-toastification";
@@ -123,7 +124,7 @@ const submitForm = async () => {
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="icon" :value="t('svg')"/>
-                        <MetaDescTextarea v-model="form.icon" class="w-full"/>
+                        <DescriptionTextarea v-model="form.icon" class="w-full"/>
                         <InputError class="mt-2" :message="form.errors.icon"/>
                     </div>
 

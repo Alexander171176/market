@@ -74,6 +74,14 @@ const getPrimaryImage = (article) => {
     }
     return null;
 };
+
+//  Усечение текста с троеточием
+const truncateText = (text, maxLength = 30) => {
+    if (!text) return '';
+    return text.length > maxLength
+        ? text.slice(0, maxLength).trimEnd() + '…'
+        : text;
+};
 </script>
 
 <template>
@@ -83,6 +91,14 @@ const getPrimaryImage = (article) => {
                 <thead
                     class="text-sm uppercase bg-slate-200 dark:bg-cyan-900 border border-solid border-gray-300 dark:border-gray-700">
                 <tr>
+                    <th class="px-2 py-3 w-px">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="w-4 h-4 fill-current text-slate-800 dark:text-slate-200"
+                             height="24" width="24" viewBox="0 0 24 24">
+                            <path d="M12.707,2.293a1,1,0,0,0-1.414,0l-5,5A1,1,0,0,0,7.707,8.707L12,4.414l4.293,4.293a1,1,0,0,0,1.414-1.414Z"></path>
+                            <path d="M16.293,15.293,12,19.586,7.707,15.293a1,1,0,0,0-1.414,1.414l5,5a1,1,0,0,0,1.414,0l5-5a1,1,0,0,0-1.414-1.414Z"></path>
+                        </svg>
+                    </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                         <div class="font-medium text-center">{{ t('id') }}</div>
                     </th>
@@ -133,9 +149,20 @@ const getPrimaryImage = (article) => {
                     </th>
                 </tr>
                 </thead>
-                <draggable tag="tbody" v-model="localArticles" @end="handleDragEnd" itemKey="id">
+                <draggable
+                    tag="tbody"
+                    v-model="localArticles"
+                    @end="handleDragEnd"
+                    itemKey="id"
+                    handle=".handle"
+                >
                     <template #item="{ element: article }">
                         <tr class="text-sm font-semibold border-b-2 hover:bg-slate-100 dark:hover:bg-cyan-800">
+                            <td class="px-2 py-1 text-center cursor-move handle">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M7 4h2v2H7V4zm4 0h2v2h-2V4zM7 8h2v2H7V8zm4 0h2v2h-2V8zM7 12h2v2H7v-2zm4 0h2v2h-2v-2z" />
+                                </svg>
+                            </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
                                 <div class="text-center text-blue-600 dark:text-blue-200">{{ article.id }}</div>
                             </td>
@@ -146,14 +173,14 @@ const getPrimaryImage = (article) => {
                                             :src="getPrimaryImage(article).webp_url || getPrimaryImage(article).url"
                                             :alt="getPrimaryImage(article).alt || t('defaultImageAlt')"
                                             :title="getPrimaryImage(article).caption || t('postImage')"
-                                            class="h-8 w-8 object-cover rounded-full"
+                                            class="h-6 w-8 object-cover rounded-xs"
                                         >
                                     </template>
                                     <template v-else>
                                         <img
                                             src="/storage/article_images/default-image.png"
                                             :alt="t('defaultImageTitle')"
-                                            class="h-8 w-8 object-cover rounded-full"
+                                            class="h-6 w-8 object-cover rounded-xs"
                                         >
                                     </template>
                                 </div>
@@ -170,7 +197,7 @@ const getPrimaryImage = (article) => {
                                               hover:text-teal-800 dark:hover:text-violet-50"
                                        target="_blank" rel="noopener noreferrer"
                                        :title="formatDate(article.published_at)">
-                                        {{ article.title }}
+                                        {{ truncateText(article.title, 30) }}
                                     </a>
                                 </div>
                             </td>

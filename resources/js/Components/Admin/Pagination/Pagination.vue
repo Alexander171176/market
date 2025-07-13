@@ -45,23 +45,25 @@ const handlePageInput = () => {
 
 <template>
     <div class="w-full sm:w-fit flex justify-center items-center">
-        <div class="flex flex-col sm:flex-row justify-center items-center px-2 py-1 bg-white dark:bg-slate-700">
+        <div class="flex flex-col sm:flex-row justify-center items-center
+                    px-2 py-1 bg-white dark:bg-slate-700">
             <button @click="changePage(props.currentPage - 1)"
                     :disabled="props.currentPage === 1"
                     class="btn font-semibold text-sm
                             bg-slate-50 dark:bg-slate-300
                             border border-green-500
                             text-teal-700
-                            px-2 py-1 rounded
+                            px-3 py-0.5 mb-1 rounded
                             hover:text-rose-500
                             disabled:opacity-50 disabled:text-slate-400">
                 {{ t('previous') }}
             </button>
-            <span class="flex flex-row items-center font-semibold text-sm ml-2 mr-2 text-slate-700 dark:text-slate-100">
+            <span class="flex flex-row items-center font-semibold text-sm
+                         ml-2 mr-2 mb-1 text-slate-700 dark:text-slate-100">
                 <span class="hidden lg:block">{{ t('page') }}</span>
                 <input type="number" v-model="pageInput" @change="handlePageInput" :disabled="totalPages === 1" min="1"
                        :max="totalPages"
-                       class="w-16 mx-2 py-1 text-center
+                       class="w-16 mx-2 py-0.5 text-center
                               border border-slate-400 rounded
                               dark:bg-slate-300 dark:text-slate-700"/>
                 <span class="text-blue-500 dark:text-rose-300">{{ t('of') }} {{ totalPages }}</span>
