@@ -74,7 +74,7 @@ const handlePageInput = () => {
                             bg-white dark:bg-slate-100
                             border border-green-500
                             text-teal-700
-                            px-2 py-1 rounded
+                            px-2 py-0.5 rounded
                             hover:text-rose-500
                             disabled:opacity-50 disabled:text-slate-400">
                 {{ t('next') }}

@@ -55,8 +55,8 @@ const logout = () => {
                         </div>
                         <DigitalClock class="relative z-10"/>
                     </div>
-                    <div class="hidden sm:flex sm:items-center sm:ms-6">
-                        <div class="ms-3 relative">
+                    <div class="flex sm:items-center sm:ms-6">
+                        <div class="hidden sm:block ms-3 relative">
                             <Dropdown align="right" width="60" class="relative z-10">
                                 <template #trigger>
                                     <button v-if="$page.props.jetstream.managesProfilePhotos"
@@ -112,7 +112,7 @@ const logout = () => {
                                 </template>
                             </Dropdown>
                         </div>
-                        <div class="ms-3 relative">
+                        <div class="hidden sm:block ms-3 relative">
                             <Dropdown v-if="$page.props.jetstream.hasTeamFeatures" align="right" width="60" class="relative z-10">
                                 <template #trigger>
                                     <span class="inline-flex rounded-md">
