@@ -34,7 +34,9 @@ class LogController extends Controller
         $relativePath = $this->files[$selected] ?? $this->files['laravel'];
         $logPath = storage_path($relativePath);
 
-        $logContent = File::exists($logPath) ? File::get($logPath) : 'Файл лога не найден.';
+        $logContent = File::exists($logPath)
+            ? mb_convert_encoding(File::get($logPath), 'UTF-8', 'UTF-8')
+            : 'Файл лога не найден.';
 
         return Inertia::render('Admin/Log/Index', [
             'log' => $logContent,
