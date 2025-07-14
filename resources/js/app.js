@@ -18,7 +18,7 @@ import "vue-toastification/dist/index.css";
 
 const toastOptions = {
     position: POSITION.TOP_RIGHT,
-    timeout: 3000,
+    timeout: 2000,
     closeOnClick: true,
     pauseOnFocusLoss: true,
     pauseOnHover: true,
@@ -28,7 +28,7 @@ const toastOptions = {
     hideProgressBar: false,
     closeButton: "button",
     icon: true,
-    rtl: false
+    rtl: false,
 };
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

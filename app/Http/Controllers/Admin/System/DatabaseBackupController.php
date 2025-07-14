@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\System;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Response;
 use Inertia\ResponseFactory;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -84,35 +86,78 @@ class DatabaseBackupController extends Controller
             'file' => 'required|string',
         ]);
 
-        $filename = $request->file;
-        $path = storage_path('app/' . self::BACKUP_DIR . "/{$filename}");
-
-        if (!File::exists($path)) {
-            return back()->with('error', 'Файл не найден: ' . $filename);
+        // ---------- 1. Проверяем, что запрошенный файл существует
+        $backupToRestore = storage_path('app/' . self::BACKUP_DIR . "/{$request->file}");
+        if (! File::exists($backupToRestore)) {
+            return back()->with('error', "Файл '{$request->file}' не найден");
         }
 
-        $db = config('database.connections.mysql');
+        // ---------- 2. Делаем safety‑dump текущей БД
+        $db       = config('database.connections.mysql');
+        $rollback = 'safety_' . now()->format('Y-m-d_H-i-s') . '_' . Str::random(4) . '.sql';
+        $rollbackPath = storage_path('app/' . self::BACKUP_DIR . "/{$rollback}");
 
-        $command = sprintf(
+        $dumpCmd = sprintf(
+            'mysqldump -h%s -P%s -u%s --password=%s %s > %s',
+            escapeshellarg($db['host']),
+            escapeshellarg($db['port']),
+            escapeshellarg($db['username']),
+            escapeshellarg($db['password']),
+            escapeshellarg($db['database']),
+            escapeshellarg($rollbackPath)
+        );
+
+        $dump = new Process(['/bin/sh', '-c', $dumpCmd]);
+        $dump->setTimeout(120);
+
+        try {
+            $dump->mustRun();
+        } catch (ProcessFailedException $e) {
+            // safety‑dump не получился — лучше не продолжать
+            return back()->with('error', 'Не удалось создать резервную копию перед восстановлением: '
+                . $e->getMessage());
+        }
+
+        // ---------- 3. Пытаемся восстановить выбранный backup
+        $restoreCmd = sprintf(
             'mysql -h%s -P%s -u%s --password=%s %s < %s',
             escapeshellarg($db['host']),
             escapeshellarg($db['port']),
             escapeshellarg($db['username']),
             escapeshellarg($db['password']),
             escapeshellarg($db['database']),
-            escapeshellarg($path)
+            escapeshellarg($backupToRestore)
         );
 
-        $process = new Process(['/bin/sh', '-c', $command]);
-        $process->setTimeout(180);
+        $restore = new Process(['/bin/sh', '-c', $restoreCmd]);
+        $restore->setTimeout(180);
 
         try {
-            $process->mustRun();
-        } catch (ProcessFailedException $e) {
-            return back()->with('error', 'Ошибка при восстановлении БД: ' . $e->getMessage());
-        }
+            $restore->mustRun();
 
-        return back()->with('success', 'База данных успешно восстановлена');
+            // ---------- 4. Успех → сообщаем и оставляем safety‑dump «на всякий»
+            return back()->with('success',
+                "БД успешно восстановлена из '{$request->file}'. "
+                . "Страховочный бэкап сохранён как '{$rollback}'");
+        } catch (ProcessFailedException $e) {
+
+            // ---------- 5. Восстановление упало → откатываемся
+            $revertCmd = sprintf(
+                'mysql -h%s -P%s -u%s --password=%s %s < %s',
+                escapeshellarg($db['host']),
+                escapeshellarg($db['port']),
+                escapeshellarg($db['username']),
+                escapeshellarg($db['password']),
+                escapeshellarg($db['database']),
+                escapeshellarg($rollbackPath)
+            );
+
+            (new Process(['/bin/sh', '-c', $revertCmd]))->run();
+
+            return back()->with('error',
+                "❌ Ошибка восстановления: {$e->getMessage()}. "
+                . "База данных откатена до состояния перед восстановлением (файл '{$rollback}').");
+        }
     }
 
     /**
@@ -157,6 +202,23 @@ class DatabaseBackupController extends Controller
             ->all();
 
         return response()->json(['backups' => $backups]);
+    }
+
+    /**
+     * Загрузить дамп на ПК
+     *
+     * @param string $filename
+     * @return StreamedResponse|RedirectResponse
+     */
+    public function download(string $filename): StreamedResponse|RedirectResponse
+    {
+        $path = self::BACKUP_DIR . '/' . $filename;
+
+        if (!Storage::disk('local')->exists($path)) {
+            return back()->with('error', 'Файл не найден для загрузки.');
+        }
+
+        return Storage::disk('local')->download($path);
     }
 
 }

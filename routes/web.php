@@ -277,12 +277,33 @@ Route::group([
                 return Inertia::render('Admin');
             })->name('index');
 
-            // для архивации и восстановления
-            Route::get('backup/list', [DatabaseBackupController::class, 'list'])->name('backup.list');
-            Route::get('backup', [DatabaseBackupController::class, 'index'])->name('backup.index');
-            Route::post('backup/create', [DatabaseBackupController::class, 'create'])->name('backup.create');
-            Route::post('backup/restore', [DatabaseBackupController::class, 'restore'])->name('backup.restore');
-            Route::delete('backup/delete', [DatabaseBackupController::class, 'delete'])->name('backup.delete');
+            Route::prefix('system/files')->name('admin.files.')->group(function () {
+                Route::get('/', [FileBackupController::class, 'index'])->name('index');
+                Route::post('/create', [FileBackupController::class, 'create'])->name('create');
+                Route::post('/restore', [FileBackupController::class, 'restore'])->name('restore');
+                Route::delete('/delete', [FileBackupController::class, 'delete'])->name('delete');
+                Route::get('/list', [FileBackupController::class, 'list'])->name('list');
+                Route::get('/download/{file}', [FileBackupController::class, 'download'])->name('download');
+            });
+
+            // для страницы архивации и восстановления
+            Route::get('backup/list', [DatabaseBackupController::class, 'list'])
+                ->name('backup.list'); // показать все бэкапы
+
+            Route::get('/admin/backup/download/{filename}', [DatabaseBackupController::class, 'download'])
+                ->name('backup.download'); // загрузить бэкап на ПК
+
+            Route::get('backup', [DatabaseBackupController::class, 'index'])
+                ->name('backup.index'); // страница архивации и восстановления
+
+            Route::post('backup/create', [DatabaseBackupController::class, 'create'])
+                ->name('backup.create'); // создать бэкап
+
+            Route::post('backup/restore', [DatabaseBackupController::class, 'restore'])
+                ->name('backup.restore'); // восстановить бэкап из рез. копии
+
+            Route::delete('backup/delete', [DatabaseBackupController::class, 'delete'])
+                ->name('backup.delete'); // удалить бэкап
 
             // для показа, очистки логов и скачивания логов
             Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
