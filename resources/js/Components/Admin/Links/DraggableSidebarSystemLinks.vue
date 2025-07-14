@@ -49,6 +49,7 @@ const hiddenLinks = ref(JSON.parse(localStorage.getItem('hiddenLinks')) || [
     'composer',
     'package',
     'env',
+    'backups',
     'parameters',
     'components',
 ]);

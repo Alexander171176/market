@@ -103,6 +103,11 @@ export const sidebarIcons = {
         <path class="fill-current text-blue-400" d="M14,0H3A1,1,0,0,0,2,1V23a1,1,0,0,0,1,1H21a1,1,0,0,0,1-1V8H15a1,1,0,0,1-1-1ZM5.5,17h13a.5.5,0,0,1,.5.5v1a.5.5,0,0,1-.5.5H5.5a.5.5,0,0,1-.5-.5v-1A.5.5,0,0,1,5.5,17Zm0-5h13a.5.5,0,0,1,.5.5v1a.5.5,0,0,1-.5.5H5.5a.5.5,0,0,1-.5-.5v-1A.5.5,0,0,1,5.5,12Zm5-3h-5A.5.5,0,0,1,5,8.5v-1A.5.5,0,0,1,5.5,7h5a.5.5,0,0,1,.5.5v1A.5.5,0,0,1,10.5,9Z"></path>
         <polygon class="fill-current text-blue-400" points="21.414 6 16 6 16 0.586 21.414 6"></polygon>
     `,
+backups: `
+    <path class="fill-current text-blue-400" d="M12,10C8.2,10,4.3,9.3,2,7.6V12c0,2.7,5.2,4,10,4s10-1.3,10-4V7.6C19.7,9.3,15.8,10,12,10z"></path>
+    <path class="fill-current text-blue-400" d="M12,18c-3.8,0-7.7-0.7-10-2.4V20c0,2.7,5.2,4,10,4s10-1.3,10-4v-4.4C19.7,17.3,15.8,18,12,18z"></path>
+    <path class="fill-current text-blue-600" d="M12,0C7.2,0,2,1.3,2,4s5.2,4,10,4s10-1.3,10-4S16.8,0,12,0z"></path>
+    `,
     components: `
         <circle class="fill-current text-blue-600" cx="16" cy="8" r="8"></circle>
         <circle class="fill-current text-blue-400" cx="8" cy="16" r="8"></circle>

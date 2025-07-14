@@ -46,6 +46,7 @@ export default {
     avatar: 'Аватар (тек PNG кескіні)',
     availableBackups: 'Қолжетімді сақтық көшірмелер: ',
     back: 'Артқа',
+    backups: 'Мәліметтер қоры',
     backupConfirmDeleteBackup: 'Сақтық көшірмені жоюды растаңыз',
     backupCreated: 'Сақтық көшірме жасалды!',
     backupDeleted: 'Сақтық көшірме жойылды',

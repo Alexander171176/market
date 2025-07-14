@@ -46,6 +46,7 @@ export default {
     avatar: 'Аватар (изображение только в формате png)',
     availableBackups: 'Доступные бэкапы: ',
     back: 'Назад',
+    backups: 'Бэкапы БД',
     backupConfirmDeleteBackup: 'Подтвердите удаление резервной копии',
     backupCreated: 'Резервная копия создана!',
     backupDeleted: 'Резервная копия удалена',

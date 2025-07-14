@@ -80,6 +80,7 @@ const linkInfo = {
     composer: {label: 'composer', route: 'admin.composer.index'},
     package: {label: 'package', route: 'admin.package.index'},
     env: {label: 'env', route: 'admin.env.index'},
+    backups: {label: t('backups'), route: 'admin.backup.index'},
     components: {label: t('components'), route: 'admin.components.index'},
     plugins: {label: t('plugins'), route: 'admin.plugins.index'},
 };

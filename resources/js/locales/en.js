@@ -46,6 +46,7 @@ export default {
     avatar: 'Avatar (image in png format only)',
     availableBackups: 'Available backups: ',
     back: 'Back',
+    backups: 'DB backups',
     backupConfirmDeleteBackup: 'Confirm the deletion of the backup',
     backupCreated: 'The backup has been created!',
     backupDeleted: 'The backup has been deleted',
