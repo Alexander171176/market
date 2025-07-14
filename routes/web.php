@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
@@ -275,6 +276,13 @@ Route::group([
             Route::get('/', function () {
                 return Inertia::render('Admin');
             })->name('index');
+
+            // для архивации и восстановления
+            Route::get('backup/list', [DatabaseBackupController::class, 'list'])->name('backup.list');
+            Route::get('backup', [DatabaseBackupController::class, 'index'])->name('backup.index');
+            Route::post('backup/create', [DatabaseBackupController::class, 'create'])->name('backup.create');
+            Route::post('backup/restore', [DatabaseBackupController::class, 'restore'])->name('backup.restore');
+            Route::delete('backup/delete', [DatabaseBackupController::class, 'delete'])->name('backup.delete');
 
             // для показа, очистки логов и скачивания логов
             Route::get('/logs', [LogController::class, 'index'])->name('logs.index');

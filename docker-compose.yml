@@ -1,49 +1,50 @@
 version: "3.9"
 
 services:
-    # Web Server Service
+
+    # Nginx Web Server
     webserver:
         image: nginx:alpine
         container_name: market-webserver
         restart: unless-stopped
+        ports:
+            - "8000:80"
         volumes:
             - ./:/var/www/
             - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
             - ./storage/docker/logs/nginx/:/var/log/nginx
-        ports:
-            - "8000:80"
         depends_on:
             - app
             - db
         networks:
             - market-webserver-network
 
-    # Application Service
+    # PHP Application (Debian-based)
     app:
         build:
             context: ./
             dockerfile: ./docker/php/Dockerfile
         container_name: market-php-app
-        user: ${UID}:${GID}
         restart: unless-stopped
+        user: "${UID}:${GID}"
         volumes:
-            - ./:/var/www
+            - ./:/var/www/
             - ./docker/php/extend-php.ini:/usr/local/etc/php/conf.d/extend-php.ini
+        environment:
+            HOME: /var/www
+            DB_CONNECTION: ${DB_CONNECTION}
+            DB_HOST: ${DB_HOST}
+            DB_PORT: ${DB_PORT}
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
         depends_on:
             - db
-        environment:
-            - HOME=/var/www
-            - DB_CONNECTION=${DB_CONNECTION}
-            - DB_HOST=${DB_HOST}
-            - DB_PORT=${DB_PORT}
-            - DB_DATABASE=${DB_DATABASE}
-            - DB_USERNAME=${DB_USERNAME}
-            - DB_PASSWORD=${DB_PASSWORD}
         networks:
             - market-db-network
             - market-webserver-network
 
-    # Database Service (MySQL)
+    # MySQL 8 Database
     db:
         image: mysql:8.0
         container_name: market-db
@@ -51,14 +52,16 @@ services:
         ports:
             - "3306:3306"
         environment:
-            MYSQL_DATABASE: ${DB_DATABASE}
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
         volumes:
             - ./storage/docker/_mysql:/var/lib/mysql
         networks:
             - market-db-network
 
-    # PhpMyAdmin Service
+    # PhpMyAdmin
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         container_name: market-phpmyadmin
