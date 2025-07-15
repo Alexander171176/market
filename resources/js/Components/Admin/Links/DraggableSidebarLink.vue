@@ -83,6 +83,7 @@ const linkInfo = {
     backups: {label: t('backups'), route: 'admin.backup.index'},
     files: {label: t('archive'), route: 'admin.files.index'},
     components: {label: t('components'), route: 'admin.components.index'},
+    robot: {label: t('robot'), route: 'admin.robot.index'},
     plugins: {label: t('plugins'), route: 'admin.plugins.index'},
 };
 

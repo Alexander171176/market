@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use App\Http\Controllers\Admin\System\FileBackupController;
+use App\Http\Controllers\Admin\System\RobotController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
@@ -10,7 +11,6 @@ use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
 use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 use Laravel\Jetstream\Http\Controllers;
-use App\Http\Controllers\Admin\Athlete\AthleteController;
 use App\Http\Controllers\Admin\Log\LogController;
 use App\Http\Controllers\Admin\Category\CategoryController;
 use App\Http\Controllers\Admin\System\ComposerController;
@@ -313,6 +313,8 @@ Route::group([
             Route::get('/composer', [ComposerController::class, 'index'])->name('composer.index');
             Route::get('/package', [PackageController::class, 'index'])->name('package.index');
             Route::get('/env', [EnvController::class, 'index'])->name('env.index');
+            Route::get('/robot', [RobotController::class, 'index'])->name('robot.index');
+            Route::put('/robot', [RobotController::class, 'update'])->name('robot.update');
 
             // --- Настройки отображения в админке ---
             Route::prefix('settings')->name('settings.')->group(function () {

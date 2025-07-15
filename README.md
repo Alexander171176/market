@@ -2,6 +2,7 @@
 
 2) Install Webp, Spatie Media Library <br>
 `прежде отключить файрвол антивируса, потом снова включить` <br>
+`composer require spatie/laravel-sitemap` <br>
 `composer require intervention/image:^2.7` <br>
 `composer require spatie/laravel-image-optimizer` <br>
 `composer require mcamara/laravel-localization` <br>
@@ -135,6 +136,7 @@
     `docker exec market-php-app php artisan make:controller Admin/System/ComposerController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/PackageController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/EnvController` <br>
+    `docker exec market-php-app php artisan make:controller Admin/System/RobotController` <br>
 
 21)  Create middleware ShareSettings <br>
      `docker exec market-php-app php artisan make:resource Admin/Setting/SettingSharedResource` <br>
