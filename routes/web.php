@@ -17,8 +17,6 @@ use App\Http\Controllers\Admin\System\ComposerController;
 use App\Http\Controllers\Admin\System\EnvController;
 use App\Http\Controllers\Admin\System\PackageController;
 use App\Http\Controllers\Admin\System\PhpInfoController;
-use App\Http\Controllers\Admin\Tournament\TournamentController;
-use App\Models\Admin\Tournament\Tournament;
 use Laravel\Jetstream\Http\Controllers\CurrentTeamController;
 use Laravel\Jetstream\Http\Controllers\Inertia\ApiTokenController;
 use Laravel\Jetstream\Http\Controllers\Inertia\CurrentUserController;

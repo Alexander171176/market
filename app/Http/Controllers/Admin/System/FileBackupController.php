@@ -18,7 +18,7 @@ use Inertia\Inertia;
 class FileBackupController extends Controller
 {
     private const BACKUP_DIR = 'file_backups';
-    private const SOURCE_DIR = 'public'; // можно заменить на `base_path()` если хотите архивировать всё
+    private const SOURCE_DIR = ''; // // то есть base_path()
 
     /**
      * @return Response
@@ -117,7 +117,7 @@ class FileBackupController extends Controller
         $request->validate(['file' => 'required|string']);
         $filename = $request->file;
         $zipPath = storage_path('app/' . self::BACKUP_DIR . '/' . $filename);
-        $targetPath = base_path(self::SOURCE_DIR);
+        $targetPath = base_path();
 
         if (!File::exists($zipPath)) {
             return back()->with('error', 'Файл не найден');
