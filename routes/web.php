@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
+use App\Http\Controllers\Admin\System\FileBackupController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
@@ -277,7 +278,8 @@ Route::group([
                 return Inertia::render('Admin');
             })->name('index');
 
-            Route::prefix('system/files')->name('admin.files.')->group(function () {
+            // для страницы архивации и восстановления сайта из архива
+            Route::prefix('files')->name('files.')->group(function () {
                 Route::get('/', [FileBackupController::class, 'index'])->name('index');
                 Route::post('/create', [FileBackupController::class, 'create'])->name('create');
                 Route::post('/restore', [FileBackupController::class, 'restore'])->name('restore');
@@ -286,29 +288,28 @@ Route::group([
                 Route::get('/download/{file}', [FileBackupController::class, 'download'])->name('download');
             });
 
-            // для страницы архивации и восстановления
-            Route::get('backup/list', [DatabaseBackupController::class, 'list'])
-                ->name('backup.list'); // показать все бэкапы
-
-            Route::get('/admin/backup/download/{filename}', [DatabaseBackupController::class, 'download'])
-                ->name('backup.download'); // загрузить бэкап на ПК
-
-            Route::get('backup', [DatabaseBackupController::class, 'index'])
-                ->name('backup.index'); // страница архивации и восстановления
-
-            Route::post('backup/create', [DatabaseBackupController::class, 'create'])
-                ->name('backup.create'); // создать бэкап
-
-            Route::post('backup/restore', [DatabaseBackupController::class, 'restore'])
-                ->name('backup.restore'); // восстановить бэкап из рез. копии
-
-            Route::delete('backup/delete', [DatabaseBackupController::class, 'delete'])
-                ->name('backup.delete'); // удалить бэкап
+            // для страницы архивации и восстановления БД
+            Route::prefix('backup')
+                ->name('backup.')
+                ->controller(DatabaseBackupController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index'); // Страница архивации и восстановления
+                    Route::get('/list', 'list')->name('list');              // Показать все бэкапы
+                    Route::post('/create', 'create')->name('create');       // Создать бэкап
+                    Route::post('/restore', 'restore')->name('restore');    // Восстановить из бэкапа
+                    Route::get('/download/{filename}', 'download')->name('download'); // Скачать бэкап
+                    Route::delete('/delete', 'delete')->name('delete');     // Удалить бэкап
+                });
 
             // для показа, очистки логов и скачивания логов
-            Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
-            Route::delete('/logs', [LogController::class, 'clear'])->name('logs.clear');
-            Route::get('/logs/download', [LogController::class, 'download'])->name('logs.download');
+            Route::prefix('logs')
+                ->name('logs.')
+                ->controller(LogController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');         // Страница логов
+                    Route::delete('/', 'clear')->name('clear');      // Очистить логи
+                    Route::get('/download', 'download')->name('download'); // Скачать логи
+                });
 
             Route::get('/phpinfo', [PhpInfoController::class, 'index'])->name('phpinfo.index');
             Route::get('/composer', [ComposerController::class, 'index'])->name('composer.index');
@@ -497,20 +498,6 @@ Route::group([
     // --- Остальные маршруты (Filemanager, Redis test) ---
     Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
         \UniSharp\LaravelFilemanager\Lfm::routes();
-    });
-
-    Route::get('/redis-test', function () {
-        try {
-            Cache::put('redis_test_key', 'redis_test_value', 10);
-            $value = Cache::get('redis_test_key');
-            if ($value === 'redis_test_value') {
-                return 'Redis connection successful!';
-            } else {
-                return 'Could not retrieve value from Redis.';
-            }
-        } catch (Throwable $e) {
-            return 'Redis connection failed: ' . $e->getMessage();
-        }
     });
 
 });

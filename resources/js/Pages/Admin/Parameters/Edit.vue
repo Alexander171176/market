@@ -135,7 +135,7 @@ const submitForm = () => {
                 </div>
                 <form @submit.prevent="submitForm" class="p-3 w-full">
 
-                    <div class="mb-3 flex justify-between flex-col lg:flex-row items-center gap-4">
+                    <div class="mb-3 flex justify-between flex-col lg:flex-row items-center gap-3">
 
                         <!-- Активность -->
                         <div class="flex justify-between w-full">
@@ -143,18 +143,6 @@ const submitForm = () => {
                                 <ActivityCheckbox v-model="form.activity"/>
                                 <LabelCheckbox for="activity" :text="t('activity')"/>
                             </div>
-                        </div>
-
-                        <!-- Категория -->
-                        <div class="flex flex-row items-center">
-                            <LabelInput for="category" :value="t('parameterCategory')" class="w-full"/>
-                            <CategorySelect v-model="form.category" :error="form.errors.category" />
-                        </div>
-
-                        <!-- Тип -->
-                        <div class="flex flex-row items-center gap-2">
-                            <LabelInput for="type" :value="t('type')" class="mr-3"/>
-                            <TypeSelect v-model="form.type" :error="form.errors.type" class="w-full lg:w-64 mr-3" />
                         </div>
 
                         <!-- Сортировка -->
@@ -170,6 +158,22 @@ const submitForm = () => {
                                 class="w-full lg:w-28"
                             />
                             <InputError class="mt-2 lg:mt-0" :message="form.errors.sort"/>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3 flex justify-between flex-col lg:flex-row items-center gap-3">
+
+                        <!-- Категория -->
+                        <div class="flex flex-row items-center">
+                            <LabelInput for="category" :value="t('parameterCategory')" class="w-full"/>
+                            <CategorySelect v-model="form.category" :error="form.errors.category" />
+                        </div>
+
+                        <!-- Тип -->
+                        <div class="flex flex-row items-center gap-2">
+                            <LabelInput for="type" :value="t('type')" class="mr-3"/>
+                            <TypeSelect v-model="form.type" :error="form.errors.type" class="w-full lg:w-64 mr-3" />
                         </div>
 
                     </div>

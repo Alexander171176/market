@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+
+    # Nginx Web Server
+    webserver:
+        image: nginx:alpine
+        container_name: market-webserver
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www/
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+            - ./storage/docker/logs/nginx/:/var/log/nginx
+        depends_on:
+            - app
+            - db
+        networks:
+            - market-webserver-network
+
+    # PHP Application (Debian-based)
+    app:
+        build:
+            context: ./
+            dockerfile: ./docker/php/Dockerfile
+        container_name: market-php-app
+        restart: unless-stopped
+        user: "${UID}:${GID}"
+        volumes:
+            - ./:/var/www/
+            - ./docker/php/extend-php.ini:/usr/local/etc/php/conf.d/extend-php.ini
+        environment:
+            HOME: /var/www
+            DB_CONNECTION: ${DB_CONNECTION}
+            DB_HOST: ${DB_HOST}
+            DB_PORT: ${DB_PORT}
+            DB_DATABASE: ${DB_DATABASE}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+        depends_on:
+            - db
+        networks:
+            - market-db-network
+            - market-webserver-network
+
+    # MySQL 8 Database
+    db:
+        image: mysql:8.0
+        container_name: market-db
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - ./storage/docker/_mysql:/var/lib/mysql
+        networks:
+            - market-db-network
+
+    # PhpMyAdmin
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: market-phpmyadmin
+        restart: unless-stopped
+        ports:
+            - "8081:80"
+        environment:
+            PMA_HOST: ${DB_HOST}
+            PMA_USER: ${DB_USERNAME}
+            PMA_PASSWORD: ${DB_PASSWORD}
+        depends_on:
+            - db
+        networks:
+            - market-db-network
+            - market-webserver-network
+
+networks:
+    market-webserver-network:
+    market-db-network:
