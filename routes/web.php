@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use App\Http\Controllers\Admin\System\FileBackupController;
 use App\Http\Controllers\Admin\System\RobotController;
+use App\Http\Controllers\Admin\System\SitemapController;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
 use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
@@ -275,6 +276,16 @@ Route::group([
             Route::get('/', function () {
                 return Inertia::render('Admin');
             })->name('index');
+
+            // для страницы генерации карты в xml
+            Route::prefix('sitemap')
+                ->name('sitemap.')
+                ->controller(SitemapController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index'); // Генерация и просмотр sitemap.xml
+                    Route::post('/', 'generate')->name('generate');// кнопка «Сгенерировать»
+                    Route::get('/file', 'download')->name('download');// скачать
+                });
 
             // для страницы архивации и восстановления сайта из архива
             Route::prefix('files')->name('files.')->group(function () {

@@ -137,6 +137,7 @@
     `docker exec market-php-app php artisan make:controller Admin/System/PackageController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/EnvController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/RobotController` <br>
+    `docker exec market-php-app php artisan make:controller Admin/System/SitemapController` <br>
 
 21)  Create middleware ShareSettings <br>
      `docker exec market-php-app php artisan make:resource Admin/Setting/SettingSharedResource` <br>

@@ -427,6 +427,19 @@ const {t} = useI18n();
             {{ t('robot') }}
         </template>
     </SidebarLink>
+    <SidebarLink :href="route('admin.sitemap.index')"
+                 :active="route().current('sitemap.index')"
+                 :expanded="props.expanded">
+        <template #default>
+            <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                <circle class="fill-current text-blue-600" cx="16" cy="8" r="8"></circle>
+                <circle class="fill-current text-blue-400" cx="8" cy="16" r="8"></circle>
+            </svg>
+        </template>
+        <template #text>
+            sitemap.xml
+        </template>
+    </SidebarLink>
     <SidebarLink :href="route('admin.plugins.index')"
                  :active="route().current('plugins.index')"
                  :expanded="props.expanded">

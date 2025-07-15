@@ -32,6 +32,7 @@ const { t } = useI18n();
         <ResponsiveNavLink :href="route('admin.files.index')" :active="route().current('admin.files.index')">{{ t('archive') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.components.index')" :active="route().current('admin.components.index')">{{ t('components') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.robot.index')" :active="route().current('admin.robot.index')">{{ t('robot') }}</ResponsiveNavLink>
+        <ResponsiveNavLink :href="route('admin.sitemap.index')" :active="route().current('admin.sitemap.index')">sitemap.xml</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.diagrams.index')" :active="route().current('admin.diagrams.index')">{{ t('diagrams') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.plugins.index')" :active="route().current('admin.plugins.index')">{{ t('plugins') }}</ResponsiveNavLink>
 

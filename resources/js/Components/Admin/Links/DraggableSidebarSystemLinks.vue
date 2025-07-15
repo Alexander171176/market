@@ -54,6 +54,7 @@ const hiddenLinks = ref(JSON.parse(localStorage.getItem('hiddenLinks')) || [
     'parameters',
     'components',
     'robot',
+    'sitemap',
 ]);
 
 const showHiddenLinks = ref(false);

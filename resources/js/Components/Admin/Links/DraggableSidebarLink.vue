@@ -84,6 +84,7 @@ const linkInfo = {
     files: {label: t('archive'), route: 'admin.files.index'},
     components: {label: t('components'), route: 'admin.components.index'},
     robot: {label: t('robot'), route: 'admin.robot.index'},
+    sitemap: {label: 'sitemap.xml', route: 'admin.sitemap.index'},
     plugins: {label: t('plugins'), route: 'admin.plugins.index'},
 };
 
