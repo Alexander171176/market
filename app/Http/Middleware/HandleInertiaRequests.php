@@ -50,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             'locale' => LaravelLocalization::getCurrentLocale(),
+            'appUrl' => config('app.url'),
 
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

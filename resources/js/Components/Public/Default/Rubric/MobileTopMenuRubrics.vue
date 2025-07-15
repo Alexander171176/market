@@ -1,10 +1,10 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { ref, watch, computed, onMounted } from 'vue';
-import { usePage } from '@inertiajs/vue3';
-import { useI18n } from 'vue-i18n';
+import {ref, watch, computed, onMounted} from 'vue';
+import {usePage} from '@inertiajs/vue3';
+import {useI18n} from 'vue-i18n';
 
-const { t } = useI18n();
+const {t} = useI18n();
 const rubrics = ref([]);
 const currentLocale = computed(() => usePage().props.locale ?? 'ru'); // ✅ исправлено
 
@@ -47,26 +47,25 @@ watch(currentLocale, (newLocale, oldLocale) => {
 </script>
 
 <template>
-    <nav class="flex flex-wrap justify-center p-1">
+    <nav class="space-y-1 bg-gray-200 dark:bg-gray-700 flex flex-wrap justify-center p-1">
         <ul v-if="rubrics.length" class="flex flex-wrap">
             <li v-for="rubric in rubrics" :key="rubric.id">
                 <Link :href="`/rubrics/${rubric.url}`"
                       class="flex items-center"
                       :class="[
-                        'mx-2 pb-0.5 text-sm font-medium transition duration-300',
+                        'mx-2 pb-0.5 mb-2 text-sm font-medium transition duration-300',
                         $page.url.includes(`/rubrics/${rubric.url}`)
-                          ? 'border-b-2 border-blue-500 dark:border-blue-500 text-blue-500'
-                          : 'text-slate-900 hover:text-blue-500'
+                          ? 'border-b-2 border-blue-500 dark:border-blue-500 text-blue-700 dark:text-blue-200'
+                          : 'text-slate-900 dark:text-slate-200 hover:text-blue-500'
                       ]">
                     <span>{{ rubric.title }}</span>
                 </Link>
             </li>
-
-            <!-- 🔗 Внешняя ссылка -->
             <li>
                 <a href="https://vcg.org.kz/" target="_blank" rel="noopener noreferrer"
                    class="flex items-center mx-2 pt-1 uppercase
-                          text-xs font-semibold text-slate-900 hover:text-blue-500 transition duration-300">
+                          text-xs font-semibold text-slate-900 dark:text-slate-100
+                          hover:text-red-400 transition duration-300">
                     VCG
                 </a>
             </li>

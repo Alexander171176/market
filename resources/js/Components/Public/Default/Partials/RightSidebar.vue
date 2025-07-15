@@ -6,18 +6,22 @@ import ArticleImageSlider from "@/Components/Public/Default/Article/ArticleImage
 import BannerImageSlider from "@/Components/Public/Default/Banner/BannerImageSlider.vue";
 
 const {t} = useI18n();
-// Получаем данные из страницы, включая новый пропс rightArticles
+// Получаем данные для правой колонки из страницы, статьи, баннеры и настройки
 const {rightArticles, rightBanners, siteSettings} = usePage().props;
 
-// Используем prop rightArticles вместо вычисления через секции
+// Вычисляем статьи и баннеры
 const articles = computed(() => rightArticles || []);
 const banners = computed(() => rightBanners || []);
 
+// переменная свёртывания колонки, по умолчанию не свёрнута
 const isCollapsed = ref(false);
+
+// функция свёртывания/развёртывания
 const toggleSidebar = () => {
     isCollapsed.value = !isCollapsed.value;
 };
 
+// класс стилей правой колонки, включая для маленьких экранов
 const sidebarClasses = computed(() => {
     return [
         'transition-all',
@@ -27,13 +31,16 @@ const sidebarClasses = computed(() => {
         isCollapsed.value ? 'lg:w-8' : 'lg:w-80'
     ].join(' ');
 });
+
 // Референс для хранения состояния темной темы (true, если активен темный режим)
 const isDarkMode = ref(false);
 
-// Переменная для хранения экземпляра MutationObserver, чтобы можно было отключить наблюдение позже
+// Переменная для хранения экземпляра MutationObserver, ч
+// тобы можно было отключить наблюдение позже
 let observer;
 
-// Функция для проверки, активирован ли темный режим, путем проверки наличия класса "dark" на элементе <html>
+// Функция для проверки, активирован ли темный режим,
+// путем проверки наличия класса "dark" на элементе <html>
 const checkDarkMode = () => {
     isDarkMode.value = document.documentElement.classList.contains('dark');
     //console.log('Dark mode updated to:', isDarkMode.value);
@@ -67,6 +74,14 @@ const bgColorClass = computed(() => {
         ? siteSettings.PublicDarkBackgroundColor
         : siteSettings.PublicLightBackgroundColor;
 });
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // месяцы от 0
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+};
 </script>
 
 <template>
@@ -95,28 +110,7 @@ const bgColorClass = computed(() => {
                     <li v-for="banner in banners" :key="banner.id"
                         class="mb-2 pb-2">
 
-                        <!-- Название баннера -->
-<!--                        <template v-if="banner.link">-->
-<!--                            <Link :href="banner.link">-->
-<!--                                <div class="px-3 my-1">-->
-<!--                                    <h3 class="text-center text-lg font-semibold-->
-<!--                                        text-teal-600 dark:text-yellow-200">-->
-<!--                                        {{ banner.title }}-->
-<!--                                    </h3>-->
-<!--                                </div>-->
-<!--                            </Link>-->
-<!--                        </template>-->
-<!--                        <template v-else>-->
-<!--                            <div class="px-3 my-1">-->
-<!--                                <h3 class="text-center text-lg font-semibold-->
-<!--                                    text-teal-600 dark:text-yellow-200">-->
-<!--                                    {{ banner.title }}-->
-<!--                                </h3>-->
-<!--                            </div>-->
-<!--                        </template>-->
-
-                        <!-- Изображение баннера -->
-                        <!-- Если banner.link не пустой, оборачиваем слайдер в ссылку, иначе просто выводим слайдер -->
+                        <!-- Если изображений много то слайдер, иначе одно изображение -->
                         <div v-if="banner.images && banner.images.length > 0">
                             <template v-if="banner.link">
                                 <Link :href="banner.link">
@@ -128,47 +122,49 @@ const bgColorClass = computed(() => {
                             </template>
                         </div>
 
-                        <!-- Краткое описание статьи -->
+                        <!-- Краткое описание баннера -->
                         <p class="mt-2 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
                             {{ banner.short }}
                         </p>
 
                     </li>
+
+                    <!-- Статьи -->
                     <li v-for="article in articles" :key="article.id"
-                        class="mb-2 pb-2">
+                        class="col-span-full flex flex-col items-start mb-2 p-2
+                               overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
+                               hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">
 
-                        <!-- Изображение статьи -->
-                        <Link v-if="article.images && article.images.length > 0"
-                              :href="`/articles/${article.url}`"
-                              class="h-auto overflow-hidden">
-                            <ArticleImageSlider
-                                :images="article.images"
-                                :link="`/articles/${article.url}`"/>
-                        </Link>
-                        <Link v-else :href="`/articles/${article.url}`"
-                              class="h-auto flex items-center justify-center bg-gray-200 dark:bg-gray-400">
-                            <span class="text-gray-500 dark:text-gray-700">{{ t('noCurrentImage') }}</span>
-                        </Link>
+                        <!-- Если изображений много то слайдер, иначе одно изображение -->
+                        <div class="w-full h-auto shrink-0 overflow-hidden mb-2
+                                    rounded-md shadow-lg shadow-gray-400 dark:shadow-gray-900">
 
-                        <!-- Ссылка и дата статьи -->
-                        <div class="px-3 my-1">
-                            <div class="text-center text-xs font-semibold text-orange-500 dark:text-orange-400">
-                                {{ article.created_at.substring(0, 10) }}
-                            </div>
-                            <h3 class="text-md font-semibold text-blue-900 dark:text-white">
+                            <Link v-if="article.img" :href="`/articles/${article.url}`">
+                                <img :src="getImgSrc(article.img)" alt="Article image"
+                                     class="w-full h-auto object-cover"/>
+                            </Link>
+                            <Link v-else-if="article.images?.length" :href="`/articles/${article.url}`">
+                                <ArticleImageSlider :images="article.images" :link="`/articles/${article.url}`"/>
+                            </Link>
+                            <Link v-else :href="`/articles/${article.url}`"
+                                  class="flex items-center justify-center bg-gray-200 dark:bg-gray-400 h-32">
+                                <span class="text-slate-900 dark:text-slate-100">{{ t('noCurrentImage') }}</span>
+                            </Link>
+                        </div>
+
+                        <!-- Контент -->
+                        <div class="flex flex-col flex-grow h-24">
+                            <h3 class="text-xs font-semibold text-black dark:text-white my-1">
                                 <Link :href="`/articles/${article.url}`"
                                       class="hover:text-blue-600 dark:hover:text-blue-400">
                                     {{ article.title }}
                                 </Link>
                             </h3>
-                        </div>
 
-                        <!-- Краткое описание статьи -->
-                        <div class="flex flex-wrap items-center p-2
-                                border border-dashed border-slate-400 dark:border-slate-200">
-                            <p class="italic text-sm font-semibold text-slate-800 dark:text-slate-200">
-                                {{ article.short }}
-                            </p>
+                            <div class="text-center text-xs font-semibold
+                                        text-slate-600 dark:text-slate-400 opacity-75">
+                                {{ formatDate(article.published_at) }}
+                            </div>
                         </div>
 
                     </li>

@@ -49,13 +49,13 @@ const currentImage = computed(() => {
 <template>
     <div class="h-full">
         <!-- Если передана ссылка, оборачиваем в <Link> -->
-        <Link v-if="link" :href="link" class="block h-full p-4 border border-slate-400">
+        <Link v-if="link" :href="link" class="block h-full">
             <img
                 :src="currentImage.webp_url || currentImage.url"
                 :alt="alt || currentImage.alt"
                 :title="title || currentImage.caption"
                 class="w-full h-full object-cover shadow-md shadow-gray-600
-                       transition-transform duration-300 hover:scale-105"
+                       rounded-md transition-transform duration-300 hover:scale-105"
             />
         </Link>
         <template v-else>
@@ -63,7 +63,7 @@ const currentImage = computed(() => {
                 :src="currentImage.webp_url || currentImage.url"
                 :alt="alt || currentImage.alt"
                 :title="title || currentImage.caption"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover rounded-md"
             />
         </template>
     </div>

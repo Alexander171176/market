@@ -207,6 +207,7 @@
     `docker exec market-php-app php artisan db:seed --class=ArticleImageSeeder` <br>
     `docker exec market-php-app php artisan make:resource Admin/Article/ArticleImageResource` <br>
     `docker exec market-php-app php artisan make:migration create_article_related_table --create=article_related` <br>
+    `docker exec market-php-app php artisan make:migration add_img_column_to_articles_table` <br>
     `docker exec market-php-app php artisan migrate` <br>
 
 28) creating business logic app Comment <br>
@@ -349,8 +350,9 @@
     `docker exec -it market-php-app composer dump-autoload` <br> очистка кеша перед пересборкой
     `docker exec -it market-php-app composer install --no-cache --no-interaction --prefer-dist` <br> пересборка зависимостей composer
     `composer config --global disable-tls false` <br> включение сертификатов обратно
-____________________________
 
 42) creating business logic Backup
     `docker exec market-php-app php artisan make:controller Admin/System/DatabaseBackupController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/FileBackupController` <br>
+____________________________
+43) 

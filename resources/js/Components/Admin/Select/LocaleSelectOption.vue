@@ -23,7 +23,9 @@ const availableLocales = Object.keys(localeModules)
     })
     .filter(item => item !== null);
 
-const localesList = ref(availableLocales);
+const localesList = ref(
+    availableLocales.filter(locale => locale.code !== 'en') // ← исключаем 'en'
+);
 // console.log('availableLocales:', localesList.value);
 
 // Определяем входные параметры компонента для поддержки v-model

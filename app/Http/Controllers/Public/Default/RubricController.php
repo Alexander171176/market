@@ -7,11 +7,14 @@ use App\Http\Resources\Admin\Article\ArticleResource;
 use App\Http\Resources\Admin\Banner\BannerResource;
 use App\Http\Resources\Admin\Rubric\RubricResource;
 use App\Http\Resources\Admin\Section\SectionResource;
-use App\Models\Admin\Article\Article;
+use App\Http\Resources\Admin\Video\VideoResource;
 use App\Models\Admin\Banner\Banner;
 use App\Models\Admin\Rubric\Rubric;
-use App\Models\Admin\Setting\Setting;
+use App\Models\Admin\Video\Video;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,7 +27,7 @@ class RubricController extends Controller
      */
     public function index(): Response
     {
-        $locale = Setting::where('option', 'locale')->value('value');
+        $locale = app()->getLocale(); // ← получаем из маршрута
 
         $rubrics = Rubric::where('activity', 1)
             ->where('locale', $locale)
@@ -40,89 +43,129 @@ class RubricController extends Controller
     /**
      * Страница показа рубрики
      */
-    public function show(string $url): Response
+    public function show(Request $request, string $url): Response
     {
         $locale = app()->getLocale();
+        $cacheMinutes = 10;
+        $search = trim($request->input('search'));
+
+        $currentPageArticles = (int) $request->input('page_articles', 1);
+
+        $perPage = 4;
 
         $rubric = Rubric::with([
-            'sections' => function ($query) use ($locale) {
-                $query->where('activity', 1)
-                    ->where('locale', $locale)
-                    ->orderBy('sort', 'asc')
-                    ->with([
-                        'articles' => function ($query) use ($locale) {
-                            $query->where('activity', 1)
-                                ->where('locale', $locale)
-                                ->orderBy('sort', 'desc')
-                                ->with([
-                                    'images' => fn($query) => $query->orderBy('order', 'asc'),
-                                    'tags'
-                                ]);
-                        }
-                    ]);
-            }
-        ])
-            ->where('url', $url)
-            ->firstOrFail();
+            'sections' => fn($q) => $q
+                ->where('activity', 1)
+                ->where('locale', $locale)
+                ->orderBy('sort')
+        ])->where('url', $url)->firstOrFail();
 
-        $sectionBanners = Banner::where('activity', 1)
-            ->whereHas('sections', fn($q) => $q->where('activity', 1)->where('locale', $locale))
-            ->with([
-                'images' => fn($q) => $q->orderBy('order'),
-                'sections' => fn($q) => $q->where('activity', 1)->where('locale', $locale),
-            ])
-            ->orderBy('sort')
-            ->get();
+        $allArticles = $rubric->sections->flatMap(function ($section) use ($locale, $search) {
+            return $section->articles()
+                ->where('activity', 1)
+                ->where('locale', $locale)
+                ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
+                ->with([
+                    'images' => fn($q) => $q->orderBy('order'),
+                    'tags'
+                ])
+                ->get();
+        });
 
-        $activeArticlesCount = $rubric->sections->reduce(function ($carry, $section) {
-            return $carry + ($section->articles ? $section->articles->count() : 0);
-        }, 0);
+        $allArticles = $allArticles->sortByDesc('published_at')->values();
 
-        $leftArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
+        $paginatedArticles = new LengthAwarePaginator(
+            $allArticles->forPage($currentPageArticles, $perPage),
+            $allArticles->count(),
+            $perPage,
+            $currentPageArticles,
+            [
+                'path' => request()->url(),
+                'pageName' => 'page_articles',
+                'query' => request()->query(),
+            ]
+        );
 
-        $mainArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('main', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
+        $leftArticles = $allArticles->where('left', true)->take(3)->values();
+        $mainArticles = $allArticles->where('main', true)->take(3)->values();
+        $rightArticles = $allArticles->where('right', true)->take(3)->values();
 
-        $rightArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
-
-        $leftBanners = Banner::where('activity', 1)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+        $leftBanners = Cache::remember("banners:left", $cacheMinutes, fn() =>
+        Banner::where('activity', 1)->where('left', true)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
+            ->orderBy('sort')->get()
+        );
 
-        $rightBanners = Banner::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
+        $rightBanners = Cache::remember("banners:right", $cacheMinutes, fn() =>
+        Banner::where('activity', 1)->where('right', true)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
+            ->orderBy('sort')->get()
+        );
 
+        $sectionBanners = Cache::remember("banners:sections:{$locale}", $cacheMinutes, function () use ($locale) {
+            return Banner::where('activity', 1)
+                ->whereHas('sections', fn($q) => $q->where('activity', 1)->where('locale', $locale))
+                ->with([
+                    'images' => fn($q) => $q->orderBy('order'),
+                    'sections' => fn($q) => $q->where('activity', 1)->where('locale', $locale),
+                ])
+                ->orderBy('sort')
+                ->get();
+        });
+
+        $videos = Cache::remember("videos:all", $cacheMinutes, fn() =>
+        Video::where('activity', 1)
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->orderBy('published_at', 'desc')
+            ->get()
+        );
+
+        $activeArticlesCount = $allArticles->count();
 
         return Inertia::render('Public/Default/Rubrics/Show', [
             'rubric' => new RubricResource($rubric),
             'sections' => SectionResource::collection($rubric->sections),
             'sectionBanners' => BannerResource::collection($sectionBanners),
             'sectionsCount' => $rubric->sections->count(),
+            'articles' => ArticleResource::collection($paginatedArticles),
+            'pagination' => [
+                'currentPage' => $paginatedArticles->currentPage(),
+                'lastPage' => $paginatedArticles->lastPage(),
+                'perPage' => $paginatedArticles->perPage(),
+                'total' => $paginatedArticles->total(),
+            ],
+            'videos' => VideoResource::collection($videos),
+            'locale' => $locale,
             'activeArticlesCount' => $activeArticlesCount,
+            'filters' => [
+                'search' => $search,
+            ],
             'leftArticles' => ArticleResource::collection($leftArticles),
             'mainArticles' => ArticleResource::collection($mainArticles),
             'rightArticles' => ArticleResource::collection($rightArticles),
             'leftBanners' => BannerResource::collection($leftBanners),
             'rightBanners' => BannerResource::collection($rightBanners),
+        ]);
+    }
+
+    /**
+     * Возвращает список активных рубрик в зависимости от выбранного языка.
+     *
+     * @return JsonResponse
+     */
+    public function menuRubrics(): JsonResponse
+    {
+        $locale = app()->getLocale(); // ← получаем из маршрута
+
+        $rubrics = Rubric::where('activity', 1)
+            ->where('locale', $locale)
+            ->orderBy('sort')
+            ->get(['id', 'title', 'url', 'locale']);
+
+        return response()->json([
+            'locale' => $locale,
+            'rubrics' => $rubrics,
+            'rubricsCount' => $rubrics->count(),
         ]);
     }
 

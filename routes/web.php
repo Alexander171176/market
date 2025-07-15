@@ -116,6 +116,10 @@ Route::group([
     // Публичная часть сайта
     Route::middleware([CheckDowntime::class])->group(function () use ($siteLayout) {
 
+        // Публичное API: меню рубрик, зависит от текущего шаблона
+        Route::get('/api/menu-rubrics', [\App\Http\Controllers\Public\Default\RubricController::class,
+            'menuRubrics'])->name('api.rubrics.menu');
+
         Route::get('/', fn() => Inertia::render('Public/' . $siteLayout . '/Index'))->name('home'); // Добавим имя
 
         $publicRubricController = "App\\Http\\Controllers\\Public\\{$siteLayout}\\RubricController";

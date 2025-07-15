@@ -10,11 +10,8 @@ export default function useLanguageSwitcher() {
         if (newLocale !== locale.value) {
             locale.value = newLocale;
 
-            const segments = window.location.pathname.split('/');
-            segments[1] = newLocale;
-            const newPath = segments.join('/') + window.location.search;
-
-            Inertia.visit(newPath, {
+            // Редирект на главную страницу с новой локалью
+            Inertia.visit(`/${newLocale}`, {
                 preserveState: false,
                 preserveScroll: true,
             });

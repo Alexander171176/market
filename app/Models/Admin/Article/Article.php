@@ -42,6 +42,7 @@ class Article extends Model
         'locale',
         'title',
         'url',
+        'img',
         'short',
         'description',
         'author',
