@@ -86,11 +86,11 @@ const formatDate = (dateString) => {
 
 <template>
     <aside v-if="articles.length > 0" :class="[sidebarClasses, bgColorClass]">
-        <div class="flex items-center justify-center">
-            <h2 v-if="!isCollapsed"
-                class="w-full text-center text-xl font-semibold text-gray-900 dark:text-slate-100">
-                {{ t('latestNews') }}
-            </h2>
+        <div class="flex items-center justify-end">
+<!--            <h2 v-if="!isCollapsed"-->
+<!--                class="w-full text-center text-xl font-semibold text-gray-900 dark:text-slate-100">-->
+<!--                {{ t('latestNews') }}-->
+<!--            </h2>-->
             <button @click="toggleSidebar" class="focus:outline-none" :title="t('toggleSidebar')">
                 <svg v-if="isCollapsed"
                      class="w-6 h-6 text-rose-500 dark:text-rose-400" viewBox="0 0 24 24" fill="currentColor">
@@ -104,11 +104,11 @@ const formatDate = (dateString) => {
         </div>
 
         <!-- Содержимое сайдбара показывается, когда он развернут -->
-        <div v-show="!isCollapsed" class="mt-4">
+        <div v-show="!isCollapsed" class="mt-1">
             <div class="flex flex-col items-center justify-center">
                 <ul class="max-w-xl">
                     <li v-for="banner in banners" :key="banner.id"
-                        class="mb-2 pb-2">
+                        class="mb-3 pb-2">
 
                         <!-- Если изображений много то слайдер, иначе одно изображение -->
                         <div v-if="banner.images && banner.images.length > 0">
@@ -122,16 +122,38 @@ const formatDate = (dateString) => {
                             </template>
                         </div>
 
-                        <!-- Краткое описание баннера -->
-                        <p class="mt-2 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
-                            {{ banner.short }}
-                        </p>
+                        <!-- Ссылка Баннера, иначе просто заголовок -->
+                        <div v-if="banner.title">
+                            <template v-if="banner.link">
+                                <Link :href="banner.link">
+                                    <div class="mt-3">
+                                        <h3 class="px-3 py-1 text-center text-xs font-semibold
+                                               text-black dark:text-white
+                                               hover:text-blue-600 dark:hover:text-blue-400
+                                               border border-dashed
+                                               border-gray-400 dark:border-gray-200">
+                                            {{ banner.title }}
+                                        </h3>
+                                    </div>
+                                </Link>
+                            </template>
+                            <template v-else>
+                                <div class="mt-3">
+                                    <h3 class="px-3 py-1 text-center text-xs font-semibold
+                                               text-black dark:text-white
+                                               border border-dashed
+                                               border-gray-400 dark:border-gray-200">
+                                        {{ banner.title }}
+                                    </h3>
+                                </div>
+                            </template>
+                        </div>
 
                     </li>
 
                     <!-- Статьи -->
                     <li v-for="article in articles" :key="article.id"
-                        class="col-span-full flex flex-col items-start mb-2 p-2
+                        class="col-span-full flex flex-col items-start mb-3 p-2
                                overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
                                hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">
 
@@ -153,7 +175,7 @@ const formatDate = (dateString) => {
                         </div>
 
                         <!-- Контент -->
-                        <div class="flex flex-col flex-grow h-24">
+                        <div class="flex flex-col flex-grow h-auto">
                             <h3 class="text-xs font-semibold text-black dark:text-white my-1">
                                 <Link :href="`/articles/${article.url}`"
                                       class="hover:text-blue-600 dark:hover:text-blue-400">

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import {Link, router, usePage} from '@inertiajs/vue3';
 import {useI18n} from 'vue-i18n';
 import ArticleImageSlider from "@/Components/Public/Default/Article/ArticleImageSlider.vue";
@@ -15,10 +15,18 @@ const getImgSrc = (imgPath) => {
 };
 
 const props = defineProps({
-    articles: Array,
-    pagination: Object,
-    baseUrl: String,
-    search: String,
+    // Может прийти либо массив, либо объект с ключом data
+    articles: { type: [Array, Object], required: true, },
+    pagination: { type: Object, default: () => ({}), },
+    baseUrl: { type: String, required: true, },
+    search: { type: String, default: '', },
+});
+
+// Приводим к массиву
+const items = computed(() => {
+    if (Array.isArray(props.articles)) return props.articles
+    if (props.articles && Array.isArray(props.articles.data)) return props.articles.data
+    return []
 });
 
 const searchQuery = ref(props.search || '');
@@ -166,7 +174,7 @@ onBeforeUnmount(() => {
         <div v-if="viewMode === 'grid'"
              class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-            <div v-for="article in articles" :key="article.id"
+            <div v-for="article in items" :key="article.id"
                  class="p-2 rounded-sm shadow-sm
                         overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
                         hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">
@@ -175,18 +183,18 @@ onBeforeUnmount(() => {
                 <div class="overflow-hidden h-auto mb-2 rounded-md
                             shadow-lg shadow-gray-400 dark:shadow-gray-900">
 
-                <Link v-if="article.img" :href="`/articles/${article.url}`">
-                    <img :src="getImgSrc(article.img)" alt="Article image"
-                         class="w-full h-auto object-cover"/>
-                </Link>
-                <Link v-else-if="article.images?.length" :href="`/articles/${article.url}`">
-                    <ArticleImageSlider :images="article.images" :link="`/articles/${article.url}`"/>
-                </Link>
-                <Link v-else :href="`/articles/${article.url}`"
-                      class="flex items-center justify-center bg-gray-200 dark:bg-gray-400 h-32">
-                    <span class="text-gray-500 dark:text-gray-700">{{ t('noCurrentImage') }}</span>
-                </Link>
-            </div>
+                    <Link v-if="article.img" :href="`/articles/${article.url}`">
+                        <img :src="getImgSrc(article.img)" alt="Article image"
+                             class="w-full h-auto object-cover"/>
+                    </Link>
+                    <Link v-else-if="article.images?.length" :href="`/articles/${article.url}`">
+                        <ArticleImageSlider :images="article.images" :link="`/articles/${article.url}`"/>
+                    </Link>
+                    <Link v-else :href="`/articles/${article.url}`"
+                          class="flex items-center justify-center bg-gray-200 dark:bg-gray-400 h-32">
+                        <span class="text-gray-500 dark:text-gray-700">{{ t('noCurrentImage') }}</span>
+                    </Link>
+                </div>
 
                 <!-- Контент -->
                 <div class="flex flex-col">
@@ -214,7 +222,7 @@ onBeforeUnmount(() => {
         <!-- Horizontal отображение -->
         <div v-else class="space-y-4">
 
-            <div v-for="article in articles" :key="article.id"
+            <div v-for="article in items" :key="article.id"
                  class="col-span-full flex flex-col sm:flex-row items-start space-x-3 p-2
                         overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
                         hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">

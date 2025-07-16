@@ -1,8 +1,6 @@
 <script setup>
 import {defineProps} from 'vue'
 import {Head, Link, useForm} from '@inertiajs/vue3'
-import ImageAuthentication from "@/Components/User/Image/ImageAuthentication.vue"
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue'
 import HeadingAuth from '@/Components/User/Heading/HeadingAuth.vue'
 import Checkbox from '@/Components/Checkbox.vue'
 import InputError from '@/Components/InputError.vue'
@@ -11,6 +9,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue'
 import {useI18n} from 'vue-i18n'
 import TextInput from "@/Components/TextInput.vue";
 import DefaultLayout from "@/Layouts/DefaultLayout.vue";
+import CustomImageAuthentication from "@/Components/User/Image/CustomImageAuthentication.vue";
 
 defineProps({
     canResetPassword: Boolean,
@@ -34,135 +33,115 @@ const submit = () => {
         })
 }
 
-const {t} = useI18n();
+const { t } = useI18n();
 </script>
 
 <template>
     <DefaultLayout>
-        <Head :title="t('loginTitle')"/>
+        <Head :title="t('loginTitle')" />
 
-        <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen w-full
-                    bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-slate-900
-                    selection:bg-red-500 selection:text-white">
-
-            <div class="flex flex-row flex-wrap w-full">
-
-                <!-- Content -->
-                <div class="w-full md:w-1/2">
-                    <div class="min-h-screen h-full flex flex-col justify-center items-center">
-
-                        <div v-if="status" class="w-full mb-4 font-medium text-md text-green-600">
-                            {{ status }}
-                        </div>
-
-                        <div class="flex flex-col justify-center items-center max-w-sm mx-auto px-4 py-8">
-
-                            <div class="mb-4 flex flex-col justify-center items-center">
-                                <!-- Logo -->
-                                <AuthenticationCardLogo/>
-                            </div>
-
-                            <div>
-
-                                <!-- Heading -->
-                                <HeadingAuth>{{ t('loginUser') }}</HeadingAuth>
-
-                                <!-- Form -->
-                                <form @submit.prevent="submit">
-                                    <div>
-                                        <InputLabel for="email" :value="t('email')"/>
-                                        <TextInput
-                                            id="email"
-                                            v-model="form.email"
-                                            type="email"
-                                            class="mt-1 block w-full"
-                                            required
-                                            autofocus
-                                            autocomplete="username"
-                                        />
-                                        <InputError class="mt-2" :message="form.errors.email"/>
-                                    </div>
-
-                                    <div class="mt-4">
-                                        <InputLabel for="password" :value="t('password')"/>
-                                        <TextInput
-                                            id="password"
-                                            v-model="form.password"
-                                            type="password"
-                                            class="mt-1 block w-full"
-                                            required
-                                            autocomplete="current-password"
-                                        />
-                                        <InputError class="mt-2" :message="form.errors.password"/>
-                                    </div>
-
-                                    <div class="block mt-4">
-                                        <label class="flex items-center">
-                                            <Checkbox v-model:checked="form.remember" name="remember"/>
-                                            <span class="ms-2 text-md text-gray-600 dark:text-gray-200">
-                                                {{ t('rememberMe') }}
-                                            </span>
-                                        </label>
-                                    </div>
-
-                                    <div class="flex items-center justify-end mt-4">
-                                        <Link
-                                            v-if="canResetPassword"
-                                            :href="route('password.request')"
-                                            class="border-b-[2px] text-lg text-sky-600 hover:text-sky-900"
-                                        >
-                                            {{ t('forgotPassword') }}
-                                        </Link>
-
-                                        <PrimaryButton
-                                            class="ms-4"
-                                            :class="{ 'opacity-25': form.processing }"
-                                            :disabled="form.processing"
-                                        >
-                                            {{ t('login') }}
-                                        </PrimaryButton>
-                                    </div>
-                                </form>
-
-                                <!-- Footer -->
-                                <div class="pt-5 mt-6 border-t border-slate-200">
-                                    <div class="text-center text-lg text-slate-700 dark:text-slate-100">
-                                        {{ t('registerPrompt') }}
-
-                                        <Link
-                                            :href="route('register')"
-                                            class="border-b-[2px] text-lg text-sky-600 hover:text-sky-900"
-                                        >
-                                            {{ t('register') }}
-                                        </Link>
-                                    </div>
-                                    <!-- Warning -->
-                                    <div class="mt-5">
-                                        <div class="bg-amber-100 text-amber-600 px-3 py-2 rounded">
-                                            <svg class="inline w-3 h-3 shrink-0 fill-current mr-2" viewBox="0 0 12 12">
-                                                <path
-                                                    d="M10.28 1.28L3.989 7.575 1.695 5.28A1 1 0 00.28 6.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 1.28z"/>
-                                            </svg>
-                                            <span class="text-sm">
-                                            {{ t('loginWarning') }}
-                                        </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- Image -->
-                <ImageAuthentication/>
-
+        <div class="relative w-full h-screen overflow-hidden bg-slate-900 text-white">
+            <!-- Анимированный фон с параллаксом -->
+            <div class="absolute top-0 left-0 w-full h-full z-0 animate-parallax">
+                <CustomImageAuthentication />
             </div>
 
+            <!-- Центрированный блок формы -->
+            <div class="relative z-10 flex items-center justify-center h-full px-4">
+                <div class="w-full max-w-sm bg-slate-700/80 px-8 py-4
+                            rounded-lg shadow-lg text-slate-900 dark:text-white">
+
+                    <div v-if="status" class="mb-4 text-green-600 font-medium text-md">
+                        {{ status }}
+                    </div>
+
+                    <!-- Заголовок -->
+                    <HeadingAuth>{{ t('loginUser') }}</HeadingAuth>
+
+                    <!-- Форма -->
+                    <form @submit.prevent="submit">
+                        <div>
+                            <InputLabel for="email" :value="t('email')" />
+                            <TextInput
+                                id="email"
+                                v-model="form.email"
+                                type="email"
+                                class="mt-1 block w-full"
+                                required
+                                autofocus
+                                autocomplete="username"
+                            />
+                            <InputError class="mt-2" :message="form.errors.email" />
+                        </div>
+
+                        <div class="mt-2">
+                            <InputLabel for="password" :value="t('password')" />
+                            <TextInput
+                                id="password"
+                                v-model="form.password"
+                                type="password"
+                                class="mt-1 block w-full"
+                                required
+                                autocomplete="current-password"
+                            />
+                            <InputError class="mt-2" :message="form.errors.password" />
+                        </div>
+
+                        <div class="block mt-2">
+                            <label class="flex items-center">
+                                <Checkbox v-model:checked="form.remember" name="remember" />
+                                <span class="ml-2 text-md text-gray-100">{{ t('rememberMe') }}</span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-2">
+                            <Link
+                                v-if="canResetPassword"
+                                :href="route('password.request')"
+                                class="text-sky-200 hover:underline text-sm"
+                            >
+                                {{ t('forgotPassword') }}
+                            </Link>
+
+                            <PrimaryButton
+                                :class="{ 'opacity-25': form.processing }"
+                                :disabled="form.processing"
+                            >
+                                {{ t('login') }}
+                            </PrimaryButton>
+                        </div>
+                    </form>
+
+                    <!-- Подвал -->
+                    <div class="pt-2 mt-2 border-t border-white/20 text-center">
+                        <p class="text-sm text-white">
+                            {{ t('registerPrompt') }}
+                            <Link :href="route('register')" class="text-sky-200 hover:underline ml-1">
+                                {{ t('register') }}
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </DefaultLayout>
 </template>
+
+<style scoped>
+@keyframes parallax {
+    0% {
+        transform: scale(1.05) translateY(0);
+    }
+    50% {
+        transform: scale(1.1) translateY(-10px);
+    }
+    100% {
+        transform: scale(1.05) translateY(0);
+    }
+}
+
+.animate-parallax {
+    animation: parallax 20s ease-in-out infinite;
+}
+</style>

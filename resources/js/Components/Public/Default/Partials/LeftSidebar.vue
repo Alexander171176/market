@@ -1,26 +1,26 @@
 <script setup>
-import {ref, computed, onMounted, onUnmounted} from 'vue';
-import {usePage, Link} from '@inertiajs/vue3';
-import {useI18n} from 'vue-i18n';
-import ArticleImageSlider from "@/Components/Public/Default/Article/ArticleImageSlider.vue";
-import BannerImageSlider from "@/Components/Public/Default/Banner/BannerImageSlider.vue";
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { usePage, Link } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n'
+import ArticleImageSlider from '@/Components/Public/Default/Article/ArticleImageSlider.vue'
+import BannerImageSlider from '@/Components/Public/Default/Banner/BannerImageSlider.vue'
 
-const {t} = useI18n();
+const { t } = useI18n()
 
 // Получаем данные для левой колонки из страницы, статьи, баннеры и настройки
-const {leftArticles, leftBanners, siteSettings} = usePage().props;
+const { leftArticles, leftBanners, siteSettings } = usePage().props
 
 // Вычисляем статьи и баннеры
-const articles = computed(() => leftArticles || []);
-const banners = computed(() => leftBanners || []);
+const articles = computed(() => leftArticles || [])
+const banners = computed(() => leftBanners || [])
 
 // переменная свёртывания колонки, по умолчанию не свёрнута
-const isCollapsed = ref(false);
+const isCollapsed = ref(false)
 
 // функция свёртывания/развёртывания
 const toggleSidebar = () => {
-    isCollapsed.value = !isCollapsed.value;
-};
+    isCollapsed.value = !isCollapsed.value
+}
 
 // класс стилей левой колонки, включая для маленьких экранов
 const sidebarClasses = computed(() => {
@@ -30,42 +30,42 @@ const sidebarClasses = computed(() => {
         'p-2',
         'w-full', // на маленьких экранах всегда full width
         isCollapsed.value ? 'lg:w-8' : 'lg:w-80'
-    ].join(' ');
-});
+    ].join(' ')
+})
 
 // Референс для хранения состояния темной темы (true, если активен темный режим)
-const isDarkMode = ref(false);
+const isDarkMode = ref(false)
 
 // Переменная для хранения экземпляра MutationObserver,
 // чтобы можно было отключить наблюдение позже
-let observer;
+let observer
 
 // Функция для проверки, активирован ли темный режим,
 // путем проверки наличия класса "dark" на элементе <html>
 const checkDarkMode = () => {
-    isDarkMode.value = document.documentElement.classList.contains('dark');
+    isDarkMode.value = document.documentElement.classList.contains('dark')
     //console.log('Dark mode updated to:', isDarkMode.value);
-};
+}
 
 onMounted(() => {
     // Выполняем первоначальную проверку при монтировании компонента
-    checkDarkMode();
+    checkDarkMode()
 
     // Настраиваем MutationObserver для отслеживания изменений в атрибуте class у <html>
     // Это необходимо для того, чтобы реагировать на динамические изменения темы
-    observer = new MutationObserver(checkDarkMode);
+    observer = new MutationObserver(checkDarkMode)
     observer.observe(document.documentElement, {
         attributes: true,           // Следим за изменениями атрибутов
         attributeFilter: ['class']  // Фильтруем только по изменению класса
-    });
-});
+    })
+})
 
 onUnmounted(() => {
     // При размонтировании компонента отключаем наблюдатель, чтобы избежать утечек памяти
     if (observer) {
-        observer.disconnect();
+        observer.disconnect()
     }
-});
+})
 
 // Вычисляемое свойство, которое возвращает нужный класс для фона в зависимости от текущего режима
 // Если темный режим активен, возвращается значение из настройки для темного режима,
@@ -73,16 +73,16 @@ onUnmounted(() => {
 const bgColorClass = computed(() => {
     return isDarkMode.value
         ? siteSettings.PublicDarkBackgroundColor
-        : siteSettings.PublicLightBackgroundColor;
-});
+        : siteSettings.PublicLightBackgroundColor
+})
 
 const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // месяцы от 0
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-};
+    const date = new Date(dateString)
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0') // месяцы от 0
+    const year = date.getFullYear()
+    return `${day}.${month}.${year}`
+}
 </script>
 
 <template>
@@ -91,25 +91,25 @@ const formatDate = (dateString) => {
             <button @click="toggleSidebar" class="focus:outline-none" :title="t('toggleSidebar')">
                 <svg v-if="isCollapsed"
                      class="w-6 h-6 text-rose-500 dark:text-rose-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
+                    <path d="M8 5v14l11-7z" />
                 </svg>
                 <svg v-else
                      class="w-6 h-6 text-rose-500 dark:text-rose-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16 5v14l-11-7z"/>
+                    <path d="M16 5v14l-11-7z" />
                 </svg>
             </button>
-            <h2 v-if="!isCollapsed"
-                class="w-full text-center text-xl font-semibold text-gray-900 dark:text-slate-100">
-                {{ t('latestNews') }}
-            </h2>
+<!--            <h2 v-if="!isCollapsed"-->
+<!--                class="w-full text-center text-xl font-semibold text-gray-900 dark:text-slate-100">-->
+<!--                {{ t('latestNews') }}-->
+<!--            </h2>-->
         </div>
 
         <!-- Содержимое сайдбара показывается, когда он развернут -->
-        <div v-show="!isCollapsed" class="mt-4">
+        <div v-show="!isCollapsed" class="mt-1">
             <div class="flex flex-col items-center justify-center">
                 <ul class="max-w-3xl">
                     <li v-for="article in articles" :key="article.id"
-                        class="col-span-full flex flex-col items-start mb-2 p-2
+                        class="col-span-full flex flex-col items-start mb-3 p-2
                                overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
                                hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">
 
@@ -119,10 +119,10 @@ const formatDate = (dateString) => {
 
                             <Link v-if="article.img" :href="`/articles/${article.url}`">
                                 <img :src="getImgSrc(article.img)" alt="Article image"
-                                     class="w-full h-auto object-cover"/>
+                                     class="w-full h-auto object-cover" />
                             </Link>
                             <Link v-else-if="article.images?.length" :href="`/articles/${article.url}`">
-                                <ArticleImageSlider :images="article.images" :link="`/articles/${article.url}`"/>
+                                <ArticleImageSlider :images="article.images" :link="`/articles/${article.url}`" />
                             </Link>
                             <Link v-else :href="`/articles/${article.url}`"
                                   class="flex items-center justify-center bg-gray-200 dark:bg-gray-400 h-32">
@@ -131,7 +131,7 @@ const formatDate = (dateString) => {
                         </div>
 
                         <!-- Контент -->
-                        <div class="flex flex-col flex-grow h-24">
+                        <div class="flex flex-col flex-grow h-auto">
                             <h3 class="text-xs font-semibold text-black dark:text-white my-1">
                                 <Link :href="`/articles/${article.url}`"
                                       class="hover:text-blue-600 dark:hover:text-blue-400">
@@ -147,27 +147,7 @@ const formatDate = (dateString) => {
 
                     </li>
                     <li v-for="banner in banners" :key="banner.id"
-                        class="mb-2 pb-2">
-
-                        <!-- Ссылка Баннера, иначе просто заголовок -->
-                        <template v-if="banner.link">
-                            <Link :href="banner.link">
-                                <div class="px-3 my-1">
-                                    <h3 class="text-center text-lg font-semibold
-                                        text-teal-600 dark:text-yellow-200">
-                                        {{ banner.title }}
-                                    </h3>
-                                </div>
-                            </Link>
-                        </template>
-                        <template v-else>
-                            <div class="px-3 my-1">
-                                <h3 class="text-center text-lg font-semibold
-                                    text-teal-600 dark:text-yellow-200">
-                                    {{ banner.title }}
-                                </h3>
-                            </div>
-                        </template>
+                        class="mb-3 pb-2">
 
                         <!-- если изображений много то один слайдер, иначе другой слайдер -->
                         <div v-if="banner.images && banner.images.length > 0">
@@ -178,6 +158,33 @@ const formatDate = (dateString) => {
                             </template>
                             <template v-else>
                                 <BannerImageSlider :images="banner.images" />
+                            </template>
+                        </div>
+
+                        <!-- Ссылка Баннера, иначе просто заголовок -->
+                        <div v-if="banner.title">
+                            <template v-if="banner.link">
+                                <Link :href="banner.link">
+                                    <div class="mt-3">
+                                        <h3 class="px-3 py-1 text-center text-xs font-semibold
+                                               text-black dark:text-white
+                                               hover:text-blue-600 dark:hover:text-blue-400
+                                               border border-dashed
+                                               border-gray-400 dark:border-gray-200">
+                                            {{ banner.title }}
+                                        </h3>
+                                    </div>
+                                </Link>
+                            </template>
+                            <template v-else>
+                                <div class="mt-3">
+                                    <h3 class="px-3 py-1 text-center text-xs font-semibold
+                                               text-black dark:text-white
+                                               border border-dashed
+                                               border-gray-400 dark:border-gray-200">
+                                        {{ banner.title }}
+                                    </h3>
+                                </div>
                             </template>
                         </div>
 

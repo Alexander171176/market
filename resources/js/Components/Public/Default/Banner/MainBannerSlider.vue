@@ -43,19 +43,44 @@ onBeforeUnmount(stopSlider);
             @mouseleave="isHovered = false"
         >
             <div v-for="(banner, index) in banners" :key="banner.id">
-                <Link
-                    v-show="currentIndex === index"
-                    :href="banner.link || '#'"
-                    class="block w-full transition-opacity duration-700"
-                >
+                <div v-show="currentIndex === index"
+                     class="w-full transition-opacity duration-700">
+
+                    <!-- Есть ссылка -->
+                    <Link
+                        v-if="banner.link"
+                        :href="banner.link"
+                        class="block w-full"
+                    >
+                        <img
+                            :src="banner.images?.[0]?.webp_url || banner.images?.[0]?.url || '/images/no-image.svg'"
+                            :alt="banner.title || ''"
+                            :title="banner.title || ''"
+                            class="w-full h-auto object-contain mx-auto
+                                   transition-transform duration-500"
+                        />
+                    </Link>
+
+                    <!-- Нет ссылки, но есть изображение -->
                     <img
+                        v-else-if="banner.images?.[0]?.webp_url || banner.images?.[0]?.url"
                         :src="banner.images?.[0]?.webp_url || banner.images?.[0]?.url"
                         :alt="banner.title || ''"
                         :title="banner.title || ''"
-                        class="w-full h-auto object-contain mx-auto transition-transform duration-500
-                               rounded-2xl"
+                        class="w-full h-auto object-contain mx-auto
+                               transition-transform duration-500"
                     />
-                </Link>
+
+                    <!-- Нет изображения → заглушка -->
+                    <img
+                        v-else
+                        src="/banner_images/default-image.png"
+                        alt="Нет изображения"
+                        class="w-full h-auto object-contain mx-auto opacity-50
+                               transition-transform duration-500"
+                    />
+
+                </div>
             </div>
         </div>
     </div>

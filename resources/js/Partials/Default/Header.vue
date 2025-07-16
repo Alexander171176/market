@@ -202,21 +202,21 @@ const onClickOutside = (e) => {
 
     <!-- Навигационная панель (используем ref и вычисляемый класс) -->
     <nav ref="mainNavRef" :class="[navClasses, headerBgColorClass]"
-         class="pt-1 border-t border-b border-dashed border-slate-100 dark:border-slate-100
+         class="border-t border-b border-dashed border-slate-100 dark:border-slate-100
                 relative z-10 transition-all duration-300 ease-in-out">
 
         <div class="max-w-12xl mx-auto px-4 sm:px-3 md:px-2 xl:px-6">
             <div class="flex items-center justify-between h-8">
 
                 <Link :href="route('home')" :title="t('home')"
-                      class="flex items-center border-r border-slate-400 px-4 h-8
+                      class="flex items-center border-r border-slate-400 px-4 h-6
                              text-md font-semibold
                              text-slate-50 hover:text-blue-500
                              dark:text-slate-50 dark:hover:text-blue-500
                              focus:outline focus:outline-2 focus:rounded-sm
                              focus:outline-blue dark:focus:outline-blue-500">
                     <!-- Логотип -->
-                    <ApplicationMark class="block h-6 w-auto mr-2"/>
+                    <ApplicationMark class="block h-5 w-auto mr-2"/>
                     VCG
                 </Link>
 
@@ -224,7 +224,7 @@ const onClickOutside = (e) => {
 
                     <LocaleSelectOption v-model="selectedLocale" class="mr-1" />
 
-                    <div v-if="canLogin" class="relative flex items-center mr-0">
+                    <div v-if="canLogin" class="relative flex items-center mr-0.5">
 
                         <!-- Иконка профиля -->
                         <button @click="showUserModal = !showUserModal"

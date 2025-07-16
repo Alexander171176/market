@@ -14,7 +14,6 @@ use App\Models\Admin\Video\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,11 +45,8 @@ class RubricController extends Controller
     public function show(Request $request, string $url): Response
     {
         $locale = app()->getLocale();
-        $cacheMinutes = 10;
         $search = trim($request->input('search'));
-
         $currentPageArticles = (int) $request->input('page_articles', 1);
-
         $perPage = 4;
 
         $rubric = Rubric::with([
@@ -90,35 +86,29 @@ class RubricController extends Controller
         $mainArticles = $allArticles->where('main', true)->take(3)->values();
         $rightArticles = $allArticles->where('right', true)->take(3)->values();
 
-        $leftBanners = Cache::remember("banners:left", $cacheMinutes, fn() =>
-        Banner::where('activity', 1)->where('left', true)
+        $leftBanners = Banner::where('activity', 1)->where('left', true)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')->get()
-        );
+            ->orderBy('sort')
+            ->get();
 
-        $rightBanners = Cache::remember("banners:right", $cacheMinutes, fn() =>
-        Banner::where('activity', 1)->where('right', true)
+        $rightBanners = Banner::where('activity', 1)->where('right', true)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')->get()
-        );
+            ->orderBy('sort')
+            ->get();
 
-        $sectionBanners = Cache::remember("banners:sections:{$locale}", $cacheMinutes, function () use ($locale) {
-            return Banner::where('activity', 1)
-                ->whereHas('sections', fn($q) => $q->where('activity', 1)->where('locale', $locale))
-                ->with([
-                    'images' => fn($q) => $q->orderBy('order'),
-                    'sections' => fn($q) => $q->where('activity', 1)->where('locale', $locale),
-                ])
-                ->orderBy('sort')
-                ->get();
-        });
+        $sectionBanners = Banner::where('activity', 1)
+            ->whereHas('sections', fn($q) => $q->where('activity', 1)->where('locale', $locale))
+            ->with([
+                'images' => fn($q) => $q->orderBy('order'),
+                'sections' => fn($q) => $q->where('activity', 1)->where('locale', $locale),
+            ])
+            ->orderBy('sort')
+            ->get();
 
-        $videos = Cache::remember("videos:all", $cacheMinutes, fn() =>
-        Video::where('activity', 1)
+        $videos = Video::where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
             ->orderBy('published_at', 'desc')
-            ->get()
-        );
+            ->get();
 
         $activeArticlesCount = $allArticles->count();
 
