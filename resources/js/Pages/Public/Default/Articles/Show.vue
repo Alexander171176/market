@@ -55,6 +55,14 @@ const bgColorClass = computed(() => {
         ? siteSettings.PublicDarkBackgroundColor
         : siteSettings.PublicLightBackgroundColor
 })
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+};
 </script>
 
 <template>
@@ -117,11 +125,11 @@ const bgColorClass = computed(() => {
             <header>
                 <!-- Дата публикации, форматируем по необходимости -->
                 <time itemprop="datePublished"
-                      datetime="{{ article.published_at.substring(0, 10) }}"
+                      :datetime="formatDate(article.published_at)"
                       class="mt-2 flex items-center justify-center
                                  text-xs font-semibold text-center
                                  text-slate-600 dark:text-slate-400 opacity-75">
-                    {{ article.published_at.substring(0, 10) }}
+                    {{ t('publishedAt') }}: {{ formatDate(article.published_at) }}
                 </time>
                 <div class="flex flex-row items-center justify-center my-1">
                     <h1 itemprop="headline"

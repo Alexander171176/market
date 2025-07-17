@@ -544,6 +544,7 @@ export default {
     videoCode: 'HTML коды',
     videoCodeInsert: 'Бейне кодын қойыңыз',
     videoLinkInsert: 'Бейне сілтемесін қойыңыз (YouTube немесе Vimeo)',
+    videoNotSupported: 'Бейнеге қолдау көрсетілмейді',
     videoUrl: 'Бейне URL',
     videos: 'Бейне',
     view: 'Қарау',

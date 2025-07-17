@@ -544,6 +544,7 @@ export default {
     videoCode: 'HTML Code',
     videoCodeInsert: 'Insert the video code',
     videoLinkInsert: 'Insert a link to the video (YouTube or Vimeo)',
+    videoNotSupported: 'Video is not supported',
     videoUrl: 'Video URL',
     videos: 'Videos',
     view: 'View',

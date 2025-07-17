@@ -23,6 +23,7 @@ class TagController extends Controller
      * Страница показа статей по тегу.
      *
      * @param string $slug
+     * @param Request $request
      * @return Response
      */
     public function show(string $slug, Request $request): Response
