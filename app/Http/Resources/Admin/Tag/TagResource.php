@@ -21,6 +21,7 @@ class TagResource extends JsonResource
             'id'            => $this->id,
             'sort'          => $this->sort,     // <--- ДОБАВЛЕНО (integer)
             'activity'      => $this->activity, // <--- ДОБАВЛЕНО (boolean)
+            'icon'          => $this->icon,
             'locale'        => $this->locale,
             'name'          => $this->name,
             'slug'          => $this->slug,

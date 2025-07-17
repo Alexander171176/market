@@ -18,6 +18,9 @@ return [
     'short.max' => 'The short description must not exceed :max characters.',
     'description.string' => 'The description must be a string.',
 
+    'icon.string' => 'The icon must be a string.',
+    'icon.max' => 'The icon content is too long.', // Fixed
+
     'meta_title.max' => 'Meta header must not exceed :max characters.',
     'meta_keywords.max' => 'Meta keywords must not exceed :max characters.',
     'meta_desc.string' => 'Meta description must be a string.', // Fixed

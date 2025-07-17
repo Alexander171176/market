@@ -30,6 +30,7 @@ class Tag extends Model
     protected $fillable = [
         'sort',         // Добавлено
         'activity',     // Добавлено
+        'icon',
         'locale',
         'name',
         'slug',

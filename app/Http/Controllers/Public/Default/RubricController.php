@@ -56,6 +56,9 @@ class RubricController extends Controller
                 ->orderBy('sort')
         ])->where('url', $url)->firstOrFail();
 
+        // Увеличиваем счётчик просмотров
+        $rubric->increment('views');
+
         $allArticles = $rubric->sections->flatMap(function ($section) use ($locale, $search) {
             return $section->articles()
                 ->where('activity', 1)

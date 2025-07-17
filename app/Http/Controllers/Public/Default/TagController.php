@@ -35,6 +35,9 @@ class TagController extends Controller
         // Получаем тег
         $tag = Tag::where('slug', $slug)->firstOrFail();
 
+        // Увеличиваем счётчик просмотров
+        $tag->increment('views');
+
         // Получаем статьи, у которых есть этот тег
         $articlesQuery = Article::where('activity', 1)
             ->where('locale', $locale)

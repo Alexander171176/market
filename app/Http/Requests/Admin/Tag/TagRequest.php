@@ -33,6 +33,7 @@ class TagRequest extends FormRequest
         return [
             'sort' => 'nullable|integer|min:0', // <--- Добавлено
             'activity' => 'required|boolean',    // <--- Добавлено
+            'icon' => 'nullable|string|max:65535', // Увеличено max для TEXT
             'locale' => [
                 'required',
                 'string',

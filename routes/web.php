@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Invokable\RemoveTagFromArticleController;
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use App\Http\Controllers\Admin\System\FileBackupController;
 use App\Http\Controllers\Admin\System\RobotController;
@@ -395,6 +396,7 @@ Route::group([
             Route::delete('/sections/{section}/articles/{article}', RemoveArticleFromSectionController::class)->name('sections.articles.destroy');
             Route::delete('/sections/{section}/banners/{banner}', RemoveBannerFromSectionController::class)->name('sections.banners.destroy');
             Route::delete('/articles/{article}/tags/{tag}', RemoveArticleFromTagController::class)->name('articles.tags.destroy');
+            Route::delete('/tags/{tag}/articles/{article}', RemoveTagFromArticleController::class)->name('tags.articles.destroy');
             Route::delete('/sections/{section}/videos/{video}', RemoveSectionFromVideoController::class)->name('sections.videos.destroy');
             Route::delete('/articles/{article}/videos/{video}', RemoveArticleFromVideoController::class)->name('articles.videos.destroy');
 

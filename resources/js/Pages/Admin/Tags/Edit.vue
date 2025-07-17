@@ -24,6 +24,7 @@ import ActivityCheckbox from "@/Components/Admin/Checkbox/ActivityCheckbox.vue";
 import InputNumber from "@/Components/Admin/Input/InputNumber.vue";
 import CKEditor from "@/Components/Admin/CKEditor/CKEditor.vue";
 import TinyEditor from "@/Components/Admin/TinyEditor/TinyEditor.vue";
+import DescriptionTextarea from '@/Components/Admin/Textarea/DescriptionTextarea.vue'
 
 // --- Инициализация ---
 const toast = useToast();
@@ -45,6 +46,7 @@ const props = defineProps({
 const form = useForm({
     _method: 'PUT',
     sort: props.tag.sort ?? 0,
+    icon: props.tag.icon ?? '',
     name: props.tag?.name,
     locale: props.tag.locale ?? '',
     slug: props.tag.slug ?? '',
@@ -168,7 +170,8 @@ const submit = () => {
                     <!-- Кнопка назад -->
                     <DefaultButton :href="route('admin.tags.index')">
                         <template #icon>
-                            <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2" viewBox="0 0 16 16">
+                            <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2"
+                                 viewBox="0 0 16 16">
                                 <path
                                     d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2.8-6.4z"></path>
                             </svg>
@@ -188,7 +191,8 @@ const submit = () => {
                         <!-- Активность -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.activity"/>
-                            <LabelCheckbox for="activity" :text="t('activity')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="activity" :text="t('activity')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                         <!-- Локализация -->
@@ -215,9 +219,16 @@ const submit = () => {
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">
+                        <LabelInput for="icon" :value="t('svg')"/>
+                        <DescriptionTextarea v-model="form.icon" class="w-full"/>
+                        <InputError class="mt-2" :message="form.errors.icon"/>
+                    </div>
+
+                    <div class="mb-3 flex flex-col items-start">
                         <div class="flex justify-between w-full">
                             <LabelInput for="name">
-                                <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('name') }}
+                                <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                                {{ t('name') }}
                             </LabelInput>
                             <div class="text-md text-gray-900 dark:text-gray-400 mt-1">
                                 {{ form.name.length }} / 100 {{ t('characters') }}
@@ -237,7 +248,8 @@ const submit = () => {
                     <!-- Поле slug -->
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="slug">
-                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('url') }}
+                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                            {{ t('url') }}
                         </LabelInput>
                         <InputText
                             id="slug"
@@ -317,7 +329,8 @@ const submit = () => {
                         <!-- Кнопка очистки мета-полей -->
                         <ClearMetaButton @clear="clearMetaFields" class="mr-4">
                             <template #default>
-                                <svg class="w-4 h-4 fill-current text-gray-500 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-gray-500 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3 9H5V7h6v2z"/>
                                 </svg>
                                 {{ t('clearMetaFields') }}
@@ -325,7 +338,8 @@ const submit = () => {
                         </ClearMetaButton>
                         <MetatagsButton @click.prevent="generateMetaFields">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-600 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-600 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path
                                         d="M13 7h2v6a1 1 0 01-1 1H4v2l-4-3 4-3v2h9V7zM3 9H1V3a1 1 0 011-1h10V0l4 3-4 3V4H3v5z"></path>
                                 </svg>
@@ -338,7 +352,8 @@ const submit = () => {
                         <DefaultButton :href="route('admin.tags.index')" class="mb-3">
                             <template #icon>
                                 <!-- SVG -->
-                                <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2.8-6.4z"></path>
                                 </svg>
                             </template>

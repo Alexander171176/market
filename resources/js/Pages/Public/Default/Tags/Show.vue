@@ -5,7 +5,6 @@ import {useI18n} from 'vue-i18n';
 import DefaultLayout from '@/Layouts/DefaultLayout.vue';
 import MainSlider from "@/Components/Public/Default/Article/MainSlider.vue";
 import TagArticles from '@/Components/Public/Default/Tag/TagArticles.vue';
-import MainBannerSlider from '@/Components/Public/Default/Banner/MainBannerSlider.vue'
 
 const {t} = useI18n();
 const {tag, articles, pagination, locale, siteSettings} = usePage().props;
@@ -107,14 +106,13 @@ const bgColorClass = computed(() => {
                        text-center font-bolder text-xl
                        text-slate-900 dark:text-slate-100">
                 {{ tag.name }}
-                <span class="flex justify-center ml-2">
-                    <svg class="shrink-0 h-4 w-4" viewBox="0 0 24 24">
-                        <path class="fill-current text-slate-400 dark:text-slate-100"
-                              d="M6.672,15.914l-5.379,5.379c-0.391,0.391-0.391,1.023,0,1.414C1.488,22.902,1.744,23,2,23 s0.512-0.098,0.707-0.293l5.379-5.379L6.672,15.914z"></path>
-                        <path class="fill-current text-slate-600 dark:text-slate-300"
-                              d="M23.707,7.293l-7-7c-0.391-0.391-1.023-0.391-1.414,0s-0.391,1.023,0,1.414l0.908,0.908L5.18,8.766 L3.707,7.293c-0.391-0.391-1.023-0.391-1.414,0s-0.391,1.023,0,1.414l13,13C15.488,21.902,15.744,22,16,22s0.512-0.098,0.707-0.293 c0.391-0.391,0.391-1.023,0-1.414l-1.473-1.473l6.151-11.021l0.908,0.908C22.488,8.902,22.744,9,23,9s0.512-0.098,0.707-0.293 C24.098,8.316,24.098,7.684,23.707,7.293z"></path>
-                    </svg>
-                </span>
+                <span v-if="tag.icon" class="flex justify-center ml-2" v-html="tag.icon" />
+                <div class="ml-2 w-6 h-5 flex items-center justify-center rounded-full
+                                text-[9px] font-semibold
+                                text-black dark:text-white bg-slate-100 dark:bg-slate-700"
+                     :title="t('views')">
+                    {{ tag.views }}
+                </div>
             </h1>
 
             <!-- Краткое описание тега, если есть -->

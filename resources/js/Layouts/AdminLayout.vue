@@ -11,6 +11,7 @@ import {usePermission} from '@/composables/permissions.js';
 import {useRubrics} from '@/composables/rubrics.js';
 import {useSection} from '@/composables/sections.js';
 import {useArticle} from '@/composables/articles.js';
+import {useTag} from '@/composables/tags.js';
 import {useBanners} from '@/composables/banners.js';
 import {useVideos} from '@/composables/videos.js';
 import {useSetting} from '@/composables/settings.js';
@@ -31,6 +32,7 @@ const {HasRubric} = useRubrics();
 const {HasVideosSection} = useSection();
 const {HasSection} = useArticle();
 const {HasTags} = useArticle();
+const {hasArticles} = useTag();
 const {HasBanners} = useBanners();
 const {HasVideos} = useVideos();
 

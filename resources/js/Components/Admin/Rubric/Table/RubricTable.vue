@@ -49,9 +49,11 @@ const toggleAll = (event) => {
 </script>
 
 <template>
-    <div class="bg-white dark:bg-slate-700 shadow-lg rounded-sm border border-slate-200 dark:border-slate-600 relative">
+    <div class="bg-white dark:bg-slate-700 shadow-lg rounded-sm
+                border border-slate-200 dark:border-slate-600 relative">
         <div class="overflow-x-auto">
-            <table v-if="rubrics.length > 0" class="table-auto w-full text-slate-700 dark:text-slate-100">
+            <table v-if="rubrics.length > 0"
+                   class="table-auto w-full text-slate-700 dark:text-slate-100">
                 <thead class="text-sm uppercase
                               bg-slate-200 dark:bg-cyan-900
                               border border-solid border-gray-300 dark:border-gray-700">
@@ -115,30 +117,40 @@ const toggleAll = (event) => {
                     handle=".handle"
                 >
                     <template #item="{ element: rubric }">
-                        <tr class="text-sm font-semibold border-b-2 hover:bg-slate-100 dark:hover:bg-cyan-800">
+                        <tr class="text-sm font-semibold border-b-2
+                                   hover:bg-slate-100 dark:hover:bg-cyan-800">
                             <td class="px-2 py-1 text-center cursor-move handle">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300"
+                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M7 4h2v2H7V4zm4 0h2v2h-2V4zM7 8h2v2H7V8zm4 0h2v2h-2V8zM7 12h2v2H7v-2zm4 0h2v2h-2v-2z" />
                                 </svg>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
-                                <div class="text-center text-blue-600 dark:text-blue-200">{{ rubric.id }}</div>
+                                <div class="text-center text-blue-600 dark:text-blue-200">
+                                    {{ rubric.id }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap w-10"> <!-- Добавим w-10 для фикс. ширины -->
-                                <div v-if="rubric.icon" class="flex justify-center items-center h-full" v-html="rubric.icon"></div>
-                                <div v-else class="flex justify-center items-center h-full text-slate-400">
+                                <div v-if="rubric.icon"
+                                     class="flex justify-center items-center h-full"
+                                     v-html="rubric.icon"></div>
+                                <div v-else class="flex justify-center items-center
+                                                   h-full text-slate-400">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
                                         <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2-3a2 2 0 11-4 0 2 2 0 014 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
                                     </svg>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap w-10">
-                                <div class="text-center uppercase text-orange-500 dark:text-orange-200">
+                                <div class="text-center uppercase
+                                            text-orange-500 dark:text-orange-200">
                                     {{ rubric.locale }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
-                                <div class="text-left text-yellow-500 dark:text-yellow-200">{{ rubric.title }}</div>
+                                <div class="text-left text-yellow-500 dark:text-yellow-200">
+                                    {{ rubric.title }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
                                 <div class="text-left">
@@ -157,8 +169,10 @@ const toggleAll = (event) => {
                                 <div class="text-left">
                                     <span v-for="section in rubric.sections" :key="section.id">
                                         <span :title="section.title"
-                                              class="py-0.5 px-1.5 mr-0.5 badge bg-blue-500 dark:bg-blue-200
-                                                     rounded-sm text-xs text-slate-100 dark:text-slate-900">
+                                              class="py-0.5 px-1.5 mr-0.5 badge
+                                                     bg-blue-500 dark:bg-blue-200
+                                                     rounded-sm text-xs
+                                                     text-slate-100 dark:text-slate-900">
                                             {{ section.id }}
                                         </span>
                                     </span>

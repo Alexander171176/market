@@ -230,14 +230,17 @@
 30) creating business logic app Tag <br>
     `docker exec market-php-app php artisan make:model Admin/Tag/Tag -mf` <br>
     `docker exec market-php-app php artisan make:migration create_article_has_tag_table --create=article_has_tag` <br>
+    `docker exec market-php-app php artisan make:migration add_icon_to_tags_table` <br>
     `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:seeder TagSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=TagSeeder` <br>
     `docker exec market-php-app php artisan make:resource Admin/Tag/TagResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Tag/TagSharedResource` <br>
     `docker exec market-php-app php artisan make:request Admin/Tag/TagRequest` <br>
     `docker exec market-php-app php artisan make:controller Admin/Tag/TagController --resource` <br>
     `docker exec market-php-app php artisan make:controller Admin/Invokable/RemoveArticleFromTagController --invokable` <br>
     `docker exec market-php-app php artisan make:controller Public/Default/TagController` <br>
+    `docker exec market-php-app php artisan make:controller Admin/Invokable/RemoveTagFromArticleController --invokable` <br>
 
 31) creating business logic app Report <br>
     `docker exec market-php-app php artisan make:controller Admin/Report/ReportController --resource` <br>

@@ -47,9 +47,11 @@ const toggleAll = (event) => {
 </script>
 
 <template>
-    <div class="bg-white dark:bg-slate-700 shadow-lg rounded-sm border border-slate-200 dark:border-slate-600 relative">
+    <div class="bg-white dark:bg-slate-700 shadow-lg rounded-sm
+                border border-slate-200 dark:border-slate-600 relative">
         <div class="overflow-x-auto">
-            <table v-if="tags.length > 0" class="table-auto w-full text-slate-700 dark:text-slate-100">
+            <table v-if="tags.length > 0"
+                   class="table-auto w-full text-slate-700 dark:text-slate-100">
                 <thead class="text-sm font-semibold uppercase
                                 bg-slate-200 dark:bg-cyan-900
                                 border border-solid
@@ -65,6 +67,13 @@ const toggleAll = (event) => {
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                         <div class="font-semibold text-center">{{ t('id') }}</div>
+                    </th>
+                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                        <div class="flex justify-center" :title="t('icon')">
+                            <svg class="w-6 h-6 fill-current shrink-0" viewBox="0 0 512 512">
+                                <path d="M0 96C0 60.7 28.7 32 64 32l384 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zM323.8 202.5c-4.5-6.6-11.9-10.5-19.8-10.5s-15.4 3.9-19.8 10.5l-87 127.6L170.7 297c-4.6-5.7-11.5-9-18.7-9s-14.2 3.3-18.7 9l-64 80c-5.8 7.2-6.9 17.1-2.9 25.4s12.4 13.6 21.6 13.6l96 0 32 0 208 0c8.9 0 17.1-4.9 21.2-12.8s3.6-17.4-1.4-24.7l-120-176zM112 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"/>
+                            </svg>
+                        </div>
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                         <div class="flex justify-center" :title="t('localization')">
@@ -106,22 +115,40 @@ const toggleAll = (event) => {
                     handle=".handle"
                 >
                     <template #item="{ element: tag }">
-                        <tr class="text-sm font-semibold border-b-2 hover:bg-slate-100 dark:hover:bg-cyan-800">
+                        <tr class="text-sm font-semibold border-b-2
+                                   hover:bg-slate-100 dark:hover:bg-cyan-800">
                             <td class="px-2 py-1 text-center cursor-move handle">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300"
+                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M7 4h2v2H7V4zm4 0h2v2h-2V4zM7 8h2v2H7V8zm4 0h2v2h-2V8zM7 12h2v2H7v-2zm4 0h2v2h-2v-2z" />
                                 </svg>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center text-blue-600 dark:text-blue-200">{{ tag.id }}</div>
+                                <div class="text-center text-blue-600 dark:text-blue-200">
+                                    {{ tag.id }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap w-10"> <!-- Добавим w-10 для фикс. ширины -->
+                                <div v-if="tag.icon"
+                                     class="flex justify-center items-center h-full"
+                                     v-html="tag.icon"></div>
+                                <div v-else class="flex justify-center items-center
+                                                   h-full text-slate-400">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm2-3a2 2 0 11-4 0 2 2 0 014 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                                    </svg>
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center uppercase text-orange-500 dark:text-orange-200">
+                                <div class="text-center uppercase
+                                            text-orange-500 dark:text-orange-200">
                                     {{ tag.locale }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-left text-teal-600 dark:text-violet-200">{{ tag.name }}</div>
+                                <div class="text-left text-teal-600 dark:text-violet-200">
+                                    {{ tag.name }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
                                 <div class="text-left">

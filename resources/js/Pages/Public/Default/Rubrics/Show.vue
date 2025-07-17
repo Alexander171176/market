@@ -110,6 +110,12 @@ const bgColorClass = computed(() => {
                        text-slate-900 dark:text-slate-100">
                 <span v-if="rubric.icon" class="flex justify-center" v-html="rubric.icon" />
                 {{ rubric.title }}
+                <div class="ml-2 w-6 h-5 flex items-center justify-center rounded-full
+                                text-[9px] font-semibold
+                                text-black dark:text-white bg-slate-100 dark:bg-slate-700"
+                          :title="t('views')">
+                    {{ rubric.views }}
+                </div>
             </h1>
 
             <!-- Вывод статей -->

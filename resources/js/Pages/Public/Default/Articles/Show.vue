@@ -11,6 +11,10 @@ const { t } = useI18n()
 // Извлекаем настройки из props, переданных через Inertia
 const { article, recommendedArticles, siteSettings } = usePage().props
 
+const activeTags = computed(() => {
+    return article.tags?.filter(tag => tag.activity) || []
+})
+
 // Референс для хранения состояния темной темы (true, если активен темный режим)
 const isDarkMode = ref(false)
 
@@ -195,15 +199,15 @@ const bgColorClass = computed(() => {
                  v-html="article.description" itemprop="articleBody"></div>
 
             <!-- Теги -->
-            <div v-if="article.tags"
+            <div v-if="activeTags.length"
                  class="flex justify-start items-center mb-3 font-semibold italic">
-                <span v-for="(tag, index) in article.tags" :key="tag.id">
-                  <Link :href="`/tags/${tag.slug}`" itemprop="keywords"
-                        class="text-sm text-blue-500 dark:text-violet-300
-                               hover:text-rose-400 hover:dark:text-rose-300">
-                      &nbsp;{{ tag.name }}
-                  </Link>
-                  <span v-if="index < article.tags.length - 1">, </span>
+                <span v-for="(tag, index) in activeTags" :key="tag.id">
+                    <Link :href="`/tags/${tag.slug}`" itemprop="keywords"
+                          class="text-sm text-blue-500 dark:text-violet-300
+                                 hover:text-rose-400 hover:dark:text-rose-300">
+                        {{ tag.name }}
+                    </Link>
+                    <span v-if="index < activeTags.length - 1">, </span>
                 </span>
             </div>
 

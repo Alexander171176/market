@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin\System;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Article\Article;
+use App\Models\Admin\Rubric\Rubric;
+use App\Models\Admin\Tag\Tag;
+use App\Models\Admin\Video\Video;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -53,6 +56,15 @@ class SitemapController extends Controller
         $sitemap = Sitemap::create()
             ->add(Url::create('/')->setLastModificationDate(Carbon::yesterday()));
 
+        // Рубрики
+        Rubric::where('activity', true)->each(function ($rubric) use ($sitemap) {
+            $sitemap->add(
+                Url::create(route('public.rubrics.show', $rubric->url))
+                    ->setLastModificationDate($rubric->updated_at)
+            );
+        });
+
+        // Статьи
         Article::where('activity', true)->each(function ($article) use ($sitemap) {
             $sitemap->add(
                 Url::create(route('public.articles.show', $article->url))
@@ -60,8 +72,25 @@ class SitemapController extends Controller
             );
         });
 
-        // добавляйте Rubric, Video и т.д. аналогично ↑
+        // Теги
+        Tag::where('activity', true)->each(function ($tag) use ($sitemap) {
+            $sitemap->add(
+                Url::create(route('public.tags.show', $tag->slug))
+                    ->setLastModificationDate($tag->updated_at)
+            );
+        });
 
+        // Видео
+        Video::where('activity', true)->each(function ($video) use ($sitemap) {
+            $sitemap->add(
+                Url::create(route('public.videos.show', $video->url))
+                    ->setLastModificationDate($video->updated_at)
+            );
+        });
+
+        // добавляйте и   др. аналогично ↑
+
+        // Сохраняем карту сайта
         $sitemap->writeToFile(public_path($this->file));
     }
 }
