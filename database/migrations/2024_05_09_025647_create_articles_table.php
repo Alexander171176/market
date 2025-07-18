@@ -15,6 +15,7 @@ return new class extends Migration
             $table->boolean('left')->default(false)->index(); // index
             $table->boolean('main')->default(false)->index(); // index
             $table->boolean('right')->default(false)->index(); // index
+            $table->text('img')->nullable();
             $table->string('locale', 2)->index(); // index
             $table->string('title'); // Убираем unique
             $table->string('url', 500)->index(); // Меняем text на string(500), убираем unique, добавляем index
@@ -23,7 +24,6 @@ return new class extends Migration
             $table->string('author')->nullable();
             $table->date('published_at')->nullable()->index(); // РЕКОМЕНДАЦИЯ: Добавить дату публикации, если нужна + index
             $table->unsignedBigInteger('views')->default(0)->index(); // index
-            $table->unsignedBigInteger('likes')->default(0)->index(); // index (если нужно сортировать/фильтровать по лайкам)
             $table->string('meta_title', 255)->nullable();
             $table->string('meta_keywords', 255)->nullable();
             $table->text('meta_desc')->nullable(); // text

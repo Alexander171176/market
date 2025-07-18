@@ -9,6 +9,7 @@ use App\Http\Resources\Admin\Video\VideoResource;
 use App\Models\Admin\Article\Article;
 use App\Models\Admin\Banner\Banner;
 use App\Models\Admin\Video\Video;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,6 +25,7 @@ class VideoController extends Controller
 
         $video = Video::where('url', $url)
             ->where('activity', 1)
+            ->withCount('likes')
             ->with([
                 'images' => fn($q) => $q->orderBy('order'),
                 'relatedVideos' => fn($q) => $q
@@ -32,9 +34,13 @@ class VideoController extends Controller
             ])
             ->firstOrFail();
 
-
         // Увеличиваем счётчик просмотров
         $video->increment('views');
+
+        // Получаем, лайкал ли пользователь
+        $alreadyLiked = auth()->check()
+            ? $video->likes()->where('user_id', auth()->id())->exists()
+            : false;
 
         // Статьи в колонках
         $leftArticles = Article::where('activity', 1)
@@ -65,7 +71,10 @@ class VideoController extends Controller
             ->get();
 
         return Inertia::render('Public/Default/Videos/Show', [
-            'video' => new VideoResource($video),
+            'video' => array_merge(
+                (new VideoResource($video))->resolve(),
+                ['already_liked' => $alreadyLiked]
+            ),
             'recommendedVideos' => VideoResource::collection($video->relatedVideos),
             'leftArticles' => ArticleResource::collection($leftArticles),
             'rightArticles' => ArticleResource::collection($rightArticles),
@@ -74,4 +83,43 @@ class VideoController extends Controller
             'locale' => $locale,
         ]);
     }
+
+    /**
+     * Лайк видео
+     *
+     * @param string $id
+     * @return JsonResponse
+     */
+    public function like(string $id): JsonResponse
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Для постановки лайка нужно авторизоваться.',
+            ], 401);
+        }
+
+        $video = Video::findOrFail($id);
+        $user = auth()->user();
+
+        $alreadyLiked = $video->likes()->where('user_id', $user->id)->exists();
+
+        if ($alreadyLiked) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Вы уже поставили лайк.',
+                'likes'   => $video->likes()->count(),
+            ]);
+        }
+
+        $video->likes()->create([
+            'user_id' => $user->id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'likes'   => $video->likes()->count(),
+        ]);
+    }
+
 }

@@ -112,9 +112,6 @@ const getPrimaryImage = (video) => {
                         <div class="font-medium text-left">{{ t('title') }}</div>
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                        <div class="font-medium text-left">{{ t('url') }}</div>
-                    </th>
-                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                         <div class="font-medium text-left">{{ t('sections') }}</div>
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -192,18 +189,13 @@ const getPrimaryImage = (video) => {
                                 <div class="text-left text-sky-600 dark:text-sky-200">{{ video.source_type}}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-left text-teal-600 dark:text-green-200"
-                                     :title="formatDate(video.published_at)">
-                                    {{ video.title }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
                                 <div class="text-left">
                                     <a :href="`/videos/${encodeURIComponent(video.url)}`"
                                        class="text-violet-600 dark:text-violet-200 hover:underline
                                               hover:text-violet-800 dark:hover:text-violet-50"
-                                       target="_blank" rel="noopener noreferrer">
-                                        {{ video.url }}
+                                       target="_blank" rel="noopener noreferrer"
+                                       :title="formatDate(video.published_at)">
+                                        {{ video.title }}
                                     </a>
                                 </div>
                             </td>
@@ -233,7 +225,7 @@ const getPrimaryImage = (video) => {
                                 <div class="text-center">{{ video.views }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center">{{ video.likes }}</div>
+                                <div class="text-center">{{ video.likes_count }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
                                 <div class="flex justify-center space-x-2">

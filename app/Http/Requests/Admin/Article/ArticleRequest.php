@@ -45,7 +45,6 @@ class ArticleRequest extends FormRequest
             'author'             => 'nullable|string|max:255',
             'published_at'       => 'nullable|date',
             'views'              => 'nullable|integer|min:0',
-            'likes'              => 'nullable|integer|min:0',
 
             'meta_title'         => 'nullable|string|max:255',
             'meta_keywords'      => 'nullable|string|max:255',

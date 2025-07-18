@@ -29,12 +29,6 @@ return [
     'author.string' => 'The author name must be a string.',
     'author.max' => 'The author name must not exceed 255 characters.',
 
-    'views.integer' => 'The number of views must be a number.',
-    'views.min' => 'The number of views cannot be negative.',
-
-    'likes.integer' => 'The number of likes must be a number.',
-    'likes.min' => 'The number of likes cannot be negative.',
-
     'meta_title.max' => 'Meta title must not exceed 255 characters.',
     'meta_keywords.max' => 'Meta keywords must not exceed 255 characters.',
     'meta_desc.string' => 'Meta description must be a string.', // Fixed

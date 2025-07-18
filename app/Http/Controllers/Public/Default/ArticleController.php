@@ -8,6 +8,7 @@ use App\Http\Resources\Admin\Banner\BannerResource;
 use App\Models\Admin\Article\Article;
 use App\Models\Admin\Banner\Banner;
 use App\Models\Admin\Setting\Setting;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,81 +19,63 @@ class ArticleController extends Controller
      */
     public function show(string $url): Response
     {
-        // Получаем локаль напрямую из базы, без кэширования
-        $locale = app()->getLocale(); // ← получаем из маршрута
+        $locale = app()->getLocale();
 
-        // Получаем статью напрямую без кэширования
-        $article = Article::with([
-            'images' => function ($query) {
-                $query->orderBy('order', 'asc');
-            },
-            'tags',
-            'relatedArticles' => function ($query) use ($locale) {
-                $query->where('activity', 1)
-                    ->where('locale', $locale);
-            },
-            'relatedArticles.images' => function ($query) {
-                $query->orderBy('order', 'asc');
-            }
-        ])
+        $article = Article::withCount('likes')
+            ->with([
+                'images' => fn($q) => $q->orderBy('order'),
+                'tags',
+                'relatedArticles' => fn($q) => $q
+                    ->where('activity', 1)
+                    ->where('locale', $locale),
+                'relatedArticles.images' => fn($q) => $q->orderBy('order'),
+            ])
             ->where('activity', 1)
             ->where('locale', $locale)
             ->where('url', $url)
             ->firstOrFail();
 
-        // Обновляем количество просмотров (обновляем сразу, без кэширования)
+        // Инкремент просмотров
         $article->increment('views');
 
-        // Получаем статьи для левого сайдбара
+        // Получаем, лайкал ли пользователь
+        $alreadyLiked = auth()->check()
+            ? $article->likes()->where('user_id', auth()->id())->exists()
+            : false;
+
+        // Статьи
         $leftArticles = Article::where('activity', 1)
             ->where('locale', $locale)
             ->where('left', true)
             ->orderBy('sort', 'desc')
-            ->with([
-                'images' => function ($query) {
-                    $query->orderBy('order', 'asc');
-                },
-                'tags'
-            ])
+            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
             ->get();
 
-        // Получаем статьи для правого сайдбара
         $rightArticles = Article::where('activity', 1)
             ->where('locale', $locale)
             ->where('right', true)
             ->orderBy('sort', 'desc')
-            ->with([
-                'images' => function ($query) {
-                    $query->orderBy('order', 'asc');
-                },
-                'tags'
-            ])
+            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
             ->get();
 
-        // Получаем баннеры для левой колонки
         $leftBanners = Banner::where('activity', 1)
             ->where('left', true)
             ->orderBy('sort', 'desc')
-            ->with([
-                'images' => function ($query) {
-                    $query->orderBy('order', 'asc');
-                }
-            ])
+            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
-        // Получаем баннеры для правой колонки
         $rightBanners = Banner::where('activity', 1)
             ->where('right', true)
             ->orderBy('sort', 'desc')
-            ->with([
-                'images' => function ($query) {
-                    $query->orderBy('order', 'asc');
-                }
-            ])
+            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
         return Inertia::render('Public/Default/Articles/Show', [
-            'article'             => new ArticleResource($article),
+            // ⬇️ Передаём уже лайкал ли пользователь в props
+            'article'             => array_merge(
+                (new ArticleResource($article))->resolve(),
+                ['already_liked' => $alreadyLiked]
+            ),
             'leftArticles'        => ArticleResource::collection($leftArticles),
             'rightArticles'       => ArticleResource::collection($rightArticles),
             'recommendedArticles' => ArticleResource::collection($article->relatedArticles),
@@ -101,20 +84,41 @@ class ArticleController extends Controller
         ]);
     }
 
-
     /**
      * Лайк статьи
      *
      * @param string $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function like(string $id): \Illuminate\Http\JsonResponse
+    public function like(string $id): JsonResponse
     {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Для постановки лайка нужно авторизоваться.',
+            ], 401);
+        }
+
         $article = Article::findOrFail($id);
-        $article->increment('likes');
+        $user = auth()->user();
+
+        $alreadyLiked = $article->likes()->where('user_id', $user->id)->exists();
+
+        if ($alreadyLiked) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Вы уже поставили лайк.',
+                'likes'   => $article->likes()->count(),
+            ]);
+        }
+
+        $article->likes()->create([
+            'user_id' => $user->id,
+        ]);
+
         return response()->json([
             'success' => true,
-            'likes'   => $article->likes,
+            'likes'   => $article->likes()->count(),
         ]);
     }
 }

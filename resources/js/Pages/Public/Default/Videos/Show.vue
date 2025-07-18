@@ -5,9 +5,13 @@ import { useI18n } from 'vue-i18n';
 import DefaultLayout from '@/Layouts/DefaultLayout.vue';
 import VideoPlayer from '@/Components/Public/Default/Video/VideoPlayer.vue';
 import RecommendedVideos from '@/Components/Public/Default/Video/RecommendedVideos.vue';
+import LikeButtonVideo from '@/Components/Public/Default/Video/LikeButtonVideo.vue';
 
 const { t } = useI18n();
 const { appUrl, video, recommendedVideos, locale, siteSettings } = usePage().props;
+
+// убедись, что console.log покажет:
+// console.log('Already liked:', video.already_liked); // true / false
 
 // Тёмный режим
 const isDarkMode = ref(false);
@@ -116,12 +120,19 @@ const formatDate = (dateString) => {
 
                 <VideoPlayer :video="video" />
 
-                <!-- Дата публикации, форматируем по необходимости -->
-                <time :datetime="formatDate(video.published_at)"
-                      class="opacity-75 text-left text-xs font-semibold
-                             text-slate-600 dark:text-slate-400">
-                    {{ t('publishedAt') }}: {{ formatDate(video.published_at) }}
-                </time>
+                <div class="flex flex-row items-center justify-between">
+
+                    <!-- Дата публикации, форматируем по необходимости -->
+                    <time :datetime="formatDate(video.published_at)"
+                          class="opacity-75 text-left text-xs font-semibold
+                                 text-slate-600 dark:text-slate-400">
+                        {{ t('publishedAt') }}: {{ formatDate(video.published_at) }}
+                    </time>
+
+                    <!-- кнопка лайков -->
+                    <LikeButtonVideo :already-liked="video.already_liked" />
+
+                </div>
 
                 <!-- Краткое описание, если есть -->
                 <p v-if="video.short"

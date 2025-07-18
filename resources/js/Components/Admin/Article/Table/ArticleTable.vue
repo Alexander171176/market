@@ -216,7 +216,7 @@ const truncateText = (text, maxLength = 30) => {
                                 <div class="text-center">{{ article.views }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center">{{ article.likes }}</div>
+                                <div class="text-center">{{ article.likes_count }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
                                 <div class="flex justify-center space-x-2">

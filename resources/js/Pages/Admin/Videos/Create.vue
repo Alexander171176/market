@@ -53,8 +53,6 @@ const form = useForm({
     description: '',
     author: '',
     published_at: '',     // дата публикации
-    views: 0,
-    likes: 0,
     meta_title: '',
     meta_keywords: '',
     meta_desc: '',
@@ -437,31 +435,6 @@ const submitForm = () => {
                                         label="title"
                                         track-by="title"/>
                         <InputError class="mt-2" :message="form.errors.related_videos"/>
-                    </div>
-
-                    <!-- количество просмотров и лайков -->
-                    <div class="mb-3 flex flex-col sm:flex-row justify-between">
-                        <div class="flex flex-row items-center mb-2">
-                            <LabelInput for="views" :value="t('views')" class="mr-3"/>
-                            <InputNumber
-                                id="views"
-                                type="number"
-                                v-model.number="form.views"
-                                autocomplete="views"
-                            />
-                            <InputError class="mt-2" :message="form.errors.views"/>
-                        </div>
-
-                        <div class="flex flex-row items-center">
-                            <LabelInput for="likes" :value="t('likes')" class="mr-3"/>
-                            <InputNumber
-                                id="likes"
-                                type="number"
-                                v-model.number="form.likes"
-                                autocomplete="likes"
-                            />
-                            <InputError class="mt-2" :message="form.errors.likes"/>
-                        </div>
                     </div>
 
                     <!-- meta title -->

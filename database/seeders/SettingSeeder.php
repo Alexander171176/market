@@ -327,7 +327,7 @@ class SettingSeeder extends Seeder
             [
                 'type' => 'string',
                 'option' => 'PublicLightBackgroundColor',
-                'value' => 'bg-amber-50',
+                'value' => 'bg-slate-50',
                 'constant' => 'PUBLIC_LIGHT_BACKGROUND_COLOR',
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS фонового цвета светлого режима',
@@ -347,7 +347,7 @@ class SettingSeeder extends Seeder
             [
                 'type' => 'string',
                 'option' => 'PublicHeaderLightBackgroundColor',
-                'value' => 'bg-slate-100',
+                'value' => 'bg-blue-800',
                 'constant' => 'PUBLIC_HEADER_LIGHT_BACKGROUND_COLOR',
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS цвета светлого режима для header',

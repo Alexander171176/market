@@ -57,8 +57,6 @@ const form = useForm({
     description: props.article.description ?? '',
     author: props.article.author ?? '',
     published_at: props.article.published_at ?? '',
-    views: props.article.views ?? '',
-    likes: props.article.likes ?? '',
     meta_title: props.article.meta_title ?? '',
     meta_keywords: props.article.meta_keywords ?? '',
     meta_desc: props.article.meta_desc ?? '',
@@ -241,7 +239,8 @@ const submitForm = () => {
                     <!-- Кнопка назад -->
                     <DefaultButton :href="route('admin.articles.index')">
                         <template #icon>
-                            <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2" viewBox="0 0 16 16">
+                            <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2"
+                                 viewBox="0 0 16 16">
                                 <path d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2.8-6.4z"></path>
                             </svg>
                         </template>
@@ -249,16 +248,19 @@ const submitForm = () => {
                     </DefaultButton>
 
                     <!-- Right: Actions -->
-                    <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                    <div class="grid grid-flow-col sm:auto-cols-max
+                                justify-start sm:justify-end gap-2">
                         <!-- Datepicker built with flatpickr -->
                     </div>
                 </div>
-                <form @submit.prevent="submitForm" enctype="multipart/form-data" class="p-3 w-full">
+                <form @submit.prevent="submitForm"
+                      enctype="multipart/form-data" class="p-3 w-full">
 
                     <div class="mb-3 flex justify-between flex-col lg:flex-row items-center gap-4">
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.activity" />
-                            <LabelCheckbox for="activity" :text="t('activity')" class="text-sm h-8 flex items-center" />
+                            <LabelCheckbox for="activity" :text="t('activity')"
+                                           class="text-sm h-8 flex items-center" />
                         </div>
                         <div class="flex flex-row items-center gap-2 w-auto">
                             <SelectLocale v-model="form.locale" :errorMessage="form.errors.locale" />
@@ -268,7 +270,8 @@ const submitForm = () => {
                             <div class="h-8 flex items-center">
                                 <LabelInput for="sort" :value="t('sort')" class="text-sm" />
                             </div>
-                            <InputNumber id="sort" type="number" v-model="form.sort" autocomplete="sort" class="w-full lg:w-28" />
+                            <InputNumber id="sort" type="number" v-model="form.sort"
+                                         autocomplete="sort" class="w-full lg:w-28" />
                             <InputError class="mt-2 lg:mt-0" :message="form.errors.sort" />
                         </div>
                     </div>
@@ -278,19 +281,22 @@ const submitForm = () => {
                         <!-- Показывать в левом сайдбаре -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.left"/>
-                            <LabelCheckbox for="left" :text="t('left')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="left" :text="t('left')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                         <!-- Показывать в главных новостях -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.main"/>
-                            <LabelCheckbox for="main" :text="t('main')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="main" :text="t('main')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                         <!-- Показывать в правом сайдбаре -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.right"/>
-                            <LabelCheckbox for="right" :text="t('right')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="right" :text="t('right')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                     </div>
@@ -308,17 +314,21 @@ const submitForm = () => {
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="title">
-                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('postTitle') }}
+                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                            {{ t('postTitle') }}
                         </LabelInput>
-                        <InputText id="title" type="text" v-model="form.title" required autocomplete="title" />
+                        <InputText id="title" type="text" v-model="form.title"
+                                   required autocomplete="title" />
                         <InputError class="mt-2" :message="form.errors.title" />
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="url">
-                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('postUrl') }}
+                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                            {{ t('postUrl') }}
                         </LabelInput>
-                        <InputText id="url" type="text" v-model="form.url" required autocomplete="url" @focus="handleUrlInputFocus" />
+                        <InputText id="url" type="text" v-model="form.url"
+                                   required autocomplete="url" @focus="handleUrlInputFocus" />
                         <InputError class="mt-2" :message="form.errors.url" />
                     </div>
 
@@ -342,6 +352,7 @@ const submitForm = () => {
 
                     <!-- Дата публикации, Автор -->
                     <div class="mb-3 flex flex-col lg:flex-row sm:justify-between sm:space-x-4">
+
                         <!-- Дата публикации -->
                         <div class="flex flex-col lg:flex-row items-center mb-2 lg:mb-0 flex-1">
                             <LabelInput for="published_at" :value="t('publishedAt')"
@@ -355,6 +366,7 @@ const submitForm = () => {
                             />
                             <InputError class="mt-1 sm:mt-0" :message="form.errors.published_at"/>
                         </div>
+
                         <!-- Автор -->
                         <div class="flex flex-col lg:flex-row items-center mb-2 lg:mb-0 flex-1">
                             <LabelInput for="author" :value="t('postAuthor')"
@@ -383,7 +395,8 @@ const submitForm = () => {
 
                     <!-- Мультиселект для связанных статей -->
                     <div class="mb-3 flex flex-col items-start">
-                        <LabelInput for="related_articles" :value="t('relatedArticles')" class="mb-1" />
+                        <LabelInput for="related_articles" :value="t('relatedArticles')"
+                                    class="mb-1" />
                         <VueMultiselect v-model="form.related_articles"
                                         :options="related_articles"
                                         :multiple="true"
@@ -394,19 +407,6 @@ const submitForm = () => {
                         <InputError class="mt-2" :message="form.errors.related_articles" />
                     </div>
 
-                    <div class="mb-3 flex justify-between">
-                        <div class="flex flex-row items-center">
-                            <LabelInput for="views" :value="t('views')" class="mr-3" />
-                            <InputNumber id="views" type="number" v-model="form.views" autocomplete="views" />
-                            <InputError class="mt-2" :message="form.errors.views" />
-                        </div>
-                        <div class="flex flex-row items-center">
-                            <LabelInput for="likes" :value="t('likes')" class="mr-3" />
-                            <InputNumber id="likes" type="number" v-model="form.likes" autocomplete="likes" />
-                            <InputError class="mt-2" :message="form.errors.likes" />
-                        </div>
-                    </div>
-
                     <div class="mb-3 flex flex-col items-start">
                         <div class="flex justify-between w-full">
                             <LabelInput for="meta_title" :value="t('metaTitle')" />
@@ -414,7 +414,8 @@ const submitForm = () => {
                                 {{ form.meta_title.length }} / 160 {{ t('characters') }}
                             </div>
                         </div>
-                        <InputText id="meta_title" type="text" v-model="form.meta_title" maxlength="160" autocomplete="url" />
+                        <InputText id="meta_title" type="text" v-model="form.meta_title"
+                                   maxlength="160" autocomplete="url" />
                         <InputError class="mt-2" :message="form.errors.meta_title" />
                     </div>
 
@@ -448,7 +449,8 @@ const submitForm = () => {
                         <!-- Кнопка очистки мета-полей -->
                         <ClearMetaButton @clear="clearMetaFields" class="mr-4">
                             <template #default>
-                                <svg class="w-4 h-4 fill-current text-gray-500 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-gray-500 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3 9H5V7h6v2z"/>
                                 </svg>
                                 {{ t('clearMetaFields') }}
@@ -457,7 +459,8 @@ const submitForm = () => {
                         <!-- Кнопка генерации мета-полей -->
                         <MetatagsButton @click.prevent="generateMetaFields">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-600 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-600 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path d="M13 7h2v6a1 1 0 01-1 1H4v2l-4-3 4-3v2h9V7zM3 9H1V3a1 1 0 011-1h10V0l4 3-4 3V4H3v5z"></path>
                                 </svg>
                             </template>
@@ -482,16 +485,19 @@ const submitForm = () => {
                     <div class="flex items-center justify-center mt-4">
                         <DefaultButton :href="route('admin.articles.index')" class="mb-3">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c-.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2 .8-6.4z"></path>
                                 </svg>
                             </template>
                             {{ t('back') }}
                         </DefaultButton>
                         <PrimaryButton class="ms-4 mb-0"
-                                       :disabled="form.processing" :class="{ 'opacity-25': form.processing }">
+                                       :disabled="form.processing"
+                                       :class="{ 'opacity-25': form.processing }">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-100" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-100"
+                                     viewBox="0 0 16 16">
                                     <path d="M14.3 2.3L5 11.6 1.7 8.3c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4 4c.2.2.4.3.7.3.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4-.4-.4-1-.4-1.4 0z"></path>
                                 </svg>
                             </template>

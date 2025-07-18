@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('sort')->default(0)->index(); // unsigned + index
             $table->boolean('activity')->default(false)->index(); // index
+            $table->text('icon')->nullable();
             $table->string('locale', 2)->index(); // index
             $table->string('name'); // Убираем unique
             $table->string('slug')->index(); // Убираем unique, добавляем index

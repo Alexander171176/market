@@ -34,8 +34,7 @@ class ArticleResource extends JsonResource
             'description'   => $this->description,
             'author'        => $this->author,
             'published_at'  => $this->published_at?->format('Y-m-d'), // YYYY-MM-DD
-            'views'         => $this->views,     // integer
-            'likes'         => $this->likes,     // integer
+            'views'         => $this->views,
             'meta_title'    => $this->meta_title,
             'meta_keywords' => $this->meta_keywords,
             'meta_desc'     => $this->meta_desc,
@@ -49,7 +48,7 @@ class ArticleResource extends JsonResource
             'tags_count'     => $this->whenCounted('tags'),
             'images_count'   => $this->whenCounted('images'),
             'videos_count'   => $this->whenCounted('videos'),
-            'likes_count'    => $this->whenCounted('likes'), // Если нужна связь HasMany для лайков
+            'likes_count'  => $this->likes_count, // Если нужна связь HasMany для лайков
 
             // Включаем полные данные связей, только если они были загружены
             'sections' => SectionResource::collection($this->whenLoaded('sections')),

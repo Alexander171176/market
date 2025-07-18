@@ -55,8 +55,7 @@ class BannerController extends Controller
 
         try {
 
-            $banners = Banner::withCount(['sections', 'images'])
-            ->with('images')
+            $banners = Banner::with(['sections', 'images'])
             ->get();
             $bannersCount = $banners->count(); // Считаем из загруженной коллекции
 

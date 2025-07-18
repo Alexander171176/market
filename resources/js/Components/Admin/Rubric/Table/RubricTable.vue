@@ -86,8 +86,8 @@ const toggleAll = (event) => {
                     <th class="px-2 first:pl-7 last:pr-7 py-3 whitespace-nowrap">
                         <div class="text-left font-medium">{{ t('title') }}</div>
                     </th>
-                    <th class="px-2 first:pl-7 last:pr-7 py-3 whitespace-nowrap">
-                        <div class="text-left font-medium">{{ t('url') }}</div>
+                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                        <div class="font-medium text-left">{{ t('sections') }}</div>
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                         <div class="flex justify-center" :title="t('views')">
@@ -95,9 +95,6 @@ const toggleAll = (event) => {
                                 <path d="M8 2C3.246 2 .251 7.29.127 7.515a.998.998 0 0 0 .002.975c.07.125 1.044 1.801 2.695 3.274C4.738 13.582 6.283 14 8 14c4.706 0 7.743-5.284 7.872-5.507a1 1 0 0 0 0-.98A13.292 13.292 0 0 0 8 2zm0 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path>
                             </svg>
                         </div>
-                    </th>
-                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                        <div class="font-medium text-left">{{ t('sections') }}</div>
                     </th>
                     <th class="px-2 first:pl-7 last:pr-7 py-3 whitespace-nowrap">
                         <div class="text-center font-medium">{{ t('actions') }}</div>
@@ -148,22 +145,14 @@ const toggleAll = (event) => {
                                 </div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
-                                <div class="text-left text-yellow-500 dark:text-yellow-200">
-                                    {{ rubric.title }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
                                 <div class="text-left">
                                     <a :href="`/rubrics/${encodeURIComponent(rubric.url)}`"
                                        class="text-violet-600 dark:text-violet-200 hover:underline
                                               hover:text-violet-800 dark:hover:text-violet-50"
                                        target="_blank" rel="noopener noreferrer">
-                                        {{ rubric.url }}
+                                        {{ rubric.title }}
                                     </a>
                                 </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center">{{ rubric.views }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
                                 <div class="text-left">
@@ -177,6 +166,9 @@ const toggleAll = (event) => {
                                         </span>
                                     </span>
                                 </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
+                                <div class="text-center">{{ rubric.views }}</div>
                             </td>
                             <td class="px-2 first:pl-7 last:pr-7 py-1 whitespace-nowrap">
                                 <div class="flex justify-center space-x-2">

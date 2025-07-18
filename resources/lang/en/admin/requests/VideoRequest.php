@@ -39,9 +39,6 @@ return [
 
     'author.max' => 'The author name must not exceed :max characters.',
 
-    'views.min'                 => 'The number of views cannot be negative.',
-    'likes.min'                 => 'The number of likes cannot be negative.',
-
     'meta_title.max' => 'Meta header must not exceed :max characters.',
     'meta_keywords.max' => 'Meta keywords must not exceed :max characters.',
     'meta_desc.max' => 'Meta description is too long (max :max characters).', // Removed

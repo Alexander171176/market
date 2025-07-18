@@ -82,6 +82,7 @@
     `docker exec market-php-app php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"` <br>
     `docker exec market-php-app php artisan optimize:clear` <br>
     `docker exec market-php-app php artisan migrate`<br>
+    `docker exec market-php-app php artisan migrate:rollback --path=database/migrations/2025_04_03_073100_create_video_likes_table.php`<br>
     `docker exec market-php-app php artisan migrate:rollback`<br>
     `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan db:seed` <br>

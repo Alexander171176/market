@@ -33,7 +33,6 @@ return new class extends Migration
             $table->string('external_video_id')->nullable(); // Для youtube/vimeo ID или для code (iframe)
 
             $table->unsignedBigInteger('views')->default(0)->index(); // index
-            $table->unsignedBigInteger('likes')->default(0)->index(); // index
 
             $table->string('meta_title', 255)->nullable();
             $table->string('meta_keywords', 255)->nullable();

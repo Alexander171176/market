@@ -33,6 +33,7 @@ class VideoResource extends JsonResource
             'description' => $this->description,
             'author' => $this->author,
             'published_at'  => $this->published_at?->format('Y-m-d'), // YYYY-MM-DD
+            'views'         => $this->views,
             'duration' => $this->duration,      // integer
             'source_type' => $this->source_type,
 
@@ -47,8 +48,6 @@ class VideoResource extends JsonResource
 
             'external_video_id' => $this->external_video_id, // Можно оставить для информации
             'embed_code' => $this->embed_code, // для HTML кода
-            'views' => $this->views,         // integer
-            'likes' => $this->likes,         // integer
             'meta_title' => $this->meta_title,
             'meta_keywords' => $this->meta_keywords,
             'meta_desc' => $this->meta_desc,
@@ -59,7 +58,7 @@ class VideoResource extends JsonResource
             'sections_count' => $this->whenCounted('sections'),
             'articles_count' => $this->whenCounted('articles'),
             'images_count'   => $this->whenCounted('images'),
-            'likes_count'    => $this->whenCounted('likes'),
+            'likes_count'  => $this->likes_count, // Если нужна связь HasMany для лайков
 
             'sections' => SectionResource::collection($this->whenLoaded('sections')),
             // Для связанных статей, возможно, нужен ArticleSharedResource? Зависит от контекста.
@@ -67,7 +66,6 @@ class VideoResource extends JsonResource
             'images'   => VideoImageResource::collection($this->whenLoaded('images')),
             // Используем VideoSharedResource для связанных видео
             'related_videos' => VideoSharedResource::collection($this->whenLoaded('relatedVideos')),
-
         ];
     }
 }

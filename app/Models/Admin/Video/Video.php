@@ -51,8 +51,6 @@ class Video extends Model implements HasMedia
         'source_type',
         'external_video_id', // Оставляем для YouTube/Vimeo/Code
         'embed_code', // для HTML кода
-        'views',
-        'likes', // Оставляем, если редактируется админом
         'meta_title',
         'meta_keywords',
         'meta_desc',

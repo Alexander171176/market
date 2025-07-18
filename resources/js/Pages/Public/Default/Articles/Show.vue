@@ -2,7 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3'
 import DefaultLayout from '@/Layouts/DefaultLayout.vue'
 import { useI18n } from 'vue-i18n'
-import LikeButton from '@/Components/Public/Default/Article/LikeButton.vue'
+import LikeButtonArticle from '@/Components/Public/Default/Article/LikeButtonArticle.vue'
 import ArticleImageMain from '@/Components/Public/Default/Article/ArticleImageMain.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
@@ -228,7 +228,7 @@ const formatDate = (dateString) => {
                     <span class="mr-2 text-sky-600 dark:text-sky-300"> {{ article.author }}</span>
                 </div>
                 <!-- Лайк -->
-                <LikeButton />
+                <LikeButtonArticle :already-liked="article.already_liked" />
             </div>
 
             <!-- Блок рекомендованных статей -->

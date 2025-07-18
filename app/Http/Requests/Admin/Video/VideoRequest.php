@@ -86,7 +86,6 @@ class VideoRequest extends FormRequest
             'video_url'       => ['nullable', 'string', 'max:500'], // количество символов url
 
             'views'           => 'nullable|integer|min:0',
-            'likes'           => 'nullable|integer|min:0',
             'meta_title'      => 'nullable|string|max:255',
             'meta_keywords'   => 'nullable|string|max:255',
             'meta_desc'       => 'nullable|string',

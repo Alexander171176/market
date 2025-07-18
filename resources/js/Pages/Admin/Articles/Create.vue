@@ -52,8 +52,6 @@ const form = useForm({
     description: '',
     author: '',
     published_at: '',
-    views: '',
-    likes: '',
     meta_title: '',
     meta_keywords: '',
     meta_desc: '',
@@ -161,10 +159,6 @@ const submitForm = () => {
         main: data.main ? 1 : 0,
         right: data.right ? 1 : 0,
 
-        // Гарантированная установка "0", если поле пустое
-        views: data.views !== '' ? Number(data.views) : 0,
-        likes: data.likes !== '' ? Number(data.likes) : 0,
-
         images: form.images.map(image => {
             if (image.file) {
                 return { file: image.file, order: image.order, alt: image.alt, caption: image.caption }; // Новое изображение
@@ -211,7 +205,8 @@ const submitForm = () => {
                     <!-- Кнопка назад -->
                     <DefaultButton :href="route('admin.articles.index')">
                         <template #icon>
-                            <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2" viewBox="0 0 16 16">
+                            <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2"
+                                 viewBox="0 0 16 16">
                                 <path d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2.8-6.4z"></path>
                             </svg>
                         </template>
@@ -219,7 +214,8 @@ const submitForm = () => {
                     </DefaultButton>
 
                     <!-- Right: Actions -->
-                    <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2">
+                    <div class="grid grid-flow-col sm:auto-cols-max
+                                justify-start sm:justify-end gap-2">
                         <!-- Datepicker built with flatpickr -->
                     </div>
                 </div>
@@ -230,7 +226,8 @@ const submitForm = () => {
                         <!-- Активность -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.activity"/>
-                            <LabelCheckbox for="activity" :text="t('activity')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="activity" :text="t('activity')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                         <!-- Локализация -->
@@ -261,19 +258,22 @@ const submitForm = () => {
                         <!-- Показывать в левом сайдбаре -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.left"/>
-                            <LabelCheckbox for="left" :text="t('left')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="left" :text="t('left')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                         <!-- Показывать в главных новостях -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.main"/>
-                            <LabelCheckbox for="main" :text="t('main')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="main" :text="t('main')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                         <!-- Показывать в правом сайдбаре -->
                         <div class="flex flex-row items-center gap-2">
                             <ActivityCheckbox v-model="form.right"/>
-                            <LabelCheckbox for="right" :text="t('right')" class="text-sm h-8 flex items-center"/>
+                            <LabelCheckbox for="right" :text="t('right')"
+                                           class="text-sm h-8 flex items-center"/>
                         </div>
 
                     </div>
@@ -292,7 +292,8 @@ const submitForm = () => {
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="title">
-                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('postTitle') }}
+                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                            {{ t('postTitle') }}
                         </LabelInput>
                         <InputText
                             id="title"
@@ -306,7 +307,8 @@ const submitForm = () => {
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="url">
-                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('postUrl') }}
+                            <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                            {{ t('postUrl') }}
                         </LabelInput>
                         <InputText
                             id="url"
@@ -381,7 +383,8 @@ const submitForm = () => {
 
                     <!-- Мультиселект для связанных статей -->
                     <div class="mb-3 flex flex-col items-start">
-                        <LabelInput for="related_articles" :value="t('relatedArticles')" class="mb-1" />
+                        <LabelInput for="related_articles" :value="t('relatedArticles')"
+                                    class="mb-1" />
                         <VueMultiselect v-model="form.related_articles"
                                         :options="related_articles"
                                         :multiple="true"
@@ -390,30 +393,6 @@ const submitForm = () => {
                                         label="title"
                                         track-by="title" />
                         <InputError class="mt-2" :message="form.errors.related_articles" />
-                    </div>
-
-                    <div class="mb-3 flex justify-between">
-                        <div class="flex flex-row items-center">
-                            <LabelInput for="views" :value="t('views')" class="mr-3"/>
-                            <InputNumber
-                                id="views"
-                                type="number"
-                                v-model="form.views"
-                                autocomplete="views"
-                            />
-                            <InputError class="mt-2" :message="form.errors.views"/>
-                        </div>
-
-                        <div class="flex flex-row items-center">
-                            <LabelInput for="likes" :value="t('likes')" class="mr-3"/>
-                            <InputNumber
-                                id="likes"
-                                type="number"
-                                v-model="form.likes"
-                                autocomplete="likes"
-                            />
-                            <InputError class="mt-2" :message="form.errors.likes"/>
-                        </div>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">
@@ -464,7 +443,8 @@ const submitForm = () => {
                     <div class="flex justify-end mt-4">
                         <MetatagsButton @click.prevent="generateMetaFields">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-600 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-600 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path
                                         d="M13 7h2v6a1 1 0 01-1 1H4v2l-4-3 4-3v2h9V7zM3 9H1V3a1 1 0 011-1h10V0l4 3-4 3V4H3v5z"></path>
                                 </svg>
@@ -479,7 +459,8 @@ const submitForm = () => {
                         <DefaultButton :href="route('admin.articles.index')" class="mb-3">
                             <template #icon>
                                 <!-- SVG -->
-                                <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-100 shrink-0 mr-2"
+                                     viewBox="0 0 16 16">
                                     <path d="M4.3 4.5c1.9-1.9 5.1-1.9 7 0 .7.7 1.2 1.7 1.4 2.7l2-.3c-.2-1.5-.9-2.8-1.9-3.8C10.1.4 5.7.4 2.9 3.1L.7.9 0 7.3l6.4-.7-2.1-2.1zM15.6 8.7l-6.4.7 2.1 2.1c-1.9 1.9-5.1 1.9-7 0-.7-.7-1.2-1.7-1.4-2.7l-2 .3c.2 1.5.9 2.8 1.9 3.8 1.4 1.4 3.1 2 4.9 2 1.8 0 3.6-.7 4.9-2l2.2 2.2.8-6.4z"></path>
                                 </svg>
                             </template>
@@ -488,7 +469,8 @@ const submitForm = () => {
                         <PrimaryButton class="ms-4 mb-0" :class="{ 'opacity-25': form.processing }"
                                        :disabled="form.processing">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-100" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-100"
+                                     viewBox="0 0 16 16">
                                     <path
                                         d="M14.3 2.3L5 11.6 1.7 8.3c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4 4c.2.2.4.3.7.3.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4-.4-.4-1-.4-1.4 0z"></path>
                                 </svg>

@@ -34,13 +34,13 @@ class BannerResource extends JsonResource
             'created_at'    => $this->created_at?->toIso8601String(),
             'updated_at'    => $this->updated_at?->toIso8601String(),
 
-            // --- Связи и счетчики ---
-            'sections_count' => $this->whenCounted('sections'),
-            'images_count'   => $this->whenCounted('images'),
-
             // Используем правильные ресурсы для связей
             'sections' => SectionResource::collection($this->whenLoaded('sections')),
+            // Количество секций (если связь уже загружена, как в index методе с with())
+            'sections_count' => $this->whenLoaded('sections', fn() => $this->resource->sections->count()), // this->resource->... для доступа к модели
+
             'images'   => BannerImageResource::collection($this->whenLoaded('images')), // <--- ИСПРАВЛЕНО
+            'images_count' => $this->whenLoaded('images', fn() => $this->resource->images->count()), // this->resource->... для доступа к модели
         ];
     }
 }

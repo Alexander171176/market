@@ -48,7 +48,6 @@ class Article extends Model
         'author',
         'published_at', // Добавлено поле даты публикации
         'views',        // Оставляем, если админ может их редактировать
-        'likes',        // Оставляем, если админ может их редактировать
         'meta_title',
         'meta_keywords',
         'meta_desc',
@@ -78,8 +77,6 @@ class Article extends Model
         'main' => 'boolean',
         'right' => 'boolean',
         'published_at' => 'date', // Используем datetime, если в БД timestamp, или 'date' если date
-        'views' => 'integer',
-        'likes' => 'integer',
     ];
 
     // --- Связи (проверяем соответствие миграциям и именам) ---
