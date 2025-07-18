@@ -81,8 +81,8 @@ onUnmounted(() => {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
             <div v-for="item in videos" :key="item.id"
-                 class="relative flex flex-col rounded overflow-hidden bg-white dark:bg-slate-800
-                        border-2 border-slate-400 shadow-md shadow-gray-600 dark:shadow-gray-900">
+                 class="relative flex flex-col rounded overflow-hidden bg-slate-100 dark:bg-slate-700
+                        border-2 border-slate-400 shadow-md shadow-gray-400 dark:shadow-gray-800">
 
                 <!-- Слайдер или плеер -->
                 <div class="relative w-full bg-black aspect-video overflow-hidden">
@@ -136,7 +136,11 @@ onUnmounted(() => {
                                  hover:text-red-600 hover:dark:text-red-400 transition">
                         {{ item.title }}
                     </Link>
-                    <div class="pb-2 text-center text-xs text-slate-600 dark:text-slate-400">
+                    <div class="pb-2 flex items-center justify-center
+                                text-center text-xs text-slate-600 dark:text-slate-400">
+                        <svg class="w-3 h-3 fill-current shrink-0 mr-1" viewBox="0 0 16 16">
+                            <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                        </svg>
                         {{ item.published_at ? new Date(item.published_at).toLocaleDateString() : '' }}
                     </div>
                 </div>

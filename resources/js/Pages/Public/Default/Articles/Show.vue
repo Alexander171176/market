@@ -1,15 +1,18 @@
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3'
-import DefaultLayout from '@/Layouts/DefaultLayout.vue'
-import { useI18n } from 'vue-i18n'
-import LikeButtonArticle from '@/Components/Public/Default/Article/LikeButtonArticle.vue'
-import ArticleImageMain from '@/Components/Public/Default/Article/ArticleImageMain.vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3';
+import { useI18n } from 'vue-i18n';
+import DefaultLayout from '@/Layouts/DefaultLayout.vue';
+import LikeButtonArticle from '@/Components/Public/Default/Article/LikeButtonArticle.vue';
+import ArticleImageMain from '@/Components/Public/Default/Article/ArticleImageMain.vue';
+import RecommendedVideos from '@/Components/Public/Default/Video/RecommendedVideos.vue';
 
 const { t } = useI18n()
 
 // Извлекаем настройки из props, переданных через Inertia
-const { article, recommendedArticles, siteSettings } = usePage().props
+const { article, recommendedArticles,recommendedVideos, siteSettings } = usePage().props
+
+// console.log('[recommendedVideos]', recommendedVideos);
 
 const activeTags = computed(() => {
     return article.tags?.filter(tag => tag.activity) || []
@@ -129,7 +132,11 @@ const formatDate = (dateString) => {
                       class="mt-2 flex items-center justify-center
                                  text-xs font-semibold text-center
                                  text-slate-600 dark:text-slate-400 opacity-75">
-                    {{ t('publishedAt') }}: {{ formatDate(article.published_at) }}
+                    {{ t('publishedAt') }}:&nbsp;
+                    <svg class="w-3 h-3 fill-current shrink-0 mr-1" viewBox="0 0 16 16">
+                        <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                    </svg>
+                    {{ formatDate(article.published_at) }}
                 </time>
                 <div class="flex flex-row items-center justify-center my-1">
                     <h1 itemprop="headline"
@@ -243,7 +250,7 @@ const formatDate = (dateString) => {
                     <Link :href="`/articles/${rec.url}`"
                           v-for="rec in recommendedArticles"
                           :key="rec.id"
-                         class="shadow-md shadow-gray-400 dark:shadow-gray-900">
+                         class="shadow-md shadow-gray-300 dark:shadow-gray-800">
                         <div class="relative w-full">
                             <!-- Обёртка с соотношением сторон 4:3 -->
                             <div class="w-full aspect-[4/3] overflow-hidden">
@@ -268,7 +275,12 @@ const formatDate = (dateString) => {
                                              text-slate-100 hover:text-amber-200">
                                     {{ rec.title }}
                                 </div>
-                                <div class="mb-1 text-xs font-semibold text-yellow-200 text-center">
+                                <div class="mb-1 flex items-center justify-center
+                                            text-xs font-semibold text-yellow-200 text-center">
+                                    <svg class="w-3 h-3 fill-current shrink-0 mr-1"
+                                         viewBox="0 0 16 16">
+                                        <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                                    </svg>
                                     {{ rec.published_at.substring(0, 10) }}
                                 </div>
                             </div>
@@ -276,6 +288,14 @@ const formatDate = (dateString) => {
                     </Link>
 
                 </div>
+            </div>
+
+            <!-- Блок рекомендованных видео -->
+            <div v-if="recommendedVideos && recommendedVideos.length > 0" class="mt-6">
+                <RecommendedVideos
+                    :videos="recommendedVideos"
+                    :formatDate="formatDate"
+                />
             </div>
 
         </article>

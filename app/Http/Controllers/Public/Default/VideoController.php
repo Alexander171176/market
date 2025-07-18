@@ -70,6 +70,18 @@ class VideoController extends Controller
             ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
+        $leftVideos = Video::where('activity', 1)
+            ->where('left', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
+        $rightVideos = Video::where('activity', 1)
+            ->where('right', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
         return Inertia::render('Public/Default/Videos/Show', [
             'video' => array_merge(
                 (new VideoResource($video))->resolve(),
@@ -80,6 +92,8 @@ class VideoController extends Controller
             'rightArticles' => ArticleResource::collection($rightArticles),
             'leftBanners' => BannerResource::collection($leftBanners),
             'rightBanners' => BannerResource::collection($rightBanners),
+            'leftVideos' => VideoResource::collection($leftVideos),
+            'rightVideos' => VideoResource::collection($rightVideos),
             'locale' => $locale,
         ]);
     }

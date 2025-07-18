@@ -7,6 +7,7 @@ import Header from "@/Partials/Default/Header.vue";
 import LeftSidebar from "@/Components/Public/Default/Partials/LeftSidebar.vue";
 import RightSidebar from "@/Components/Public/Default/Partials/RightSidebar.vue";
 import Footer from "@/Partials/Default/Footer.vue";
+import ScrollButtons from '@/Components/Admin/Scroll/ScrollButtons.vue'
 
 const { siteSettings } = usePage().props;
 
@@ -42,5 +43,7 @@ const {props: pageProps} = usePage();
     </main>
 
     <Footer :can-login="canLogin" :can-register="canRegister"/>
+
+    <ScrollButtons/>
 
 </template>

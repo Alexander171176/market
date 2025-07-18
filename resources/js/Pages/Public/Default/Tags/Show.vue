@@ -130,7 +130,7 @@ const bgColorClass = computed(() => {
                 :search="$page.props.filters?.search ?? ''"
             />
 
-            <MainSlider />
+<!--            <MainSlider />-->
 
         </div>
     </DefaultLayout>

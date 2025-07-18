@@ -1,58 +1,70 @@
 <script setup>
-import {ref, onMounted, onUnmounted} from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const scrollContainer = ref(null);
-const showScrollToTop = ref(false);
-const showScrollToBottom = ref(true);
-let scrollInterval = null;
+const scrollContainer = ref(null)
+const showScrollToTop = ref(false)
+const showScrollToBottom = ref(true)
+let scrollInterval = null
 
 const findScrollContainer = () => {
-    // Найдем родительский элемент с overflow-y-auto
-    let parent = document.querySelector('main');
+    let parent = document.querySelector('main')
     while (parent && getComputedStyle(parent).overflowY !== 'auto') {
-        parent = parent.parentElement;
+        parent = parent.parentElement
     }
-    return parent;
-};
+    return parent || window
+}
 
 const startScroll = (direction) => {
-    const scrollStep = direction === 'down' ? 20 : -20;
+    const scrollStep = direction === 'down' ? 20 : -20
     scrollInterval = setInterval(() => {
-        if (scrollContainer.value) {
-            scrollContainer.value.scrollTop += scrollStep;
+        if (scrollContainer.value === window) {
+            window.scrollBy({ top: scrollStep, behavior: 'auto' })
+        } else {
+            scrollContainer.value.scrollTop += scrollStep
         }
-    }, 16); // примерно 60 кадров в секунду
-};
+    }, 16)
+}
 
 const stopScroll = () => {
-    clearInterval(scrollInterval);
-};
+    clearInterval(scrollInterval)
+}
 
 const handleScroll = () => {
-    if (scrollContainer.value) {
-        const scrollTop = scrollContainer.value.scrollTop;
-        const scrollHeight = scrollContainer.value.scrollHeight;
-        const clientHeight = scrollContainer.value.clientHeight;
+    let scrollTop, scrollHeight, clientHeight
 
-        showScrollToTop.value = scrollTop > 0;
-        showScrollToBottom.value = scrollTop + clientHeight < scrollHeight;
+    if (scrollContainer.value === window) {
+        scrollTop = window.scrollY
+        scrollHeight = document.documentElement.scrollHeight
+        clientHeight = window.innerHeight
+    } else {
+        scrollTop = scrollContainer.value.scrollTop
+        scrollHeight = scrollContainer.value.scrollHeight
+        clientHeight = scrollContainer.value.clientHeight
     }
-};
+
+    showScrollToTop.value = scrollTop > 0
+    showScrollToBottom.value = scrollTop + clientHeight < scrollHeight
+}
 
 onMounted(() => {
-    scrollContainer.value = findScrollContainer();
-    if (scrollContainer.value) {
-        scrollContainer.value.addEventListener('scroll', handleScroll);
-        handleScroll(); // Обновляем состояние при монтировании
-    }
-});
+    scrollContainer.value = findScrollContainer()
+
+    const container = scrollContainer.value === window
+        ? window
+        : scrollContainer.value
+
+    container.addEventListener('scroll', handleScroll)
+    handleScroll()
+})
 
 onUnmounted(() => {
-    if (scrollContainer.value) {
-        scrollContainer.value.removeEventListener('scroll', handleScroll);
-    }
-    clearInterval(scrollInterval);
-});
+    const container = scrollContainer.value === window
+        ? window
+        : scrollContainer.value
+
+    container.removeEventListener('scroll', handleScroll)
+    clearInterval(scrollInterval)
+})
 </script>
 
 <template>
@@ -84,7 +96,7 @@ onUnmounted(() => {
 
 <style scoped>
 .scroll-button {
-    background-color: #09f; /* Tailwind bg-blue-700 */
+    background-color: #333;
     color: white;
     width: 2rem;
     height: 2rem;
@@ -93,8 +105,9 @@ onUnmounted(() => {
     justify-content: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: opacity 0.3s ease;
-    opacity: 0.5;
+    opacity: 0.7;
     cursor: pointer;
+    border-radius: 0.25rem;
 }
 
 .scroll-button:hover {

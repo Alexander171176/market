@@ -124,8 +124,12 @@ const formatDate = (dateString) => {
 
                     <!-- Дата публикации, форматируем по необходимости -->
                     <time :datetime="formatDate(video.published_at)"
-                          class="opacity-75 text-left text-xs font-semibold
+                          class="flex items-center justify-start
+                                 opacity-75 text-left text-xs font-semibold
                                  text-slate-600 dark:text-slate-400">
+                        <svg class="w-3 h-3 fill-current shrink-0 mr-1" viewBox="0 0 16 16">
+                            <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                        </svg>
                         {{ t('publishedAt') }}: {{ formatDate(video.published_at) }}
                     </time>
 

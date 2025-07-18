@@ -108,17 +108,36 @@ class RubricController extends Controller
             ->orderBy('sort')
             ->get();
 
-        $videos = Video::where('activity', 1)
+        $sectionVideos = Video::where('activity', 1)
+            ->where('locale', $locale)
+            ->whereHas('sections', fn($q) => $q
+                ->where('activity', 1)
+                ->where('locale', $locale)
+                ->whereIn('sections.id', $rubric->sections->pluck('id'))
+            )
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('published_at', 'desc')
+            ->orderBy('sort')
             ->get();
 
         $activeArticlesCount = $allArticles->count();
+
+        $leftVideos = Video::where('activity', 1)
+            ->where('left', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
+        $rightVideos = Video::where('activity', 1)
+            ->where('right', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
 
         return Inertia::render('Public/Default/Rubrics/Show', [
             'rubric' => new RubricResource($rubric),
             'sections' => SectionResource::collection($rubric->sections),
             'sectionBanners' => BannerResource::collection($sectionBanners),
+            'sectionVideos' => VideoResource::collection($sectionVideos),
             'sectionsCount' => $rubric->sections->count(),
             'articles' => ArticleResource::collection($paginatedArticles),
             'pagination' => [
@@ -127,7 +146,6 @@ class RubricController extends Controller
                 'perPage' => $paginatedArticles->perPage(),
                 'total' => $paginatedArticles->total(),
             ],
-            'videos' => VideoResource::collection($videos),
             'locale' => $locale,
             'activeArticlesCount' => $activeArticlesCount,
             'filters' => [
@@ -138,6 +156,8 @@ class RubricController extends Controller
             'rightArticles' => ArticleResource::collection($rightArticles),
             'leftBanners' => BannerResource::collection($leftBanners),
             'rightBanners' => BannerResource::collection($rightBanners),
+            'leftVideos' => VideoResource::collection($leftVideos),
+            'rightVideos' => VideoResource::collection($rightVideos),
         ]);
     }
 

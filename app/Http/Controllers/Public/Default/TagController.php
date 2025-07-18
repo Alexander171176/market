@@ -100,9 +100,16 @@ class TagController extends Controller
             ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
-        $videos = Video::where('activity', 1)
+        $leftVideos = Video::where('activity', 1)
+            ->where('left', true)
+            ->orderBy('sort')
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('published_at', 'desc')
+            ->get();
+
+        $rightVideos = Video::where('activity', 1)
+            ->where('right', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
         return Inertia::render('Public/Default/Tags/Show', [
@@ -115,7 +122,6 @@ class TagController extends Controller
                 'perPage'     => $paginatedArticles->perPage(),
                 'total'       => $paginatedArticles->total(),
             ],
-            'videos' => VideoResource::collection($videos),
             'locale' => $locale,
             'filters' => [
                 'search' => $search,
@@ -125,6 +131,8 @@ class TagController extends Controller
             'rightArticles' => ArticleResource::collection($rightArticles),
             'leftBanners' => BannerResource::collection($leftBanners),
             'rightBanners' => BannerResource::collection($rightBanners),
+            'leftVideos' => VideoResource::collection($leftVideos),
+            'rightVideos' => VideoResource::collection($rightVideos),
         ]);
     }
 

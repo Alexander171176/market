@@ -1,13 +1,14 @@
 <script setup>
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { useI18n } from 'vue-i18n';
 import DefaultLayout from '@/Layouts/DefaultLayout.vue';
 import SectionArticles from "@/Components/Public/Default/Article/SectionArticles.vue";
 import MainBannerSlider from "@/Components/Public/Default/Banner/MainBannerSlider.vue";
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import SectionVideoList from '@/Components/Public/Default/Video/SectionVideoList.vue';
 
 const { t } = useI18n();
-const { rubric, sectionBanners, articles, pagination, locale, siteSettings } = usePage().props;
+const { rubric, sectionBanners, sectionVideos, articles, pagination, locale, siteSettings } = usePage().props;
 
 // Референс для хранения состояния темной темы (true, если активен темный режим)
 const isDarkMode = ref(false);
@@ -131,6 +132,13 @@ const bgColorClass = computed(() => {
                 v-if="sectionBanners && sectionBanners.length"
                 :banners="sectionBanners"
             />
+
+            <!-- Видео -->
+            <SectionVideoList
+                v-if="sectionVideos && sectionVideos.length"
+                :videos="sectionVideos"
+            />
+
         </div>
     </DefaultLayout>
 </template>

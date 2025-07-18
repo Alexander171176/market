@@ -42,7 +42,7 @@ const currentImage = computed(() => {
 </script>
 
 <template>
-    <div class="h-full overflow-hidden shadow-lg shadow-gray-400 dark:shadow-gray-900">
+    <div class="h-full overflow-hidden shadow-md shadow-gray-400 dark:shadow-gray-900">
         <img
             :src="currentImage.webp_url || currentImage.url"
             :alt="alt || currentImage.alt"

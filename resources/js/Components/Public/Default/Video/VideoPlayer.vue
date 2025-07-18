@@ -81,7 +81,7 @@ const getVideoUrl = (video) => {
 
 <template>
     <div class="relative w-full aspect-video bg-black rounded mb-4
-              shadow-lg shadow-gray-600 dark:shadow-gray-900 overflow-hidden">
+              shadow-lg shadow-gray-400 dark:shadow-gray-800 overflow-hidden">
 
         <!-- Слайдер -->
         <template v-if="video.images?.length && activeVideoId !== video.id">

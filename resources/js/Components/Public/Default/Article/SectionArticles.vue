@@ -169,7 +169,7 @@ onBeforeUnmount(() => {
             <div v-for="article in articles" :key="article.id"
                  class="p-2 rounded-sm shadow-sm
                         overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
-                        hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">
+                        hover:shadow-md hover:shadow-gray-400 dark:hover:shadow-gray-700">
 
                 <!-- Контейнер Изображения -->
                 <div class="overflow-hidden h-auto mb-2 rounded-md
@@ -201,9 +201,13 @@ onBeforeUnmount(() => {
                         {{ article.short }}
                     </p>
 
-                    <div class="text-xs font-semibold text-center
+                    <div class="flex items-center justify-center
+                                text-xs font-semibold text-center
                                 text-slate-600 dark:text-slate-400 opacity-75">
-                        {{ formatDate(article.published_at) }}
+                        <svg class="w-3 h-3 fill-current shrink-0 mr-1" viewBox="0 0 16 16">
+                            <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                        </svg>
+                        <span>{{ formatDate(article.published_at) }}</span>
                     </div>
                 </div>
 
@@ -217,7 +221,7 @@ onBeforeUnmount(() => {
             <div v-for="article in articles" :key="article.id"
                  class="col-span-full flex flex-col sm:flex-row items-start space-x-3 p-2
                         overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
-                        hover:shadow-lg hover:shadow-gray-400 dark:hover:shadow-gray-700">
+                        hover:shadow-md hover:shadow-gray-400 dark:hover:shadow-gray-700">
 
                 <!-- Картинка -->
                 <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-56 h-auto
@@ -249,9 +253,13 @@ onBeforeUnmount(() => {
                         {{ article.short }}
                     </p>
 
-                    <div class="text-xs font-semibold text-center
+                    <div class="flex items-center justify-center
+                                text-xs font-semibold text-center
                                 text-slate-600 dark:text-slate-400 opacity-75">
-                        {{ formatDate(article.published_at) }}
+                        <svg class="w-3 h-3 fill-current shrink-0 mr-1" viewBox="0 0 16 16">
+                            <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                        </svg>
+                        <span>{{ formatDate(article.published_at) }}</span>
                     </div>
                 </div>
 
