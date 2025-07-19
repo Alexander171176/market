@@ -187,15 +187,9 @@ const onClickOutside = (e) => {
 
 <template>
     <!-- Верхний блок (используем ref) -->
-    <div ref="topBarRef" :class="[bgColorClass]">
-        <div class="max-w-12xl mx-auto">
-            <div class="flex items-center justify-center h-10">
-                <div class="ml-2 flex items-center">
-                    <SocialIcons class="flex"/>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div
+        ref="topBarRef"
+        class="h-8 bg-cover bg-center" style="background-image: url('/images/sky.jpg')"></div>
 
     <!-- Плейсхолдер (используем ref и вычисляемый класс) -->
     <div ref="navPlaceholderRef" :class="[placeholderClasses, bgColorClass]"></div>
@@ -219,6 +213,14 @@ const onClickOutside = (e) => {
                     <ApplicationMark class="block h-5 w-auto mr-2"/>
                     VCG
                 </Link>
+
+                <div class="hidden sm:block max-w-12xl mx-auto">
+                    <div class="flex items-center justify-center h-10">
+                        <div class="ml-2 flex items-center">
+                            <SocialIcons class="flex"/>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="ml-2 flex items-center">
 
