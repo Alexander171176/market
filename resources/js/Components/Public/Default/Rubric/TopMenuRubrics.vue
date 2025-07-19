@@ -62,6 +62,20 @@ watch(currentLocale, (newLocale, oldLocale) => {
                 </Link>
             </li>
 
+            <!-- Внутренняя ссылка -->
+            <li>
+                <Link :href="`/videos`"
+                      class="flex items-center"
+                      :class="[
+                        'mx-2 pb-0.5 text-sm font-medium transition duration-300',
+                        $page.url.includes(`/videos`)
+                          ? 'border-b-2 border-blue-500 dark:border-blue-500 text-blue-500'
+                          : 'text-slate-900 hover:text-blue-500'
+                      ]">
+                    <span>{{ t('allVideos') }}</span>
+                </Link>
+            </li>
+
             <!-- 🔗 Внешняя ссылка -->
             <li>
                 <a href="https://vcg.org.kz/" target="_blank" rel="noopener noreferrer"

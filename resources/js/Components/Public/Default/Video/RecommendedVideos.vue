@@ -38,19 +38,38 @@ const playVideo = (videoId) => {
 const getVideoUrl = (video) => {
     const source = video.source_type;
     const id = video.external_video_id;
+
     try {
         if (source === 'youtube') {
+            let videoId = null;
             const url = new URL(id);
-            const videoId = url.searchParams.get('v');
-            return `https://www.youtube.com/embed/${videoId}`;
+
+            // Попробовать вытащить параметр ?v=...
+            videoId = url.searchParams.get('v');
+
+            // Если это ссылка вида youtu.be/ID
+            if (!videoId && url.hostname === 'youtu.be') {
+                videoId = url.pathname.slice(1);
+            }
+
+            // Если это ссылка вида /shorts/ID или другой путь
+            if (!videoId && url.pathname) {
+                const match = url.pathname.match(/(?:\/shorts\/|\/watch\/|\/)([a-zA-Z0-9_-]{11})/);
+                videoId = match ? match[1] : null;
+            }
+
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
         }
+
         if (source === 'vimeo') {
             const match = id.match(/vimeo\.com\/(?:video\/)?(\d+)/);
             return match ? `https://player.vimeo.com/video/${match[1]}` : null;
         }
+
         if (source === 'local') {
             return video.video_url || `/storage/${id}`;
         }
+
         if (source === 'code') {
             return video.video_code || video.embed_code || null;
         }
@@ -58,6 +77,7 @@ const getVideoUrl = (video) => {
         console.error('❌ Video URL error:', e);
         return null;
     }
+
     return null;
 };
 

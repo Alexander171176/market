@@ -36,9 +36,29 @@ const emit = defineEmits([
 
 // Функции для извлечения ID из ссылки YouTube/Vimeo
 const extractYouTubeId = (url) => {
-    const regex = /(?:youtube\.com\/.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
+    try {
+        const parsed = new URL(url);
+
+        // https://www.youtube.com/watch?v=VIDEO_ID
+        const vParam = parsed.searchParams.get('v');
+        if (vParam) return vParam;
+
+        // https://youtu.be/VIDEO_ID
+        if (parsed.hostname === 'youtu.be') {
+            return parsed.pathname.slice(1);
+        }
+
+        // https://www.youtube.com/shorts/VIDEO_ID
+        if (parsed.pathname.startsWith('/shorts/')) {
+            const parts = parsed.pathname.split('/');
+            return parts[2] || parts[1]; // to handle both with and without trailing slash
+        }
+
+    } catch (e) {
+        console.error('❌ extractYouTubeId error:', e);
+    }
+
+    return null;
 };
 
 const extractVimeoId = (url) => {

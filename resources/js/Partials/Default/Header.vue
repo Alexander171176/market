@@ -309,14 +309,21 @@ const onClickOutside = (e) => {
                 </ResponsiveNavLink>
 
                 <form v-if="auth.user" @submit.prevent="logout" class="w-full ml-2">
-                    <LogoutButton>{{ t('logout') }}</LogoutButton>
+                    <LogoutButton>
+                        {{ t('logout') }}
+                    </LogoutButton>
                 </form>
 
                 <template v-else>
-                    <ResponsiveNavLink :href="route('login')">{{ t('login') }}</ResponsiveNavLink>
+
+                    <ResponsiveNavLink :href="route('login')">
+                        {{ t('login') }}
+                    </ResponsiveNavLink>
+
                     <ResponsiveNavLink v-if="canRegister" :href="route('register')">
                         {{ t('register') }}
                     </ResponsiveNavLink>
+
                 </template>
 
             </div>

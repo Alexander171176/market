@@ -134,6 +134,7 @@ Route::group([
         Route::get('/tags/{url}', [$publicTagController, 'show'])->where('url', '.*')->name('public.tags.show');
 
         $publicVideoController = "App\\Http\\Controllers\\Public\\{$siteLayout}\\VideoController";
+        Route::get('/videos', [$publicVideoController, 'index'])->name('videos.index');
         Route::get('/videos/{url}', [$publicVideoController, 'show'])->where('url', '.*')->name('public.videos.show');
         Route::post('/videos/{video}/like', [$publicVideoController, 'like'])->name('videos.like');
 

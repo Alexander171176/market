@@ -34,6 +34,7 @@ export default {
     alertLikeAlready: 'You\'ve already liked it.)',
     alertLikeAuthRequired: 'You need to log in for a like',
     allRightsReserved: 'All rights reserved.',
+    allVideos: 'All videos',
     alreadyRegistered: 'Already registered?',
     and: 'and',
     apiToken: 'API Token',

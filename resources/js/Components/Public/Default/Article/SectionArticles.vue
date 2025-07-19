@@ -273,7 +273,8 @@ onBeforeUnmount(() => {
             <!-- Кнопка назад -->
             <button @click="goToPage(pagination.currentPage - 1)"
                     :disabled="pagination.currentPage === 1"
-                    class="px-3 py-1 rounded bg-slate-100 dark:bg-slate-600 text-gray-900 dark:text-gray-100
+                    class="px-3 py-1 rounded bg-slate-100 dark:bg-slate-600
+                           text-gray-900 dark:text-gray-100
                            border border-gray-400 dark:border-gray-200 disabled:opacity-50">
                 «
             </button>
@@ -283,15 +284,17 @@ onBeforeUnmount(() => {
                    @change="e => goToPage(Number(e.target.value))"
                    :min="1"
                    :max="pagination.lastPage"
-                   class="w-16 text-center px-3 py-1.5 border border-gray-400 dark:border-gray-200 rounded
-                          bg-slate-100 dark:bg-slate-600 text-gray-900 dark:text-white text-xs"/>
+                   class="w-16 text-center px-3 py-1.5 rounded text-xs
+                          border border-gray-400 dark:border-gray-200
+                          bg-slate-100 dark:bg-slate-600 text-gray-900 dark:text-white"/>
 
             <span class="text-gray-700 dark:text-gray-200">/ {{ pagination.lastPage }}</span>
 
             <!-- Кнопка вперёд -->
             <button @click="goToPage(pagination.currentPage + 1)"
                     :disabled="pagination.currentPage === pagination.lastPage"
-                    class="px-3 py-1 rounded bg-slate-100 dark:bg-slate-600 text-gray-900 dark:text-gray-100
+                    class="px-3 py-1 rounded bg-slate-100 dark:bg-slate-600
+                           text-gray-900 dark:text-gray-100
                            border border-gray-400 dark:border-gray-200 disabled:opacity-50">
                 »
             </button>

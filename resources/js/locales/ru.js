@@ -34,6 +34,7 @@ export default {
     alertLikeAlready: 'Вы уже лайкнули)',
     alertLikeAuthRequired: 'Для лайка нужно авторизоваться',
     allRightsReserved: 'Все права защищены.',
+    allVideos: 'Все видео',
     alreadyRegistered: 'Уже зарегистрированы?',
     and: 'и',
     apiToken: 'Токен API',

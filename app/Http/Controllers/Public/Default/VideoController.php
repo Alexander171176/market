@@ -16,6 +16,110 @@ use Inertia\Response;
 
 class VideoController extends Controller
 {
+
+    /**
+     * Страница всех видео
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request): Response
+    {
+        $locale = app()->getLocale();
+        $search = trim($request->input('search'));
+        $currentPage = (int) $request->input('page_videos', 1);
+        $perPage = 6;
+
+        // Базовый запрос
+        $query = Video::where('activity', true)
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->withCount('likes')
+            ->orderByDesc('created_at');
+
+        // Поиск
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+
+        // Пагинация
+        $videosPaginator = $query->paginate($perPage, ['*'], 'page_videos', $currentPage);
+
+        // Лайки текущего пользователя
+        $videoIds = $videosPaginator->pluck('id')->toArray();
+        $likedVideoIds = auth()->check()
+            ? auth()->user()->videoLikes()->whereIn('video_id', $videoIds)->pluck('video_id')->toArray()
+            : [];
+
+        // Трансформация коллекции с already_liked
+        $videosWithLikes = $videosPaginator->getCollection()->map(function ($video) use ($likedVideoIds) {
+            return array_merge(
+                (new VideoResource($video))->resolve(),
+                ['already_liked' => in_array($video->id, $likedVideoIds)]
+            );
+        });
+
+        // Остальной контент страницы
+        $leftArticles = Article::where('activity', 1)
+            ->where('locale', $locale)
+            ->where('left', true)
+            ->orderBy('sort', 'desc')
+            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
+            ->get();
+
+        $rightArticles = Article::where('activity', 1)
+            ->where('locale', $locale)
+            ->where('right', true)
+            ->orderBy('sort', 'desc')
+            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
+            ->get();
+
+        $leftBanners = Banner::where('activity', 1)
+            ->where('left', true)
+            ->orderBy('sort', 'desc')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
+        $rightBanners = Banner::where('activity', 1)
+            ->where('right', true)
+            ->orderBy('sort', 'desc')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
+        $leftVideos = Video::where('activity', 1)
+            ->where('left', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
+        $rightVideos = Video::where('activity', 1)
+            ->where('right', true)
+            ->orderBy('sort')
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->get();
+
+        return Inertia::render('Public/Default/Videos/Index', [
+            'videos' => [
+                'data' => $videosWithLikes,
+            ],
+            'pagination' => [
+                'currentPage' => $videosPaginator->currentPage(),
+                'lastPage' => $videosPaginator->lastPage(),
+                'perPage' => $videosPaginator->perPage(),
+                'total' => $videosPaginator->total(),
+            ],
+            'filters' => [
+                'search' => $search,
+            ],
+            'locale' => $locale,
+            'leftArticles' => ArticleResource::collection($leftArticles),
+            'rightArticles' => ArticleResource::collection($rightArticles),
+            'leftBanners' => BannerResource::collection($leftBanners),
+            'rightBanners' => BannerResource::collection($rightBanners),
+            'leftVideos' => VideoResource::collection($leftVideos),
+            'rightVideos' => VideoResource::collection($rightVideos),
+        ]);
+    }
+
     /**
      * Страница показа видео
      */

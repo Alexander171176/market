@@ -34,6 +34,7 @@ export default {
     alertLikeAlready: 'Сізге әлдеқашан ұнады)',
     alertLikeAuthRequired: 'Ұнату үшін жүйеге кіру керек',
     allRightsReserved: 'Барлық құқықтар қорғалған.',
+    allVideos: 'Барлық бейнелер',
     alreadyRegistered: 'Тіркелгенсіз бе?',
     and: 'және',
     apiToken: 'API токені',

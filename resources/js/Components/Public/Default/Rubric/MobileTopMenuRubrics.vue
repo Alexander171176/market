@@ -62,6 +62,18 @@ watch(currentLocale, (newLocale, oldLocale) => {
                 </Link>
             </li>
             <li>
+                <Link :href="`/videos`"
+                      class="flex items-center"
+                      :class="[
+                        'mx-2 pb-0.5 mb-2 text-sm font-medium transition duration-300',
+                        $page.url.includes(`/videos`)
+                          ? 'border-b-2 border-blue-500 dark:border-blue-500 text-blue-700 dark:text-blue-200'
+                          : 'text-slate-900 dark:text-slate-200 hover:text-blue-500'
+                      ]">
+                    <span>{{ t('allVideos') }}</span>
+                </Link>
+            </li>
+            <li>
                 <a href="https://vcg.org.kz/" target="_blank" rel="noopener noreferrer"
                    class="flex items-center mx-2 pt-1 uppercase
                           text-xs font-semibold text-slate-900 dark:text-slate-100

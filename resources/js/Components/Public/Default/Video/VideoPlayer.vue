@@ -53,9 +53,24 @@ const getVideoUrl = (video) => {
 
     try {
         if (source === 'youtube') {
+            let videoId = null;
             const url = new URL(id);
-            const videoId = url.searchParams.get('v');
-            return `https://www.youtube.com/embed/${videoId}`;
+
+            // Попробовать вытащить параметр ?v=...
+            videoId = url.searchParams.get('v');
+
+            // Если это ссылка вида youtu.be/ID
+            if (!videoId && url.hostname === 'youtu.be') {
+                videoId = url.pathname.slice(1);
+            }
+
+            // Если это ссылка вида /shorts/ID или другой путь
+            if (!videoId && url.pathname) {
+                const match = url.pathname.match(/(?:\/shorts\/|\/watch\/|\/)([a-zA-Z0-9_-]{11})/);
+                videoId = match ? match[1] : null;
+            }
+
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
         }
 
         if (source === 'vimeo') {
@@ -77,6 +92,7 @@ const getVideoUrl = (video) => {
 
     return null;
 };
+
 </script>
 
 <template>
