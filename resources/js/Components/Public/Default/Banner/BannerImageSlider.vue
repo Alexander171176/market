@@ -49,6 +49,7 @@ const currentImage = computed(() => {
             :title="title || currentImage.caption"
             class="w-full h-full object-cover shadow-md shadow-gray-600
                    transition-transform duration-300 hover:scale-105"
+            loading="lazy"
         />
     </div>
 </template>

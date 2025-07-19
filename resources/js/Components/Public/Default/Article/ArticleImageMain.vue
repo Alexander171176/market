@@ -31,6 +31,7 @@ const currentImage = computed(() => props.images[currentIndex.value]);
                     :alt="currentImage.alt"
                     class="w-full h-full object-cover
                            shadow-md shadow-gray-600 dark:shadow-gray-900"
+                    loading="lazy"
                 />
             </transition>
         </Link>

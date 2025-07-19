@@ -56,6 +56,7 @@ const currentImage = computed(() => {
                 :title="title || currentImage.caption"
                 class="w-full h-full object-cover shadow-md shadow-gray-600
                        rounded-md transition-transform duration-300 hover:scale-105"
+                loading="lazy"
             />
         </Link>
         <template v-else>
@@ -64,6 +65,7 @@ const currentImage = computed(() => {
                 :alt="alt || currentImage.alt"
                 :title="title || currentImage.caption"
                 class="w-full h-full object-cover rounded-md"
+                loading="lazy"
             />
         </template>
     </div>

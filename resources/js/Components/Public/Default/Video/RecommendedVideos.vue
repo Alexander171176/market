@@ -114,6 +114,7 @@ onUnmounted(() => {
                                     :alt="img.alt || item.title"
                                     class="slide-fade w-full h-full object-cover"
                                     :class="{ 'slide-fade-active': index === currentSlides[item.id] }"
+                                    loading="lazy"
                                 />
                             </template>
                             <div class="absolute inset-0 flex items-center justify-center z-20">
@@ -138,7 +139,7 @@ onUnmounted(() => {
                                 style="width: 100% !important; aspect-ratio: 16 / 9 !important; display: block !important;"
                                 frameborder="0"
                                 allow="autoplay; fullscreen; picture-in-picture"
-                                allowfullscreen>
+                                allowfullscreen loading="lazy">
                         </iframe>
                         <video v-else-if="item.source_type === 'local'"
                                class="w-full h-full object-contain"

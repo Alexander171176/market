@@ -121,7 +121,9 @@ Route::group([
         Route::get('/api/menu-rubrics', [\App\Http\Controllers\Public\Default\RubricController::class,
             'menuRubrics'])->name('api.rubrics.menu');
 
-        Route::get('/', fn() => Inertia::render('Public/' . $siteLayout . '/Index'))->name('home'); // Добавим имя
+        $publicHomeController = "App\\Http\\Controllers\\Public\\{$siteLayout}\\HomeController";
+        Route::get('/', [$publicHomeController,
+            'index'])->name('home');
 
         $publicRubricController = "App\\Http\\Controllers\\Public\\{$siteLayout}\\RubricController";
         Route::get('/rubrics/{url}', [$publicRubricController, 'show'])->where('url', '.*')->name('public.rubrics.show');

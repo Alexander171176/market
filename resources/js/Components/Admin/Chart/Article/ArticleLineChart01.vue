@@ -39,7 +39,7 @@ const processArticles = () => {
     const sorted = [...props.articles].sort((a, b) => a.id - b.id);
     const labels = sorted.map(a => `ID: ${a.id}`);
     const views = sorted.map(a => a.views || 0);
-    const likes = sorted.map(a => a.likes || 0);
+    const likes = sorted.map(a => a.likes_count || 0); // заменили likes → likes_count
 
     return {
         labels,

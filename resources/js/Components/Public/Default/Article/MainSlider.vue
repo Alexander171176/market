@@ -52,6 +52,7 @@ onUnmounted(() => {
                             :src="currentArticle.images[0].webp_url || currentArticle.images[0].url"
                             :alt="currentArticle.images[0].alt"
                             class="w-full h-full object-cover"
+                            loading="lazy"
                         />
                         <div
                             v-else

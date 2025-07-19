@@ -30,27 +30,23 @@ class VideoController extends Controller
         $currentPage = (int) $request->input('page_videos', 1);
         $perPage = 6;
 
-        // Базовый запрос
+        // Видео с пагинацией
         $query = Video::where('activity', true)
             ->with(['images' => fn($q) => $q->orderBy('order')])
             ->withCount('likes')
             ->orderByDesc('created_at');
 
-        // Поиск
         if ($search) {
             $query->where('title', 'like', "%{$search}%");
         }
 
-        // Пагинация
         $videosPaginator = $query->paginate($perPage, ['*'], 'page_videos', $currentPage);
 
-        // Лайки текущего пользователя
         $videoIds = $videosPaginator->pluck('id')->toArray();
         $likedVideoIds = auth()->check()
             ? auth()->user()->videoLikes()->whereIn('video_id', $videoIds)->pluck('video_id')->toArray()
             : [];
 
-        // Трансформация коллекции с already_liked
         $videosWithLikes = $videosPaginator->getCollection()->map(function ($video) use ($likedVideoIds) {
             return array_merge(
                 (new VideoResource($video))->resolve(),
@@ -58,58 +54,45 @@ class VideoController extends Controller
             );
         });
 
-        // Остальной контент страницы
-        $leftArticles = Article::where('activity', 1)
+        // Универсальный контент: статьи, баннеры, видео
+        $sideArticles = Article::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+            ->where(function ($q) {
+                $q->where('left', true)->orWhere('right', true);
+            })
             ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
+            ->orderBy('sort', 'desc')
             ->get();
 
-        $rightArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
+        $leftArticles = $sideArticles->where('left', true)->values();
+        $rightArticles = $sideArticles->where('right', true)->values();
 
-        $leftBanners = Banner::where('activity', 1)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+        $allBanners = Banner::where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $rightBanners = Banner::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $leftVideos = Video::where('activity', 1)
-            ->where('left', true)
             ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
-        $rightVideos = Video::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort')
+        $leftBanners = $allBanners->where('left', true)->values();
+        $rightBanners = $allBanners->where('right', true)->values();
+
+        $allVideos = Video::where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->orderBy('sort')
             ->get();
+
+        $leftVideos = $allVideos->where('left', true)->values();
+        $rightVideos = $allVideos->where('right', true)->values();
 
         return Inertia::render('Public/Default/Videos/Index', [
-            'videos' => [
-                'data' => $videosWithLikes,
-            ],
+            'videos' => ['data' => $videosWithLikes],
             'pagination' => [
                 'currentPage' => $videosPaginator->currentPage(),
-                'lastPage' => $videosPaginator->lastPage(),
-                'perPage' => $videosPaginator->perPage(),
-                'total' => $videosPaginator->total(),
+                'lastPage'    => $videosPaginator->lastPage(),
+                'perPage'     => $videosPaginator->perPage(),
+                'total'       => $videosPaginator->total(),
             ],
-            'filters' => [
-                'search' => $search,
-            ],
+            'filters' => ['search' => $search],
             'locale' => $locale,
             'leftArticles' => ArticleResource::collection($leftArticles),
             'rightArticles' => ArticleResource::collection($rightArticles),
@@ -138,53 +121,40 @@ class VideoController extends Controller
             ])
             ->firstOrFail();
 
-        // Увеличиваем счётчик просмотров
         $video->increment('views');
 
-        // Получаем, лайкал ли пользователь
         $alreadyLiked = auth()->check()
             ? $video->likes()->where('user_id', auth()->id())->exists()
             : false;
 
-        // Статьи в колонках
-        $leftArticles = Article::where('activity', 1)
+        $sideArticles = Article::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+            ->where(function ($q) {
+                $q->where('left', true)->orWhere('right', true);
+            })
             ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
+            ->orderBy('sort', 'desc')
             ->get();
 
-        $rightArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
+        $leftArticles = $sideArticles->where('left', true)->values();
+        $rightArticles = $sideArticles->where('right', true)->values();
 
-        // Баннеры в колонках
-        $leftBanners = Banner::where('activity', 1)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+        $allBanners = Banner::where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $rightBanners = Banner::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $leftVideos = Video::where('activity', 1)
-            ->where('left', true)
             ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
-        $rightVideos = Video::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort')
+        $leftBanners = $allBanners->where('left', true)->values();
+        $rightBanners = $allBanners->where('right', true)->values();
+
+        $allVideos = Video::where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->orderBy('sort')
             ->get();
+
+        $leftVideos = $allVideos->where('left', true)->values();
+        $rightVideos = $allVideos->where('right', true)->values();
 
         return Inertia::render('Public/Default/Videos/Show', [
             'video' => array_merge(

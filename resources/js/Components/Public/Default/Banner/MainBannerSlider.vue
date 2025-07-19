@@ -58,6 +58,7 @@ onBeforeUnmount(stopSlider);
                             :title="banner.title || ''"
                             class="w-full h-auto object-contain mx-auto
                                    transition-transform duration-500"
+                            loading="lazy"
                         />
                     </Link>
 
@@ -69,6 +70,7 @@ onBeforeUnmount(stopSlider);
                         :title="banner.title || ''"
                         class="w-full h-auto object-contain mx-auto
                                transition-transform duration-500"
+                        loading="lazy"
                     />
 
                     <!-- Нет изображения → заглушка -->
@@ -78,6 +80,7 @@ onBeforeUnmount(stopSlider);
                         alt="Нет изображения"
                         class="w-full h-auto object-contain mx-auto opacity-50
                                transition-transform duration-500"
+                        loading="lazy"
                     />
 
                 </div>

@@ -34,8 +34,8 @@ const props = defineProps({
                 <div class="sm:flex sm:justify-between sm:items-center mb-2">
                     <!-- Возможно, сюда стоит добавить какой-то контент -->
                 </div>
-                <ArticleLineChart01 :articles="props.articles" :width="600" :height="400" />
                 <RubricBarChart01 :rubrics="props.rubrics" :width="600" :height="400" />
+                <ArticleLineChart01 :articles="props.articles" :width="600" :height="400" />
             </div>
         </div>
     </AdminLayout>

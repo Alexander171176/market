@@ -23,102 +23,94 @@ class ArticleController extends Controller
     {
         $locale = app()->getLocale();
 
+        // Статья с лайками, изображениями и связанными статьями
         $article = Article::withCount('likes')
             ->with([
                 'images' => fn($q) => $q->orderBy('order'),
                 'tags',
                 'relatedArticles' => fn($q) => $q
                     ->where('activity', 1)
-                    ->where('locale', $locale),
-                'relatedArticles.images' => fn($q) => $q->orderBy('order'),
+                    ->where('locale', $locale)
+                    ->with(['images' => fn($q) => $q->orderBy('order')])
             ])
             ->where('activity', 1)
             ->where('locale', $locale)
             ->where('url', $url)
             ->firstOrFail();
 
-        // Инкремент просмотров
+        // Увеличиваем просмотры
         $article->increment('views');
 
-        // Получаем, лайкал ли пользователь
+        // Уже лайкал?
         $alreadyLiked = auth()->check()
             ? $article->likes()->where('user_id', auth()->id())->exists()
             : false;
 
-        // Статьи
-        $leftArticles = Article::where('activity', 1)
+        // Заранее загружаем все статьи с флагами left / right
+        $sideArticles = Article::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+            ->where(function ($q) {
+                $q->where('left', true)->orWhere('right', true);
+            })
             ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
+            ->orderBy('sort', 'desc')
             ->get();
 
-        $rightArticles = Article::where('activity', 1)
+        $leftArticles = $sideArticles->where('left', true)->values();
+        $rightArticles = $sideArticles->where('right', true)->values();
+
+        // Загрузка всех баннеров и разбиение
+        $allBanners = Banner::query()
+            ->where('activity', 1)
+            ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->orderBy('sort')
+            ->get();
+
+        $leftBanners = $allBanners->where('left', true)->values();
+        $rightBanners = $allBanners->where('right', true)->values();
+
+        // Загрузка всех видео и разбиение
+        $allVideos = Video::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
-
-        $leftBanners = Banner::where('activity', 1)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $rightBanners = Banner::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $leftVideos = Video::where('activity', 1)
-            ->where('left', true)
             ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
-        $rightVideos = Video::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
+        $leftVideos = $allVideos->where('left', true)->values();
+        $rightVideos = $allVideos->where('right', true)->values();
 
-        // Получаем все видео, в которых есть эта статья
+        // Видео, в которых участвует эта статья
         $videosWithThisArticle = Video::whereHas('articles', function ($q) use ($article) {
             $q->where('articles.id', $article->id);
-        })->get();
+        })
+            ->with(['relatedVideos' => fn($q) => $q
+                ->where('activity', 1)
+                ->where('locale', $locale)
+                ->with(['images' => fn($q) => $q->orderBy('order')])
+                ->orderBy('sort')
+            ])
+            ->get();
 
-        // Собираем рекомендованные видео со всех таких видео
-        $recommendedVideos = collect();
-
-        foreach ($videosWithThisArticle as $video) {
-            $recommendedVideos = $recommendedVideos->merge(
-                $video->relatedVideos()
-                    ->where('activity', 1)
-                    ->where('locale', $locale)
-                    ->with(['images' => fn($q) => $q->orderBy('order')])
-                    ->orderBy('sort')
-                    ->get()
-            );
-        }
-
-        // Удаляем дубликаты по id
-        $recommendedVideos = $recommendedVideos->unique('id')->values();
+        // Собираем уникальные рекомендованные видео
+        $recommendedVideos = $videosWithThisArticle
+            ->flatMap(fn($video) => $video->relatedVideos)
+            ->unique('id')
+            ->values();
 
         return Inertia::render('Public/Default/Articles/Show', [
-            // ⬇️ Передаём уже лайкал ли пользователь в props
-            'article'             => array_merge(
+            'article' => array_merge(
                 (new ArticleResource($article))->resolve(),
                 ['already_liked' => $alreadyLiked]
             ),
-            'leftArticles'        => ArticleResource::collection($leftArticles),
-            'rightArticles'       => ArticleResource::collection($rightArticles),
+            'leftArticles' => ArticleResource::collection($leftArticles),
+            'rightArticles' => ArticleResource::collection($rightArticles),
             'recommendedArticles' => ArticleResource::collection($article->relatedArticles),
-            'leftBanners'         => BannerResource::collection($leftBanners),
-            'rightBanners'        => BannerResource::collection($rightBanners),
-            'leftVideos'          => VideoResource::collection($leftVideos),
-            'rightVideos'         => VideoResource::collection($rightVideos),
+            'leftBanners' => BannerResource::collection($leftBanners),
+            'rightBanners' => BannerResource::collection($rightBanners),
+            'leftVideos' => VideoResource::collection($leftVideos),
+            'rightVideos' => VideoResource::collection($rightVideos),
             'recommendedVideos' => VideoResource::collection($recommendedVideos),
         ]);
     }

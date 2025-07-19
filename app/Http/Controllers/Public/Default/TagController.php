@@ -30,91 +30,69 @@ class TagController extends Controller
     {
         $locale = app()->getLocale();
         $search = trim($request->input('search'));
-        $currentPageArticles = (int) $request->input('page_articles', 1);
         $perPage = 4;
 
-        // Получаем тег
+        // 🔹 Получение тега
         $tag = Tag::where('slug', $slug)->firstOrFail();
-
-        // Увеличиваем счётчик просмотров
         $tag->increment('views');
 
-        // Получаем статьи, у которых есть этот тег
-        $articlesQuery = Article::where('activity', 1)
+        // 🔹 Пагинация по статьям с этим тегом
+        $paginatedArticles = Article::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
             ->whereHas('tags', fn($q) => $q->where('id', $tag->id))
             ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
             ->with([
                 'images' => fn($q) => $q->orderBy('order'),
-                'tags'
+                'tags',
             ])
-            ->orderByDesc('published_at');
+            ->orderByDesc('published_at')
+            ->paginate($perPage, ['*'], 'page_articles');
 
-        $allArticles = $articlesQuery->get();
+        $articlesCount = $paginatedArticles->total();
 
-        $paginatedArticles = new LengthAwarePaginator(
-            $allArticles->forPage($currentPageArticles, $perPage),
-            $allArticles->count(),
-            $perPage,
-            $currentPageArticles,
-            [
-                'path' => request()->url(),
-                'pageName' => 'page_articles',
-                'query' => request()->query(),
-            ]
-        );
-
-        $articlesCount = $allArticles->count();
-
-        // Дополнительные статьи и баннеры
-        $leftArticles = Article::where('activity', 1)
+        // 🔹 Единый запрос для статей с флагами
+        $flaggedArticles = Article::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+            ->where(function ($q) {
+                $q->where('left', true)
+                    ->orWhere('main', true)
+                    ->orWhere('right', true);
+            })
             ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
+            ->orderByDesc('sort')
             ->get();
 
-        $mainArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('main', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
+        $leftArticles  = $flaggedArticles->where('left', true)->take(3)->values();
+        $mainArticles  = $flaggedArticles->where('main', true)->take(3)->values();
+        $rightArticles = $flaggedArticles->where('right', true)->take(3)->values();
 
-        $rightArticles = Article::where('activity', 1)
-            ->where('locale', $locale)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->get();
-
-        $leftBanners = Banner::where('activity', 1)
-            ->where('left', true)
-            ->orderBy('sort', 'desc')
+        // 🏁 Один запрос ко всем активным баннерам
+        $allBanners = Banner::query()
+            ->where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $rightBanners = Banner::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort', 'desc')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->get();
-
-        $leftVideos = Video::where('activity', 1)
-            ->where('left', true)
             ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
             ->get();
 
-        $rightVideos = Video::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort')
+        // ⚡ Группировка баннеров
+        $leftBanners = $allBanners->where('left', true)->values();
+        $rightBanners = $allBanners->where('right', true)->values();
+
+        // 🎥 Один запрос ко всем активным видео
+        $allVideos = Video::query()
+            ->where('activity', 1)
             ->with(['images' => fn($q) => $q->orderBy('order')])
+            ->orderBy('sort')
             ->get();
+
+        // ⚡ Группировка видео
+        $leftVideos = $allVideos->where('left', true)->values();
+        $rightVideos = $allVideos->where('right', true)->values();
 
         return Inertia::render('Public/Default/Tags/Show', [
-            'tag' => new TagResource($tag),
-            'articles' => ArticleResource::collection($paginatedArticles),
+            'tag'           => new TagResource($tag),
+            'articles'      => ArticleResource::collection($paginatedArticles),
             'articlesCount' => $articlesCount,
             'pagination' => [
                 'currentPage' => $paginatedArticles->currentPage(),
@@ -122,17 +100,15 @@ class TagController extends Controller
                 'perPage'     => $paginatedArticles->perPage(),
                 'total'       => $paginatedArticles->total(),
             ],
-            'locale' => $locale,
-            'filters' => [
-                'search' => $search,
-            ],
-            'leftArticles' => ArticleResource::collection($leftArticles),
-            'mainArticles' => ArticleResource::collection($mainArticles),
+            'locale'        => $locale,
+            'filters'       => ['search' => $search],
+            'leftArticles'  => ArticleResource::collection($leftArticles),
+            'mainArticles'  => ArticleResource::collection($mainArticles),
             'rightArticles' => ArticleResource::collection($rightArticles),
-            'leftBanners' => BannerResource::collection($leftBanners),
-            'rightBanners' => BannerResource::collection($rightBanners),
-            'leftVideos' => VideoResource::collection($leftVideos),
-            'rightVideos' => VideoResource::collection($rightVideos),
+            'leftBanners'   => BannerResource::collection($leftBanners),
+            'rightBanners'  => BannerResource::collection($rightBanners),
+            'leftVideos'    => VideoResource::collection($leftVideos),
+            'rightVideos'   => VideoResource::collection($rightVideos),
         ]);
     }
 

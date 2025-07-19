@@ -175,7 +175,7 @@ const formatDate = (dateString) => {
                 <img :src="article.images[0].webp_url || article.images[0].url"
                      :alt="article.images[0].alt"
                      class="w-full h-full object-cover
-                            shadow-md shadow-gray-600 dark:shadow-gray-900" />
+                            shadow-md shadow-gray-600 dark:shadow-gray-900" loading="lazy"/>
                 <meta itemprop="width" content="800" />
                 <meta itemprop="height" content="600" />
             </div>
@@ -187,7 +187,7 @@ const formatDate = (dateString) => {
                 <img src="/article_images/default-image.png"
                      alt="No image available"
                      class="w-full h-full object-cover opacity-40
-                            shadow-md shadow-gray-600 dark:shadow-gray-900" />
+                            shadow-md shadow-gray-600 dark:shadow-gray-900" loading="lazy"/>
                 <meta itemprop="width" content="800" />
                 <meta itemprop="height" content="600" />
             </div>
@@ -259,6 +259,7 @@ const formatDate = (dateString) => {
                                     :src="rec.images[0].webp_url || rec.images[0].url"
                                     :alt="rec.images[0].alt"
                                     class="w-full h-full object-cover"
+                                    loading="lazy"
                                 />
                                 <div v-else
                                      class="w-full h-full flex items-center justify-center

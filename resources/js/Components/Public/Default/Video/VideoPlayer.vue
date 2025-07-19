@@ -106,6 +106,7 @@ const getVideoUrl = (video) => {
                     <img
                         :src="img.url"
                         :alt="img.alt || video.title"
+                        loading="lazy"
                         class="slide-fade w-full h-full object-cover"
                         :class="{ 'slide-fade-active': index === currentSlide }"
                     />
@@ -116,7 +117,7 @@ const getVideoUrl = (video) => {
                     <button
                         @click="playVideo(video.id)"
                         class="bg-white/30 hover:bg-white/40 backdrop-blur-md rounded-full
-                   p-2 border-8 border-white/30">
+                               p-2 border-8 border-white/30">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              class="w-8 h-8 text-red-600"
                              viewBox="0 0 24 24" fill="currentColor">
@@ -142,7 +143,7 @@ const getVideoUrl = (video) => {
                display: block !important;"
                 frameborder="0"
                 allow="autoplay; fullscreen; picture-in-picture"
-                allowfullscreen
+                allowfullscreen loading="lazy"
             ></iframe>
 
             <video

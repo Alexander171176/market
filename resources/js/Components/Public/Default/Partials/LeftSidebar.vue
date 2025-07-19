@@ -121,8 +121,8 @@ const formatDate = (dateString) => {
                                     rounded-md shadow-md shadow-gray-400 dark:shadow-gray-700">
 
                             <Link v-if="article.img" :href="`/articles/${article.url}`">
-                                <img :src="getImgSrc(article.img)" alt="Article image"
-                                     class="w-full h-auto object-cover" />
+                                <img :src="getImgSrc(article.img)" :alt="article.img.alt"
+                                     class="w-full h-auto object-cover" loading="lazy"/>
                             </Link>
                             <Link v-else-if="article.images?.length"
                                   :href="`/articles/${article.url}`">
