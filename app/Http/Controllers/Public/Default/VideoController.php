@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\Article\ArticleResource;
 use App\Http\Resources\Admin\Banner\BannerResource;
 use App\Http\Resources\Admin\Video\VideoResource;
-use App\Models\Admin\Article\Article;
-use App\Models\Admin\Banner\Banner;
 use App\Models\Admin\Video\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,16 +14,13 @@ use Inertia\Response;
 
 class VideoController extends Controller
 {
+    use HasPublicBlocksTrait;
 
     /**
-     * Страница всех видео
-     *
-     * @param Request $request
-     * @return Response
+     * Страница всех видео.
      */
     public function index(Request $request): Response
     {
-        $locale = app()->getLocale();
         $search = trim($request->input('search'));
         $currentPage = (int) $request->input('page_videos', 1);
         $perPage = 6;
@@ -54,35 +49,10 @@ class VideoController extends Controller
             );
         });
 
-        // Универсальный контент: статьи, баннеры, видео
-        $sideArticles = Article::query()
-            ->where('activity', 1)
-            ->where('locale', $locale)
-            ->where(function ($q) {
-                $q->where('left', true)->orWhere('right', true);
-            })
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->orderBy('sort', 'desc')
-            ->get();
-
-        $leftArticles = $sideArticles->where('left', true)->values();
-        $rightArticles = $sideArticles->where('right', true)->values();
-
-        $allBanners = Banner::where('activity', 1)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')
-            ->get();
-
-        $leftBanners = $allBanners->where('left', true)->values();
-        $rightBanners = $allBanners->where('right', true)->values();
-
-        $allVideos = Video::where('activity', 1)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')
-            ->get();
-
-        $leftVideos = $allVideos->where('left', true)->values();
-        $rightVideos = $allVideos->where('right', true)->values();
+        // Универсальные блоки
+        $flaggedArticles = $this->getFlaggedArticles();
+        $banners = $this->getGroupedBanners();
+        $videos = $this->getGroupedVideos();
 
         return Inertia::render('Public/Default/Videos/Index', [
             'videos' => ['data' => $videosWithLikes],
@@ -93,18 +63,18 @@ class VideoController extends Controller
                 'total'       => $videosPaginator->total(),
             ],
             'filters' => ['search' => $search],
-            'locale' => $locale,
-            'leftArticles' => ArticleResource::collection($leftArticles),
-            'rightArticles' => ArticleResource::collection($rightArticles),
-            'leftBanners' => BannerResource::collection($leftBanners),
-            'rightBanners' => BannerResource::collection($rightBanners),
-            'leftVideos' => VideoResource::collection($leftVideos),
-            'rightVideos' => VideoResource::collection($rightVideos),
+            'locale' => app()->getLocale(),
+            'leftArticles' => ArticleResource::collection($flaggedArticles['left']),
+            'rightArticles' => ArticleResource::collection($flaggedArticles['right']),
+            'leftBanners' => BannerResource::collection($banners['left']),
+            'rightBanners' => BannerResource::collection($banners['right']),
+            'leftVideos' => VideoResource::collection($videos['left']),
+            'rightVideos' => VideoResource::collection($videos['right']),
         ]);
     }
 
     /**
-     * Страница показа видео
+     * Страница показа видео.
      */
     public function show(string $url): Response
     {
@@ -127,34 +97,10 @@ class VideoController extends Controller
             ? $video->likes()->where('user_id', auth()->id())->exists()
             : false;
 
-        $sideArticles = Article::query()
-            ->where('activity', 1)
-            ->where('locale', $locale)
-            ->where(function ($q) {
-                $q->where('left', true)->orWhere('right', true);
-            })
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->orderBy('sort', 'desc')
-            ->get();
-
-        $leftArticles = $sideArticles->where('left', true)->values();
-        $rightArticles = $sideArticles->where('right', true)->values();
-
-        $allBanners = Banner::where('activity', 1)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')
-            ->get();
-
-        $leftBanners = $allBanners->where('left', true)->values();
-        $rightBanners = $allBanners->where('right', true)->values();
-
-        $allVideos = Video::where('activity', 1)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')
-            ->get();
-
-        $leftVideos = $allVideos->where('left', true)->values();
-        $rightVideos = $allVideos->where('right', true)->values();
+        // Универсальные блоки
+        $flaggedArticles = $this->getFlaggedArticles();
+        $banners = $this->getGroupedBanners();
+        $videos = $this->getGroupedVideos();
 
         return Inertia::render('Public/Default/Videos/Show', [
             'video' => array_merge(
@@ -162,21 +108,18 @@ class VideoController extends Controller
                 ['already_liked' => $alreadyLiked]
             ),
             'recommendedVideos' => VideoResource::collection($video->relatedVideos),
-            'leftArticles' => ArticleResource::collection($leftArticles),
-            'rightArticles' => ArticleResource::collection($rightArticles),
-            'leftBanners' => BannerResource::collection($leftBanners),
-            'rightBanners' => BannerResource::collection($rightBanners),
-            'leftVideos' => VideoResource::collection($leftVideos),
-            'rightVideos' => VideoResource::collection($rightVideos),
+            'leftArticles' => ArticleResource::collection($flaggedArticles['left']),
+            'rightArticles' => ArticleResource::collection($flaggedArticles['right']),
+            'leftBanners' => BannerResource::collection($banners['left']),
+            'rightBanners' => BannerResource::collection($banners['right']),
+            'leftVideos' => VideoResource::collection($videos['left']),
+            'rightVideos' => VideoResource::collection($videos['right']),
             'locale' => $locale,
         ]);
     }
 
     /**
-     * Лайк видео
-     *
-     * @param string $id
-     * @return JsonResponse
+     * Лайк видео.
      */
     public function like(string $id): JsonResponse
     {
@@ -209,5 +152,4 @@ class VideoController extends Controller
             'likes'   => $video->likes()->count(),
         ]);
     }
-
 }

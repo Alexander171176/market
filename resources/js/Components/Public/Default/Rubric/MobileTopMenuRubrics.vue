@@ -49,6 +49,18 @@ watch(currentLocale, (newLocale, oldLocale) => {
 <template>
     <nav class="space-y-1 bg-gray-200 dark:bg-gray-700 flex flex-wrap justify-center p-1">
         <ul v-if="rubrics.length" class="flex flex-wrap">
+            <li>
+                <Link :href="`/`"
+                      class="flex items-center"
+                      :class="[
+                        'mx-2 pb-0.5 mb-2 text-sm font-medium transition duration-300',
+                        $page.url.includes(`/`)
+                          ? 'border-b-2 border-blue-500 dark:border-blue-500 text-blue-700 dark:text-blue-200'
+                          : 'text-slate-900 dark:text-slate-200 hover:text-blue-500'
+                      ]">
+                    <span>{{ t('home') }}</span>
+                </Link>
+            </li>
             <li v-for="rubric in rubrics" :key="rubric.id">
                 <Link :href="`/rubrics/${rubric.url}`"
                       class="flex items-center"

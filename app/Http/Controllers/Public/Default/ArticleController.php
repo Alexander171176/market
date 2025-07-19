@@ -7,8 +7,6 @@ use App\Http\Resources\Admin\Article\ArticleResource;
 use App\Http\Resources\Admin\Banner\BannerResource;
 use App\Http\Resources\Admin\Video\VideoResource;
 use App\Models\Admin\Article\Article;
-use App\Models\Admin\Banner\Banner;
-use App\Models\Admin\Setting\Setting;
 use App\Models\Admin\Video\Video;
 use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
@@ -16,6 +14,8 @@ use Inertia\Response;
 
 class ArticleController extends Controller
 {
+    use HasPublicBlocksTrait;
+
     /**
      * Страница показа конкретной статьи.
      */
@@ -38,62 +38,29 @@ class ArticleController extends Controller
             ->where('url', $url)
             ->firstOrFail();
 
-        // Увеличиваем просмотры
         $article->increment('views');
 
-        // Уже лайкал?
         $alreadyLiked = auth()->check()
             ? $article->likes()->where('user_id', auth()->id())->exists()
             : false;
 
-        // Заранее загружаем все статьи с флагами left / right
-        $sideArticles = Article::query()
-            ->where('activity', 1)
-            ->where('locale', $locale)
-            ->where(function ($q) {
-                $q->where('left', true)->orWhere('right', true);
-            })
-            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
-            ->orderBy('sort', 'desc')
-            ->get();
+        // Флагированные блоки
+        $flaggedArticles = $this->getFlaggedArticles();
+        $banners = $this->getGroupedBanners();
+        $videos = $this->getGroupedVideos();
 
-        $leftArticles = $sideArticles->where('left', true)->values();
-        $rightArticles = $sideArticles->where('right', true)->values();
-
-        // Загрузка всех баннеров и разбиение
-        $allBanners = Banner::query()
-            ->where('activity', 1)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')
-            ->get();
-
-        $leftBanners = $allBanners->where('left', true)->values();
-        $rightBanners = $allBanners->where('right', true)->values();
-
-        // Загрузка всех видео и разбиение
-        $allVideos = Video::query()
-            ->where('activity', 1)
-            ->where('locale', $locale)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')
-            ->get();
-
-        $leftVideos = $allVideos->where('left', true)->values();
-        $rightVideos = $allVideos->where('right', true)->values();
-
-        // Видео, в которых участвует эта статья
+        // Видео, связанные с этой статьей
         $videosWithThisArticle = Video::whereHas('articles', function ($q) use ($article) {
             $q->where('articles.id', $article->id);
         })
             ->with(['relatedVideos' => fn($q) => $q
                 ->where('activity', 1)
-                ->where('locale', $locale)
+                ->where('locale', app()->getLocale())
                 ->with(['images' => fn($q) => $q->orderBy('order')])
                 ->orderBy('sort')
             ])
             ->get();
 
-        // Собираем уникальные рекомендованные видео
         $recommendedVideos = $videosWithThisArticle
             ->flatMap(fn($video) => $video->relatedVideos)
             ->unique('id')
@@ -104,22 +71,22 @@ class ArticleController extends Controller
                 (new ArticleResource($article))->resolve(),
                 ['already_liked' => $alreadyLiked]
             ),
-            'leftArticles' => ArticleResource::collection($leftArticles),
-            'rightArticles' => ArticleResource::collection($rightArticles),
+
+            'leftArticles' => ArticleResource::collection($flaggedArticles['left']),
+            'rightArticles' => ArticleResource::collection($flaggedArticles['right']),
             'recommendedArticles' => ArticleResource::collection($article->relatedArticles),
-            'leftBanners' => BannerResource::collection($leftBanners),
-            'rightBanners' => BannerResource::collection($rightBanners),
-            'leftVideos' => VideoResource::collection($leftVideos),
-            'rightVideos' => VideoResource::collection($rightVideos),
+
+            'leftBanners' => BannerResource::collection($banners['left']),
+            'rightBanners' => BannerResource::collection($banners['right']),
+
+            'leftVideos' => VideoResource::collection($videos['left']),
+            'rightVideos' => VideoResource::collection($videos['right']),
             'recommendedVideos' => VideoResource::collection($recommendedVideos),
         ]);
     }
 
     /**
-     * Лайк статьи
-     *
-     * @param string $id
-     * @return JsonResponse
+     * Лайк статьи.
      */
     public function like(string $id): JsonResponse
     {
@@ -133,9 +100,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
         $user = auth()->user();
 
-        $alreadyLiked = $article->likes()->where('user_id', $user->id)->exists();
-
-        if ($alreadyLiked) {
+        if ($article->likes()->where('user_id', $user->id)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Вы уже поставили лайк.',
@@ -143,9 +108,7 @@ class ArticleController extends Controller
             ]);
         }
 
-        $article->likes()->create([
-            'user_id' => $user->id,
-        ]);
+        $article->likes()->create(['user_id' => $user->id]);
 
         return response()->json([
             'success' => true,

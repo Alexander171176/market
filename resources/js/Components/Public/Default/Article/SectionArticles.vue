@@ -5,7 +5,7 @@ import {useI18n} from 'vue-i18n';
 import ArticleImageSlider from "@/Components/Public/Default/Article/ArticleImageSlider.vue";
 
 const {t} = useI18n();
-const { appUrl} = usePage().props;
+const { appUrl } = usePage().props;
 
 const getImgSrc = (imgPath) => {
     if (!imgPath) return '';

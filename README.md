@@ -140,6 +140,7 @@
     `docker exec market-php-app php artisan make:controller Admin/System/RobotController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/SitemapController` <br>
     `docker exec market-php-app php artisan make:controller Public/Default/HomeController` <br>
+    `docker exec market-php-app php artisan make:controller Public/AbstractPublicController` <br>
 
 21)  Create middleware ShareSettings <br>
      `docker exec market-php-app php artisan make:resource Admin/Setting/SettingSharedResource` <br>

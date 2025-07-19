@@ -13,21 +13,17 @@ use App\Models\Admin\Rubric\Rubric;
 use App\Models\Admin\Video\Video;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RubricController extends Controller
 {
-    /**
-     * Возвращает список активных рубрик в зависимости от выбранного языка.
-     *
-     * @return Response
-     */
+    use HasPublicBlocksTrait;
+
     public function index(): Response
     {
-        $locale = app()->getLocale(); // ← получаем из маршрута
+        $locale = app()->getLocale();
 
         $rubrics = Rubric::where('activity', 1)
             ->where('locale', $locale)
@@ -40,17 +36,12 @@ class RubricController extends Controller
         ]);
     }
 
-    /**
-     * Страница показа рубрики
-     */
     public function show(Request $request, string $url): Response
     {
         $locale = app()->getLocale();
         $search = trim($request->input('search'));
-        $currentPageArticles = (int) $request->input('page_articles', 1);
         $perPage = 4;
 
-        // Получаем рубрику с секциями
         $rubric = Rubric::with([
             'sections' => fn($q) => $q
                 ->where('activity', 1)
@@ -58,13 +49,9 @@ class RubricController extends Controller
                 ->orderBy('sort')
         ])->where('url', $url)->firstOrFail();
 
-        // Увеличиваем счётчик просмотров
         $rubric->increment('views');
-
-        // Получаем ID всех секций рубрики
         $sectionIds = $rubric->sections->pluck('id');
 
-        // Пагинация по статьям
         $paginatedArticles = \App\Models\Admin\Article\Article::query()
             ->where('activity', 1)
             ->where('locale', $locale)
@@ -74,76 +61,16 @@ class RubricController extends Controller
                 ->where('locale', $locale)
             )
             ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
-            ->with([
-                'images' => fn($q) => $q->orderBy('order'),
-                'tags'
-            ])
+            ->with(['images' => fn($q) => $q->orderBy('order'), 'tags'])
             ->orderByDesc('published_at')
             ->paginate($perPage, ['*'], 'page_articles');
 
-        // ⚡ Выборка для боковых блоков
-        $leftArticles = \App\Models\Admin\Article\Article::query()
+        $flaggedArticles = $this->getFlaggedArticles($sectionIds->all());
+        $banners = $this->getGroupedBanners();
+        $videos = $this->getGroupedVideos();
+
+        $sectionBanners = Banner::query()
             ->where('activity', 1)
-            ->where('locale', $locale)
-            ->where('left', true)
-            ->whereHas('sections', fn($q) =>
-            $q->whereIn('sections.id', $sectionIds)
-                ->where('activity', 1)
-                ->where('locale', $locale)
-            )
-            ->with([
-                'images' => fn($q) => $q->orderBy('order'),
-                'tags'
-            ])
-            ->orderByDesc('published_at')
-            ->limit(3)
-            ->get();
-
-        $mainArticles = \App\Models\Admin\Article\Article::query()
-            ->where('activity', 1)
-            ->where('locale', $locale)
-            ->where('main', true)
-            ->whereHas('sections', fn($q) =>
-            $q->whereIn('sections.id', $sectionIds)
-                ->where('activity', 1)
-                ->where('locale', $locale)
-            )
-            ->with([
-                'images' => fn($q) => $q->orderBy('order'),
-                'tags'
-            ])
-            ->orderByDesc('published_at')
-            ->limit(3)
-            ->get();
-
-        $rightArticles = \App\Models\Admin\Article\Article::query()
-            ->where('activity', 1)
-            ->where('locale', $locale)
-            ->where('right', true)
-            ->whereHas('sections', fn($q) =>
-            $q->whereIn('sections.id', $sectionIds)
-                ->where('activity', 1)
-                ->where('locale', $locale)
-            )
-            ->with([
-                'images' => fn($q) => $q->orderBy('order'),
-                'tags'
-            ])
-            ->orderByDesc('published_at')
-            ->limit(3)
-            ->get();
-
-        // Баннеры по флагам
-        $leftBanners = Banner::where('activity', 1)->where('left', true)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')->get();
-
-        $rightBanners = Banner::where('activity', 1)->where('right', true)
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')->get();
-
-        // Баннеры, привязанные к секциям
-        $sectionBanners = Banner::where('activity', 1)
             ->whereHas('sections', fn($q) => $q
                 ->whereIn('sections.id', $sectionIds)
                 ->where('activity', 1)
@@ -152,31 +79,18 @@ class RubricController extends Controller
                 'images' => fn($q) => $q->orderBy('order'),
                 'sections' => fn($q) => $q->where('activity', 1)->where('locale', $locale),
             ])
-            ->orderBy('sort')->get();
+            ->orderBy('sort')
+            ->get();
 
-        // Видео, связанные с секциями
-        $sectionVideos = Video::where('activity', 1)
+        $sectionVideos = Video::query()
+            ->where('activity', 1)
             ->where('locale', $locale)
             ->whereHas('sections', fn($q) => $q
                 ->whereIn('sections.id', $sectionIds)
                 ->where('activity', 1)
                 ->where('locale', $locale))
             ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->orderBy('sort')->get();
-
-        // Видео по флагам
-        $leftVideos = Video::where('activity', 1)
-            ->where('left', true)
             ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->limit(3)
-            ->get();
-
-        $rightVideos = Video::where('activity', 1)
-            ->where('right', true)
-            ->orderBy('sort')
-            ->with(['images' => fn($q) => $q->orderBy('order')])
-            ->limit(3)
             ->get();
 
         return Inertia::render('Public/Default/Rubrics/Show', [
@@ -201,23 +115,18 @@ class RubricController extends Controller
                 'search' => $search,
             ],
 
-            'leftArticles' => ArticleResource::collection($leftArticles),
-            'mainArticles' => ArticleResource::collection($mainArticles),
-            'rightArticles' => ArticleResource::collection($rightArticles),
+            'leftArticles' => ArticleResource::collection($flaggedArticles['left']),
+            'mainArticles' => ArticleResource::collection($flaggedArticles['main']),
+            'rightArticles' => ArticleResource::collection($flaggedArticles['right']),
 
-            'leftBanners' => BannerResource::collection($leftBanners),
-            'rightBanners' => BannerResource::collection($rightBanners),
+            'leftBanners' => BannerResource::collection($banners['left']),
+            'rightBanners' => BannerResource::collection($banners['right']),
 
-            'leftVideos' => VideoResource::collection($leftVideos),
-            'rightVideos' => VideoResource::collection($rightVideos),
+            'leftVideos' => VideoResource::collection($videos['left']),
+            'rightVideos' => VideoResource::collection($videos['right']),
         ]);
     }
 
-    /**
-     * Возвращает список активных рубрик в зависимости от выбранного языка.
-     *
-     * @return JsonResponse
-     */
     public function menuRubrics(): JsonResponse
     {
         $locale = app()->getLocale();
@@ -235,5 +144,4 @@ class RubricController extends Controller
             'rubricsCount' => $rubrics->count(),
         ]);
     }
-
 }

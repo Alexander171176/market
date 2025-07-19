@@ -1,15 +1,78 @@
 <script setup>
-import {Head, usePage} from '@inertiajs/vue3';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { Head, Link, usePage } from '@inertiajs/vue3'
+import { useI18n } from 'vue-i18n';
 import DefaultLayout from '@/Layouts/DefaultLayout.vue';
+import ArticleImageSlider from '@/Components/Public/Default/Article/ArticleImageSlider.vue'
+
+const { t } = useI18n();
 
 // Получаем доступ к глобальным свойствам страницы
-const {locale} = usePage().props;
+const { appUrl, sections, locale, siteSettings } = usePage().props;
 //console.log('Текущая локаль:', locale);
+
+const getImgSrc = (imgPath) => {
+    if (!imgPath) return '';
+    const base = appUrl.endsWith('/') ? appUrl.slice(0, -1) : appUrl;
+    const path = imgPath.startsWith('/') ? imgPath.slice(1) : imgPath;
+    return `${base}/storage/${path}`;
+};
 
 defineProps({
     title: String,
     canLogin: Boolean,
     canRegister: Boolean,
+});
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // месяцы от 0
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+};
+
+// Референс для хранения состояния темной темы (true, если активен темный режим)
+const isDarkMode = ref(false);
+
+// Переменная для хранения экземпляра MutationObserver,
+// чтобы можно было отключить наблюдение позже
+let observer;
+
+// Функция для проверки, активирован ли темный режим,
+// путем проверки наличия класса "dark" на элементе <html>
+const checkDarkMode = () => {
+    isDarkMode.value = document.documentElement.classList.contains('dark');
+    //console.log('Dark mode updated to:', isDarkMode.value);
+};
+
+onMounted(() => {
+    // Выполняем первоначальную проверку при монтировании компонента
+    checkDarkMode();
+
+    // Настраиваем MutationObserver для отслеживания изменений в атрибуте class у <html>
+    // Это необходимо для того, чтобы реагировать на динамические изменения темы
+    observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+        attributes: true,           // Следим за изменениями атрибутов
+        attributeFilter: ['class']  // Фильтруем только по изменению класса
+    });
+});
+
+onUnmounted(() => {
+    // При размонтировании компонента отключаем наблюдатель, чтобы избежать утечек памяти
+    if (observer) {
+        observer.disconnect();
+    }
+});
+
+// Вычисляемое свойство, которое возвращает нужный класс для фона в зависимости от текущего режима
+// Если темный режим активен, возвращается значение из настройки для темного режима,
+// иначе - значение из настройки для светлого режима.
+const bgColorClass = computed(() => {
+    return isDarkMode.value
+        ? siteSettings.PublicDarkBackgroundColor
+        : siteSettings.PublicLightBackgroundColor;
 });
 </script>
 
@@ -19,74 +82,104 @@ defineProps({
         :can-login="canLogin"
         :can-register="canRegister"
     >
-        <Head title="Welcome"/>
 
-        <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen
-                    bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-slate-900
-                    selection:bg-red-500 selection:text-white">
-            <div class="max-w-8xl mx-auto">
+        <!-- SEO -->
+        <Head>
+            <title>{{ t('home') }}</title>
+            <meta name="title" :content="''" />
+            <meta name="keywords" :content="''" />
+            <meta name="description" :content="''" />
 
-                <div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        <a href="https://laravel.com/docs/10.x"
-                           class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div>
-                                <div
-                                    class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                              d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/>
-                                    </svg>
-                                </div>
+            <meta property="og:title" :content="''" />
+            <meta property="og:description" :content="''" />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" :content="`/`" />
+            <meta property="og:image" :content="''" />
+            <meta property="og:locale" :content="'ru_RU'" />
 
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Документация
-                                    Laravel</h2>
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" :content="''" />
+            <meta name="twitter:description" :content="''" />
+            <meta name="twitter:image" :content="''" />
 
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    В Laravel есть замечательная документация, охватывающая каждый аспект фреймворка.
-                                    Независимо от того, являетесь ли вы новичком или имеете предыдущий опыт работы с
-                                    Laravel, мы рекомендуем прочитать нашу документацию от начала до конца.
-                                </p>
+            <meta name="DC.title" :content="''" />
+            <meta name="DC.description" :content="''" />
+            <meta name="DC.identifier" :content="`/`" />
+            <meta name="DC.language" :content="'ru'" />
+        </Head>
+
+        <div class="flex-1 p-4" :class="[bgColorClass]">
+
+            <!-- Хлебные крошки -->
+            <nav class="text-sm"
+                 aria-label="Breadcrumb">
+                <ol class="list-reset flex items-center space-x-0">
+                    <li class="text-slate-900 dark:text-slate-100">
+                        {{ t('home') }}
+                    </li>
+                    <li>
+                        <span class="mx-1 text-slate-900 dark:text-slate-100">/</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Заголовок рубрики -->
+            <h1 class="flex items-center justify-center my-4
+                       text-center font-bolder text-xl
+                       text-slate-900 dark:text-slate-100">
+                {{ t('home') }}
+            </h1>
+
+            <!-- Секции с их статьями -->
+            <section v-for="section in sections" :key="section.id">
+                <ul>
+                    <li v-for="article in section.articles" :key="article.id"
+                        class="col-span-full flex flex-col sm:flex-row items-start space-x-3 p-2
+                        overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800
+                        hover:shadow-md hover:shadow-gray-400 dark:hover:shadow-gray-700">
+                        <!-- Картинка -->
+                        <div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-56 h-auto
+                            shrink-0 overflow-hidden rounded-md">
+
+                            <Link v-if="article.img" :href="`/articles/${article.url}`">
+                                <img :src="getImgSrc(article.img)" :alt="article.img.alt"
+                                     class="w-full h-auto object-cover" loading="lazy"/>
+                            </Link>
+                            <Link v-else-if="article.images?.length" :href="`/articles/${article.url}`">
+                                <ArticleImageSlider :images="article.images" :link="`/articles/${article.url}`"/>
+                            </Link>
+                            <Link v-else :href="`/articles/${article.url}`"
+                                  class="flex items-center justify-center bg-gray-200 dark:bg-gray-400 h-32">
+                                <span class="text-slate-900 dark:text-slate-100">{{ t('noCurrentImage') }}</span>
+                            </Link>
+                        </div>
+
+                        <!-- Контент -->
+                        <div class="flex flex-col flex-grow">
+                            <h3 class="text-md font-semibold text-black dark:text-white my-1">
+                                <Link :href="`/articles/${article.url}`"
+                                      class="hover:text-blue-600 dark:hover:text-blue-400">
+                                    {{ article.title }}
+                                </Link>
+                            </h3>
+
+                            <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                {{ article.short }}
+                            </p>
+
+                            <div class="flex items-center justify-center
+                                text-xs font-semibold text-center
+                                text-slate-600 dark:text-slate-400 opacity-75">
+                                <svg class="w-3 h-3 fill-current shrink-0 mr-1" viewBox="0 0 16 16">
+                                    <path d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z"></path>
+                                </svg>
+                                <span>{{ formatDate(article.published_at) }}</span>
                             </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
 
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/>
-                            </svg>
-                        </a>
-
-                        <a href="https://laracasts.com"
-                           class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500">
-                            <div>
-                                <div
-                                    class="h-16 w-16 bg-red-50 dark:bg-red-800/20 flex items-center justify-center rounded-full">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                         stroke-width="1.5" class="w-7 h-7 stroke-red-500">
-                                        <path stroke-linecap="round"
-                                              d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"/>
-                                    </svg>
-                                </div>
-
-                                <h2 class="mt-6 text-xl font-semibold text-gray-900 dark:text-white">Laracasts</h2>
-
-                                <p class="mt-4 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-                                    Laracasts предлагает тысячи видеоуроков по разработке на Laravel, PHP и JavaScript.
-                                    Ознакомьтесь с ними, убедитесь сами и значительно повысьте свои навыки разработки в
-                                    процессе.
-                                </p>
-                            </div>
-
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                 class="self-center shrink-0 stroke-red-500 w-6 h-6 mx-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                      d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </DefaultLayout>
