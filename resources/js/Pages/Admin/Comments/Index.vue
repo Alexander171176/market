@@ -1,7 +1,13 @@
 <script setup>
+/**
+ * @version PulsarCMS 1.0
+ * @author Александр Косолапов <kosolapov1976@gmail.com>
+ */
 import {defineProps, ref, computed, watch} from 'vue';
 import { useForm } from '@inertiajs/vue3';
-import { useI18n } from 'vue-i18n';
+import {useI18n} from 'vue-i18n';
+import {useToast} from 'vue-toastification';
+import {router} from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import TitlePage from '@/Components/Admin/Headlines/TitlePage.vue';
 import DangerModal from '@/Components/Admin/Modal/DangerModal.vue';
@@ -15,35 +21,47 @@ import CommentDetailsModal from '@/Components/Admin/Comment/Modal/CommentDetails
 import CountTable from '@/Components/Admin/Count/CountTable.vue';
 import axios from 'axios';
 
-const { t } = useI18n();
+// --- Инициализация экземпляр i18n, toast ---
+const {t} = useI18n();
+const toast = useToast();
+
 const props = defineProps(['comments', 'commentsCount', 'adminCountComments', 'adminSortComments']);
-const form = useForm({});
 
-// Используем значение из props для начального количества элементов на странице
-const itemsPerPage = ref(props.adminCountComments)
+/**
+ * Реактивная переменная для хранения текущего количества элементов на странице.
+ */
+const itemsPerPage = ref(props.adminCountComments); // Используем значение из props
 
-// чтобы при изменении itemsPerPage автоматически обновлялся параметр в базе,
+/**
+ * Наблюдатель за изменением количества элементов на странице.
+ */
 watch(itemsPerPage, (newVal) => {
-    axios.put(route('settings.updateAdminCountComments'), { value: newVal.toString() })
-        .then(response => {
-            // console.log('Количество элементов на странице обновлено:', response.data.value)
-        })
-        .catch(error => {
-            console.error('Ошибка обновления настройки:', error.response.data)
-        })
-})
+    router.put(route('admin.settings.updateAdminCountComments'), {value: newVal}, {
+        preserveScroll: true,
+        preserveState: true, // Не перезагружаем все props
+        onSuccess: () => toast.info(`Показ ${newVal} элементов на странице.`),
+        onError: (errors) => toast.error(errors.value || 'Ошибка обновления кол-ва элементов.'),
+    });
+});
 
-// параметр сортировки по умолчанию, устанавливаем из props
-const sortParam = ref(props.adminSortComments)
+/**
+ * Реактивная переменная для хранения текущего параметра сортировки.
+ */
+const sortParam = ref(props.adminSortComments); // Используем значение из props
+
+/**
+ * Наблюдатель за изменением параметра сортировки.
+ */
 watch(sortParam, (newVal) => {
-    axios.put(route('settings.updateAdminSortComments'), { value: newVal })
-        .then(response => {
-            // console.log('Сортировка обновлена:', response.data.value)
-        })
-        .catch(error => {
-            console.error('Ошибка обновления сортировки:', error.response.data)
-        })
-})
+    router.put(route('admin.settings.updateAdminSortComments'), {value: newVal}, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => toast.info('Сортировка успешно изменена'),
+        onError: (errors) => toast.error(errors.value || 'Ошибка обновления сортировки.'),
+    });
+});
+
+const form = useForm({});
 
 // Модальное окно просмотра
 const showCommentDetailsModal = ref(false);
@@ -61,6 +79,7 @@ const closeCommentDetailsModal = () => {
 // Модальное окно удаления
 const showConfirmDeleteModal = ref(false);
 const commentToDeleteId = ref(null);
+
 const confirmDelete = (id) => {
     commentToDeleteId.value = id;
     showConfirmDeleteModal.value = true;
@@ -69,37 +88,67 @@ const closeModal = () => {
     showConfirmDeleteModal.value = false;
 };
 
-// Удаление комментария
+/**
+ * Отправляет запрос на удаление.
+ */
 const deleteComment = () => {
-    if (commentToDeleteId.value !== null) {
-        form.delete(route('comments.destroy', commentToDeleteId.value), {
-            onSuccess: () => closeModal()
-        });
-    }
+    if (commentToDeleteId.value === null) return;
+
+    const idToDelete = commentToDeleteId.value; // Сохраняем ID во временную переменную
+
+    router.delete(route('admin.comments.destroy', {comment: idToDelete}), { // Используем временную переменную
+        preserveScroll: true,
+        preserveState: false,
+        onSuccess: (page) => {
+            closeModal(); // Закрываем модалку
+            toast.success(`Комментарий "${'ID: ' + idToDelete}" удалена.`);
+            // console.log('Удаление успешно.');
+        },
+        onError: (errors) => {
+            closeModal();
+            const errorMsg = errors.general || errors[Object.keys(errors)[0]] || 'Произошла ошибка при удалении.';
+            toast.error(`${errorMsg} (Комментарий: ${'ID: ' + idToDelete})`);
+            console.error('Ошибка удаления:', errors);
+        },
+        onFinish: () => {
+            // console.log('Запрос на удаление завершен.');
+            commentToDeleteId.value = null;
+        }
+    });
 };
 
-// Кнопка активности
+/**
+ * Отправляет запрос для изменения статуса активности.
+ */
 const toggleActivity = (comment) => {
     const newActivity = !comment.activity;
-    axios.put(route('comments.updateActivity', comment.id), { activity: newActivity })
-        .then(response => {
-            comment.activity = newActivity;
-            if (response.data.reload) {
-                window.location.reload();
-            }
+
+    axios.put(route('admin.actions.comments.updateActivity', { comment: comment.id }), {
+        activity: newActivity,
+    })
+        .then((response) => {
+            comment.activity = response.data.activity;
+            toast.success(response.data.message);
         })
-        .catch(error => {
-            console.error(error.response?.data || error.message);
+        .catch((error) => {
+            toast.error('Ошибка при изменении активности комментария.');
+            console.error(error);
         });
 };
 
-// Пагинация
+/**
+ * Текущая страница пагинации.
+ */
 const currentPage = ref(1);
 
-// Строка поиска
+/**
+ * Строка поискового запроса.
+ */
 const searchQuery = ref('');
 
-// Функция сортировки
+/**
+ * Сортирует массив на основе текущего параметра сортировки.
+ */
 const sortComments = (comments) => {
     // Сортировка по id
     if (sortParam.value === 'idAsc') {
@@ -122,7 +171,15 @@ const sortComments = (comments) => {
     if (sortParam.value === 'instatus') {
         return comments.filter(comment => !comment.status);
     }
-    // Новое условие: сортировка по пользователю (по имени)
+    // Условие: сортировка по типу модели
+    if (sortParam.value === 'type') {
+        return comments.slice().sort((a, b) => {
+            const typeA = a.commentable_type?.toLowerCase() || '';
+            const typeB = b.commentable_type?.toLowerCase() || '';
+            return typeA.localeCompare(typeB);
+        });
+    }
+    // Условие: сортировка по пользователю (по имени)
     if (sortParam.value === 'user') {
         return comments.slice().sort((a, b) => {
             return a.user.name.localeCompare(b.user.name);
@@ -136,9 +193,11 @@ const sortComments = (comments) => {
     });
 };
 
-// Фильтр поиска
+/**
+ * Вычисляемое свойство, отсортированный список поиска.
+ */
 const filteredComments = computed(() => {
-    let filtered = props.comments;
+    let filtered = props.comments.data || []; // <-- исправлено
 
     if (searchQuery.value) {
         filtered = filtered.filter(comment =>
@@ -149,23 +208,35 @@ const filteredComments = computed(() => {
     return sortComments(filtered);
 });
 
-// Пагинация
+/**
+ * Вычисляемое свойство пагинации, возвращающее для текущей страницы.
+ */
 const paginatedComments = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
     return filteredComments.value.slice(start, start + itemsPerPage.value);
 });
 
+/**
+ * Вычисляемое свойство, возвращающее общее количество страниц пагинации.
+ */
 const totalPages = computed(() => Math.ceil(filteredComments.value.length / itemsPerPage.value));
 
-// Выбранные комментарии для массовых действий
+/**
+ * Массив выбранных ID для массовых действий.
+ */
 const selectedComments = ref([]);
 
-// Функции для выбора и отмены выбора всех элементов select
+/**
+ * Логика выбора всех для массовых действий.
+ */
 const toggleAll = (event) => {
     const isChecked = event.target.checked;
     selectedComments.value = isChecked ? paginatedComments.value.map(comment => comment.id) : [];
 };
 
+/**
+ * Обрабатывает событие выбора/снятия выбора одной строки.
+ */
 const toggleSelectComment = (commentId) => {
     const index = selectedComments.value.indexOf(commentId);
     if (index > -1) {
@@ -175,35 +246,69 @@ const toggleSelectComment = (commentId) => {
     }
 };
 
-// Функции для выбора и отмены выбора всех элементов checkbox
+/**
+ * Выполняет массовое включение/выключение активности выбранных.
+ */
 const bulkToggleActivity = (newActivity) => {
-    selectedComments.value.forEach((commentId) => {
-        axios.put(route('comments.updateActivity', commentId), { activity: newActivity })
-            .then(response => {
-                if (response.data.reload) {
-                    window.location.reload();
+    if (!selectedComments.value.length) {
+        toast.warning('Выберите комментарии для активации/деактивации');
+        return;
+    }
+    axios
+        .put(route('admin.actions.comments.bulkUpdateActivity'), {
+            ids: selectedComments.value,
+            activity: newActivity,
+        })
+        .then(() => {
+            toast.success('Активность массово обновлена')
+            // сразу очистим выбор
+            const updatedIds = [...selectedComments.value]
+            selectedComments.value = []
+            // и оптимистично поправим флаг в таблице
+            paginatedComments.value.forEach((a) => {
+                if (updatedIds.includes(a.id)) {
+                    a.activity = newActivity
                 }
             })
-            .catch(error => {
-                console.error(error.response?.data || error.message);
-            });
+        })
+        .catch(() => {
+            toast.error('Не удалось обновить активность')
+        })
+};
+
+/**
+ * Выполняет массовое удаление выбранных.
+ */
+const bulkDelete = () => {
+    if (selectedComments.value.length === 0) {
+        toast.warning('Выберите хотя бы один комментарий для удаления.'); // <--- Используем toast
+        return;
+    }
+    if (!confirm(`Вы уверены, что хотите их удалить ?`)) {
+        return;
+    }
+    router.delete(route('admin.actions.comments.bulkDestroy'), {
+        data: {ids: selectedComments.value},
+        preserveScroll: true,
+        preserveState: false, // Перезагружаем данные страницы
+        onSuccess: (page) => {
+            selectedComments.value = []; // Очищаем выбор
+            toast.success('Массовое удаление комментариев успешно завершено.');
+            // console.log('Массовое удаление комментариев успешно завершено.');
+        },
+        onError: (errors) => {
+            console.error("Ошибка массового удаления:", errors);
+            // Отображаем первую ошибку
+            const errorKey = Object.keys(errors)[0];
+            const errorMessage = errors[errorKey] || 'Произошла ошибка при удалении комментариев.';
+            toast.error(errorMessage);
+        },
     });
 };
 
-// Функция для массового удаления комментариев
-const bulkDelete = () => {
-    axios.delete(route('comments.bulkDestroy'), { data: { ids: selectedComments.value } })
-        .then(response => {
-            selectedComments.value = [];
-            if (response.data.reload) {
-                window.location.reload();
-            }
-        })
-        .catch(error => {
-            console.error(error.response.data);
-        });
-};
-
+/**
+ * Обрабатывает выбор действия в селекте массовых действий.
+ */
 const handleBulkAction = (event) => {
     const action = event.target.value;
     if (action === 'selectAll') {
@@ -224,19 +329,17 @@ const handleBulkAction = (event) => {
     event.target.value = ''; // Сбросить выбранное значение после выполнения действия
 };
 
-// Функция для обновления статуса комментария
-const approveComment = (commentId) => {
-    axios.put(route('comments.approve', commentId))
-        .then(response => {
-            // Обновляем комментарий в локальном списке
-            const comment = props.comments.find(c => c.id === commentId);
-            if (comment) {
-                comment.status = true;
-            }
-            // Можно добавить уведомление об успешном обновлении
+/**
+ * Отправляет запрос на одобрение комментария (модерация).
+ */
+const approveComment = (comment) => {
+    axios.put(route('admin.actions.comments.approve', { comment: comment.id }))
+        .then((response) => {
+            comment.approved = response.data.approved; // обновляем локально
+            toast.success(response.data.message);
         })
-        .catch(error => {
-            // Обработка ошибок
+        .catch((error) => {
+            toast.error('Ошибка при обновлении одобрения комментария.');
             console.error(error);
         });
 };

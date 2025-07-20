@@ -25,12 +25,12 @@ const updateSort = (event) => {
                 border border-slate-400 dark:border-slate-600 rounded-sm shadow-sm">
             <option value="idDesc">{{ t('idDesc') }}</option>
             <option value="idAsc">{{ t('idAsc') }}</option>
-            <option value="activity">{{ t('active') }}</option>
-            <option value="inactive">{{ t('inactive') }}</option>
             <option value="status">{{ t('passedModeration') }}</option>
             <option value="instatus">{{ t('notPassModeration') }}</option>
-            <!-- Новая опция сортировки по пользователю -->
-            <option value="user">{{ t('users') }}</option>
+            <option value="activity">{{ t('active') }}</option>
+            <option value="inactive">{{ t('inactive') }}</option>
+            <option value="type">{{ t('type') }}</option><!-- опция сортировки по модели -->
+            <option value="user">{{ t('users') }}</option><!-- опция сортировки по пользователю -->
         </select>
     </div>
 </template>

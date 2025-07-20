@@ -6,9 +6,10 @@ import DefaultLayout from '@/Layouts/DefaultLayout.vue';
 import VideoPlayer from '@/Components/Public/Default/Video/VideoPlayer.vue';
 import RecommendedVideos from '@/Components/Public/Default/Video/RecommendedVideos.vue';
 import LikeButtonVideo from '@/Components/Public/Default/Video/LikeButtonVideo.vue';
+import CommentThread from '@/Components/Public/Default/Comment/CommentThread.vue'
 
 const { t } = useI18n();
-const { appUrl, video, recommendedVideos, locale, siteSettings } = usePage().props;
+const { appUrl, video, recommendedVideos, locale, siteSettings, user } = usePage().props;
 
 // убедись, что console.log покажет:
 // console.log('Already liked:', video.already_liked); // true / false
@@ -157,6 +158,10 @@ const formatDate = (dateString) => {
                 :videos="recommendedVideos"
                 :formatDate="formatDate"
             />
+
+            <CommentThread commentable-type="App\Models\Admin\Video\Video"
+                           :commentable-id="video.id"
+                           :auth-user="user" />
 
         </div>
     </DefaultLayout>

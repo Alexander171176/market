@@ -11,7 +11,15 @@ const props = defineProps({
     selectedComments: Array
 });
 
-const emits = defineEmits(['toggle-activity', 'edit', 'delete', 'toggle-select', 'view-details', 'approve-comment']);
+const emits = defineEmits([
+    'toggle-activity',
+    'edit',
+    'delete',
+    'toggle-select',
+    'toggle-all',
+    'view-details',
+    'approve-comment'
+]);
 
 const toggleAll = (event) => {
     const isChecked = event.target.checked;
@@ -23,6 +31,17 @@ const toggleAll = (event) => {
         }
     });
 };
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date)
+}
 </script>
 
 <template>
@@ -44,6 +63,12 @@ const toggleAll = (event) => {
                         <div class="font-medium text-left">{{ t('comment') }}</div>
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                        <div class="font-medium text-left">{{ t('type') }}</div>
+                    </th>
+                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                        <div class="font-medium text-left">{{ t('id') }}</div>
+                    </th>
+                    <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                         <div class="font-medium text-end">{{ t('actions') }}</div>
                     </th>
                     <th class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
@@ -62,21 +87,46 @@ const toggleAll = (event) => {
                         <div class="text-center">{{ comment.id }}</div>
                     </td>
                     <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                        <div class="text-left text-yellow-500 dark:text-rose-200">{{ comment.user.name  }}</div>
+                        <div class="text-left text-red-500 dark:text-red-300">
+                            {{ comment.user.name  }}
+                        </div>
                     </td>
                     <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                        <div class="text-left text-blue-600 dark:text-violet-200">{{ comment.content }}</div>
+                        <div class="text-left text-blue-600 dark:text-blue-300 cursor-pointer"
+                             :title="formatDate(comment.updated_at)">
+                            {{ comment.content.length > 30 ? comment.content.slice(0, 30) + '…' : comment.content }}
+                        </div>
+                    </td>
+                    <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
+                        <div class="text-left text-fuchsia-600 dark:text-fuchsia-300">
+                            {{ comment.commentable_type.split('\\').pop() }}
+                        </div>
+                    </td>
+                    <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
+                        <div class="text-center text-green-600 dark:text-green-300 cursor-pointer"
+                             :title="comment.commentable_title">
+                            {{ comment.commentable_id }}
+                        </div>
                     </td>
                     <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
                         <div class="flex justify-end space-x-2">
                             <!-- Кнопка «Пройти модерацию» отображается только если status === false -->
                             <button v-if="!comment.status"
-                                    @click="$emit('approve-comment', comment.id)"
-                                    :title="t('approve')"
-                                    class="flex items-center py-1 px-1 rounded
-                                           border border-slate-300 hover:border-teal-500
-                                           dark:border-teal-300 dark:hover:border-teal-100">
-                                <svg class="w-4 h-4 shrink-0 fill-current text-teal-500 mx-1" viewBox="0 0 16 16">
+                                    @click="() => $emit('approve-comment', comment)"
+                                    :title="comment.approved ? t('approved') : t('approvedNot')"
+                                    :class="[
+                                        'flex items-center py-1 px-1 rounded border',
+                                        comment.approved ?
+                                        'border-amber-500 dark:border-amber-300 hover:border-gray-600 dark:hover:border-gray-400'
+                                        : 'border-slate-400 hover:border-rose-400 dark:border-gray-300 dark:hover:border-rose-300'
+                                      ]">
+                                <svg :class="[
+                                        'w-4 h-4 shrink-0 fill-current mx-1',
+                                        comment.approved ?
+                                        'text-amber-500 dark:text-amber-300 hover:text-gray-600 dark:hover:text-gray-400'
+                                        : 'text-gray-400 hover:text-rose-400 dark:text-gray-300 dark:hover:text-rose-300',
+                                      ]"
+                                     viewBox="0 0 16 16">
                                     <path d="M14.14 9.585h-.002a2.5 2.5 0 0 1-2 4.547 6.91 6.91 0 0 1-6.9 1.165 4.436 4.436 0 0 0 1.343-1.682c.365.087.738.132 1.113.135a4.906 4.906 0 0 0 2.924-.971 2.5 2.5 0 0 1 3.522-3.194Zm-4.015-7.397a7.023 7.023 0 0 1 4.47 5.396 4.5 4.5 0 0 0-1.7-.334c-.15.002-.299.012-.447.03a5.027 5.027 0 0 0-2.723-3.078 2.5 2.5 0 1 1 .4-2.014ZM4.663 10.5a2.5 2.5 0 1 1-3.859-.584 6.888 6.888 0 0 1-.11-1.166c0-2.095.94-4.08 2.56-5.407.093.727.364 1.419.788 2.016A4.97 4.97 0 0 0 2.694 8.75c.003.173.015.345.037.516A2.49 2.49 0 0 1 4.663 10.5Z"></path>
                                 </svg>
                             </button>

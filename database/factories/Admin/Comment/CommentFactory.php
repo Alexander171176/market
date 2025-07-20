@@ -6,25 +6,20 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Comment>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Admin\Comment\Comment>
  */
 class CommentFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'user_id' => User::inRandomOrder()->first()->id,  // случайный пользователь
-            'article_id' => 1,  // статья с id 1
-            'section_id' => null, // если нужно указать рубрику, можно изменить это поле
-            'parent_id' => null, // для комментариев без родителя
-            'content' => $this->faker->sentence,  // случайный текст комментария
-            'status' => true,  // заменено на булевое значение
-            'activity' => true,  // комментарий активен
+            'user_id' => User::inRandomOrder()->first()?->id, // два юзера
+            'commentable_id' => null,      // задается извне
+            'commentable_type' => null,    // задается извне
+            'parent_id' => null,           // можно переопределить в сидере
+            'content' => $this->faker->realText(100),
+            'approved' => $this->faker->boolean(80),
+            'activity' => $this->faker->boolean(90),
         ];
     }
 }

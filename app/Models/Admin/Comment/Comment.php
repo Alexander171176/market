@@ -41,6 +41,7 @@ class Comment extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'sort' => 'integer',
         'approved' => 'boolean',
         'activity' => 'boolean',
     ];

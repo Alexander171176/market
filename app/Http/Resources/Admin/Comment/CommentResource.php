@@ -34,6 +34,7 @@ class CommentResource extends JsonResource
             // и преобразуем ее соответствующим Shared ресурсом
             'commentable_type' => $this->commentable_type, // Тип родительской модели (App\Models\...)
             'commentable_id' => $this->commentable_id,     // ID родительской модели
+            'commentable_title' => $this->commentable->title ?? $this->commentable->name ?? '—',
             'commentable' => $this->whenLoaded('commentable', function () {
                 // Определяем, какой ресурс использовать в зависимости от типа модели
                 return match ($this->commentable_type) {

@@ -6,75 +6,75 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\Comment\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 
 class CommentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Получить все активные и одобренные комментарии для конкретного ресурса (например, статьи или видео).
      */
-    public function index($article): \Illuminate\Http\JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        // Загружаем комментарии вместе с данными пользователя и ответами
-        $comments = Comment::with(['user', 'replies.user'])  // Подгружаем реплики и пользователей
-        ->where('article_id', $article)
-            ->where('status', true)
+        $request->validate([
+            'commentable_type' => 'required|string',
+            'commentable_id'   => 'required|integer',
+        ]);
+
+        $comments = Comment::with(['user', 'replies.user'])
+            ->where('commentable_type', $request->commentable_type)
+            ->where('commentable_id', $request->commentable_id)
+            ->where('approved', true) // ✅ Заменено
             ->where('activity', true)
-            ->whereNull('parent_id')  // Только корневые комментарии
+            ->whereNull('parent_id')
             ->get();
 
         return response()->json($comments);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Сохранить новый комментарий (или ответ).
      */
-    public function store(Request $request): \Illuminate\Http\JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        // Валидация данных
         $validated = $request->validate([
-            'article_id' => 'required|exists:articles,id',
-            'user_id' => 'required|exists:users,id',  // Проверяем наличие user_id
-            'content' => 'required|string|max:500',
-            'parent_id' => 'nullable|exists:comments,id'  // Проверяем наличие parent_id, если это ответ
+            'commentable_type' => 'required|string',
+            'commentable_id'   => 'required|integer',
+            'content'          => 'required|string|max:500',
+            'parent_id'        => 'nullable|exists:comments,id',
         ]);
 
         try {
-            // Создаем новый комментарий или ответ
             $comment = new Comment([
-                'user_id' => $validated['user_id'],
-                'article_id' => $validated['article_id'],
-                'content' => $validated['content'],
-                'parent_id' => $validated['parent_id'] ?? null,  // Добавляем parent_id для ответов
-                'status' => false,  // Комментарии требуют модерации
-                'activity' => true,  // Комментарии активны
+                'user_id'          => auth()->id(), // ← используем текущего пользователя
+                'commentable_type' => $validated['commentable_type'],
+                'commentable_id'   => $validated['commentable_id'],
+                'content'          => $validated['content'],
+                'parent_id'        => $validated['parent_id'] ?? null,
+                'status'           => false,
+                'activity'         => true,
             ]);
-            $comment->save();
 
-            // Загружаем пользователя вместе с комментариями
+            $comment->save();
             $comment->load('user');
 
-            return response()->json($comment, 201);  // Возвращаем созданный комментарий
+            return response()->json($comment, 201);
         } catch (\Exception $e) {
-            Log::error("Ошибка при создании комментария: {$e->getMessage()}", [
-                'user_id' => $validated['user_id'],
-                'article_id' => $validated['article_id']
-            ]);
+            Log::error("Ошибка при создании комментария: {$e->getMessage()}", $validated);
 
-            return response()->json(['message' => 'Ошибка при сохранении комментария', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Ошибка при сохранении комментария',
+                'error'   => $e->getMessage()
+            ], 500);
         }
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param Comment $comment
-     * @return \Illuminate\Http\JsonResponse
+     * Показать конкретный комментарий, если он активен и одобрен.
      */
-    public function show(Comment $comment): \Illuminate\Http\JsonResponse
+    public function show(Comment $comment): JsonResponse
     {
-        // Загружаем пользователя и реплики, если комментарий активен
         if ($comment->status && $comment->activity) {
-            $comment->load(['user', 'replies.user']);  // Загружаем автора комментария и реплики
+            $comment->load(['user', 'replies.user']);
             return response()->json($comment);
         }
 
@@ -82,47 +82,48 @@ class CommentController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Обновить содержимое комментария.
      */
-    public function update(Request $request, Comment $comment): \Illuminate\Http\JsonResponse
+    public function update(Request $request, Comment $comment): JsonResponse
     {
-        // Валидация данных
+        if ($comment->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Вы не можете редактировать этот комментарий'], 403);
+        }
+
         $validated = $request->validate([
-            'content' => 'required|string|max:500'
+            'content' => 'required|string|max:500',
         ]);
 
         try {
-            // Обновление комментария
-            $comment->update([
-                'content' => $validated['content']
-            ]);
-
-            return response()->json($comment, 200);  // Возвращаем обновленный комментарий
+            $comment->update(['content' => $validated['content']]);
+            return response()->json($comment, 200);
         } catch (\Exception $e) {
-            Log::error("Ошибка при обновлении комментария: {$e->getMessage()}", [
-                'comment_id' => $comment->id
-            ]);
-
-            return response()->json(['message' => 'Ошибка при обновлении комментария', 'error' => $e->getMessage()], 500);
+            Log::error("Ошибка при обновлении комментария: {$e->getMessage()}", ['id' => $comment->id]);
+            return response()->json([
+                'message' => 'Ошибка при обновлении комментария',
+                'error'   => $e->getMessage()
+            ], 500);
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Удалить комментарий.
      */
-    public function destroy(Comment $comment): \Illuminate\Http\JsonResponse
+    public function destroy(Comment $comment): JsonResponse
     {
-        try {
-            // Удаление комментария и его ответов
-            $comment->delete();
+        if ($comment->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Вы не можете удалить этот комментарий'], 403);
+        }
 
+        try {
+            $comment->delete();
             return response()->json(['message' => 'Комментарий удалён'], 200);
         } catch (\Exception $e) {
-            Log::error("Ошибка при удалении комментария: {$e->getMessage()}", [
-                'comment_id' => $comment->id ?? 'unknown'
-            ]);
-
-            return response()->json(['message' => 'Ошибка при удалении комментария', 'error' => $e->getMessage()], 500);
+            Log::error("Ошибка при удалении комментария: {$e->getMessage()}", ['id' => $comment->id ?? null]);
+            return response()->json([
+                'message' => 'Ошибка при удалении комментария',
+                'error'   => $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -6,11 +6,12 @@ import DefaultLayout from '@/Layouts/DefaultLayout.vue';
 import LikeButtonArticle from '@/Components/Public/Default/Article/LikeButtonArticle.vue';
 import ArticleImageMain from '@/Components/Public/Default/Article/ArticleImageMain.vue';
 import RecommendedVideos from '@/Components/Public/Default/Video/RecommendedVideos.vue';
+import CommentThread from '@/Components/Public/Default/Comment/CommentThread.vue';
 
 const { t } = useI18n()
 
 // Извлекаем настройки из props, переданных через Inertia
-const { article, recommendedArticles,recommendedVideos, siteSettings } = usePage().props
+const { article, recommendedArticles,recommendedVideos, siteSettings, user } = usePage().props
 
 // console.log('[recommendedVideos]', recommendedVideos);
 
@@ -298,6 +299,10 @@ const formatDate = (dateString) => {
                     :formatDate="formatDate"
                 />
             </div>
+
+            <CommentThread commentable-type="App\Models\Admin\Article\Article"
+                           :commentable-id="article.id"
+                           :auth-user="user" />
 
         </article>
 

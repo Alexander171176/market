@@ -345,7 +345,7 @@ Route::group([
                 Route::put('/update-count/sections', [SettingController::class, 'updateAdminCountSections'])->name('updateAdminCountSections');
                 Route::put('/update-count/articles', [SettingController::class, 'updateAdminCountArticles'])->name('updateAdminCountArticles');
                 Route::put('/update-count/tags', [SettingController::class, 'updateAdminCountTags'])->name('updateAdminCountTags');
-                Route::put('/update-count/comments', [SettingController::class, 'updateAdminCountComments'])->name('updateAdminCountComments'); // Исправлено имя
+                Route::put('/update-count/comments', [SettingController::class, 'updateAdminCountComments'])->name('updateAdminCountComments');
                 Route::put('/update-count/banners', [SettingController::class, 'updateAdminCountBanners'])->name('updateAdminCountBanners');
                 Route::put('/update-count/videos', [SettingController::class, 'updateAdminCountVideos'])->name('updateAdminCountVideos');
                 Route::put('/update-count/users', [SettingController::class, 'updateAdminCountUsers'])->name('updateAdminCountUsers');
@@ -446,6 +446,8 @@ Route::group([
                     ->name('plugins.bulkUpdateActivity');
                 Route::put('/admin/actions/settings/bulk-activity', [ParameterController::class, 'bulkUpdateActivity'])
                     ->name('settings.bulkUpdateActivity');
+                Route::put('/admin/actions/comments/bulk-activity', [CommentController::class, 'bulkUpdateActivity'])
+                    ->name('comments.bulkUpdateActivity');
 
                 // Переключение Left/Main/Right (Используем имена моделей для параметров RMB)
                 Route::put('/articles/{article}/left', [ArticleController::class, 'updateLeft'])->name('articles.updateLeft');

@@ -3,18 +3,13 @@
 namespace App\Http\Controllers\Admin\Comment;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Comment\CommentRequest; // Используем обновленный реквест
-
-// Реквесты для простых действий
+use App\Http\Requests\Admin\Comment\CommentRequest;
 use App\Http\Requests\Admin\UpdateActivityRequest;
-use App\Http\Requests\Admin\ApproveRequest; // Можно создать для approve
-
 use App\Http\Resources\Admin\Comment\CommentResource;
 use App\Models\Admin\Comment\Comment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request; // Для bulkDestroy
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -60,39 +55,12 @@ class CommentController extends Controller
         return Inertia::render('Admin/Comments/Index', [
             'comments'      => CommentResource::collection($comments),
             'commentsCount' => $commentsCount,
-            'adminCountComments' => $adminCountComments,
+            'adminCountComments' => (int)$adminCountComments,
             'adminSortComments' => $adminSortComments,
             // TODO: Передать параметры фильтров для отображения в интерфейсе
             'filters' => $request->only(['status', 'activity', 'type'])
         ]);
     }
-
-    /**
-     * Форма создания комментария обычно не нужна в админке.
-     * Если нужна, нужно передать список пользователей и комментируемых сущностей.
-     */
-    // public function create(): Response
-    // {
-    //     // $users = User::select('id', 'name')->get();
-    //     // $articles = Article::select('id', 'title')->get();
-    //     // $videos = Video::select('id', 'title')->get();
-    //     // return Inertia::render('Admin/Comments/Create', [...]);
-    // }
-
-    /**
-     * Сохранение нового комментария (если нужно создавать из админки).
-     */
-    // public function store(CommentRequest $request): RedirectResponse
-    // {
-    //     $data = $request->validated();
-    //     try {
-    //         Comment::create($data);
-    //         return redirect()->route('comments.index')->with('success', 'Комментарий успешно создан.');
-    //     } catch (Throwable $e) {
-    //         Log::error("Ошибка при создании комментария: " . $e->getMessage());
-    //         return back()->withInput()->withErrors(['general' => 'Произошла ошибка при создании комментария.']);
-    //     }
-    // }
 
     /**
      * Отображение формы редактирования комментария.
@@ -188,36 +156,55 @@ class CommentController extends Controller
     // Используем {comment} в маршруте для RMB
     public function updateActivity(UpdateActivityRequest $request, Comment $comment): JsonResponse
     {
-        // authorize() в UpdateActivityRequest
-        $validated = $request->validated(); // Валидирует только 'activity'
+        $validated = $request->validated();
         $comment->activity = $validated['activity'];
         $comment->save();
-        Log::info("Обновлено activity комментария ID {$comment->id} на {$comment->activity}");
-        return response()->json(['success' => true, 'reload' => true]);
+
+        Log::info("Обновлена активность комментария ID {$comment->id} на {$comment->activity}");
+
+        return response()->json([
+            'success' => true,
+            'activity' => $comment->activity,
+            'message' => $comment->activity
+                ? 'Комментарий активирован.'
+                : 'Комментарий деактивирован.',
+        ]);
+    }
+
+    /**
+     * Обновление статуса активности массово
+     *
+     * @param Request $request
+     * @return JsonResponse Json ответ
+     */
+    public function bulkUpdateActivity(Request $request): JsonResponse
+    {
+        // TODO: Проверка прав $this->authorize('update-comments', $comment);
+        $data = $request->validate([
+            'ids'      => 'required|array',
+            'ids.*'    => 'required|integer|exists:comments,id',
+            'activity' => 'required|boolean',
+        ]);
+
+        Comment::whereIn('id', $data['ids'])->update(['activity' => $data['activity']]);
+
+        return response()->json(['success' => true]);
     }
 
     /**
      * Одобрение комментария.
      */
     // Используем {comment} в маршруте для RMB
-    public function approve(Request $request, Comment $comment): JsonResponse // Добавляем Request для возможной валидации/авторизации
+    public function approve(Request $request, Comment $comment): JsonResponse
     {
-        // TODO: Проверка прав $this->authorize('approve-comments', $comment);
+        $comment->approved = !$comment->approved; // переключаем
+        $comment->save();
 
-        // Можно добавить FormRequest ApproveCommentRequest
-        $request->validate(['approved' => 'sometimes|boolean']); // Валидация, если approved передается (хотя тут мы его просто ставим в true)
-
-        try {
-            $comment->approved = true; // Используем новое поле
-            $comment->save();
-            Log::info("Комментарий одобрен: ID " . $comment->id);
-            return response()->json(['success' => true, 'message' => 'Комментарий успешно одобрен', 'reload' => true]); // Добавили success и reload
-        } catch (Throwable $e) {
-            Log::error("Ошибка при одобрении комментария ID {$comment->id}: " . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Ошибка одобрения комментария.'], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'approved' => $comment->approved,
+            'message' => $comment->approved ? 'Комментарий одобрен' : 'Одобрение снято',
+        ]);
     }
 
-    // Метод updateSort не нужен для комментариев
-    // Метод clone не нужен для комментариев
 }
