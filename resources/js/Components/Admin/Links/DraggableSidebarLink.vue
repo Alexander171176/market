@@ -72,7 +72,6 @@ const linkInfo = {
     videos: {label: t('videos'), route: 'admin.videos.index'},
     reports: {label: t('reports'), route: 'admin.reports.index'},
     charts: {label: t('charts'), route: 'admin.charts.index'},
-    diagrams: {label: t('diagrams'), route: 'admin.diagrams.index'},
     settings: {label: t('settings'), route: 'admin.settings.index'},
     parameters: {label: t('parameters'), route: 'admin.parameters.index'},
     logs: {label: t('logs'), route: 'admin.logs.index'},

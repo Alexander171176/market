@@ -38,13 +38,13 @@ const logout = () => {
 
 <template>
     <div class="sticky top-0
-                bg-gradient-to-b from-slate-100 to-slate-300
-                dark:bg-gradient-to-b dark:from-slate-700 dark:to-slate-900
-                border-b border-slate-200 dark:border-slate-700 z-20">
+                bg-slate-200 dark:bg-slate-800
+                border-x border-slate-400 dark:border-slate-900
+                shadow-md shadow-slate-400 dark:shadow-slate-900 z-20">
 
         <TopPanel/>
 
-        <nav class="border-b border-gray-100">
+        <nav class="border-b border-gray-200 dark:border-gray-800">
             <div class="max-w-full mx-auto px-4 sm:px-0">
                 <div class="flex items-center justify-between h-10">
                     <div class="flex items-center justify-center">
@@ -53,15 +53,14 @@ const logout = () => {
                                 <ApplicationMark class="block h-9 w-auto"/>
                             </Link>
                         </div>
-                        <DigitalClock class="relative z-10"/>
                     </div>
-                    <div class="flex sm:items-center sm:ms-6">
+                    <div class="w-full flex justify-between sm:items-center">
                         <div class="hidden sm:block ms-3 relative">
                             <Dropdown align="right" width="60" class="relative z-10">
                                 <template #trigger>
                                     <button v-if="$page.props.jetstream.managesProfilePhotos"
                                             class="flex items-center
-                                                    px-2 py-1
+                                                    px-2 py-0.5
                                                     font-semibold text-sm
                                                     text-sky-600 dark:text-slate-100
                                                     border-2 border-transparent rounded-full
@@ -112,8 +111,12 @@ const logout = () => {
                                 </template>
                             </Dropdown>
                         </div>
-                        <div class="hidden sm:block ms-3 relative">
-                            <Dropdown v-if="$page.props.jetstream.hasTeamFeatures" align="right" width="60" class="relative z-10">
+                        <div class="mx-2 flex items-center">
+                            <ThemeToggle class="relative z-10"/>
+                        </div>
+                        <div class="hidden sm:block sm:me-8 relative">
+                            <Dropdown v-if="$page.props.jetstream.hasTeamFeatures"
+                                      align="right" width="60" class="relative z-10">
                                 <template #trigger>
                                     <span class="inline-flex rounded-md">
                                         <button type="button"
@@ -176,9 +179,6 @@ const logout = () => {
                                     </div>
                                 </template>
                             </Dropdown>
-                        </div>
-                        <div class="mx-2 flex items-center">
-                            <ThemeToggle class="relative z-10"/>
                         </div>
                     </div>
                     <div class="-me-2 flex items-center sm:hidden">

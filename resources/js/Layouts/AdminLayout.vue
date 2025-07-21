@@ -101,7 +101,8 @@ const sidebarTitle = computed(() => {
 
             <!-- TitlePage Page Heading -->
             <header v-if="$slots.header" class="dark:bg-slate-700 bg-slate-50 shadow">
-                <div class="max-w-7xl mx-auto py-2 px-1 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto py-2 px-1 sm:px-6 lg:px-8
+                            border-b border-slate-300 dark:border-slate-700">
                     <slot name="header" />
                 </div>
             </header>

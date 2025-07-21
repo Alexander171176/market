@@ -388,7 +388,6 @@ Route::group([
             Route::resource('/comments', CommentController::class)->except(['create', 'store', 'show']); // Админ обычно не создает комменты с нуля
             Route::resource('/components', ComponentController::class);
             Route::post('/components/save', [ComponentController::class, 'save'])->name('components.save'); // Выносим отдельно, т.к. не ресурсный
-            Route::resource('/diagrams', DiagramController::class);
             Route::resource('/plugins', PluginController::class);
             Route::get('/reports/download', [ReportController::class, 'download'])->name('reports.download'); // Выносим отдельно
 

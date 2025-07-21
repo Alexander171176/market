@@ -6,6 +6,7 @@ import ApplicationMark from '@/Components/ApplicationMark.vue';
 import DraggableSidebarGroupLink from '@/Components/Admin/Links/DraggableSidebarGroupLink.vue';
 import DraggableSidebarSystemLinks from "@/Components/Admin/Links/DraggableSidebarSystemLinks.vue";
 import SidebarLinkPlugin from '@/Components/Admin/Links/SidebarLinkPlugin.vue';
+import DigitalClock from '@/Components/Admin/CurrentTime/DigitalClock.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
@@ -109,7 +110,7 @@ const isActive = (path) => {
                     md:static md:left-auto md:top-auto md:translate-x-0 md:overflow-y-auto
                     overflow-y-scroll no-scrollbar transition-all duration-200 ease-in-out">
 
-            <div class="flex justify-around items-center mb-5 pr-3 md:px-0">
+            <div class="flex justify-around items-center mb-2 pr-3 md:px-0">
                 <button @click.prevent="sidebarExpanded = !sidebarExpanded" title="t('toggleSidebar')">
                     <svg :class="{ 'rotate-180': sidebarExpanded }"
                          class="mx-1 w-6 h-6 py-1 fill-current transition-transform duration-200
@@ -128,7 +129,7 @@ const isActive = (path) => {
                 </span>
                 <FontAwesomeIcon :icon="['fas', 'sliders']" class="text-white" v-if="sidebarExpanded"/>
             </div>
-
+            <DigitalClock v-if="sidebarExpanded" class="mb-2 relative z-10"/>
             <div class="space-y-2">
                 <!-- Ссылки главного ряда -->
                 <span :class="[colorTextActive]"

@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     <url>
         <loc>http://localhost:8000</loc>
-        <lastmod>2025-07-16T00:00:00+00:00</lastmod>
+        <lastmod>2025-07-20T00:00:00+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/rubrics/ventilyatsiya-i-konditsionirovanie</loc>
-        <lastmod>2025-07-13T04:32:05+00:00</lastmod>
+        <lastmod>2025-07-21T03:54:10+00:00</lastmod>
 
             </url>
     <url>
@@ -22,62 +22,87 @@
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/dobro-pozhalovat</loc>
-        <lastmod>2025-07-15T14:08:14+00:00</lastmod>
+        <lastmod>2025-07-21T06:22:02+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/pochemu-u-drugikh-deshevle</loc>
-        <lastmod>2025-07-15T14:34:02+00:00</lastmod>
+        <lastmod>2025-07-20T15:35:14+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/priglashaem-vas-na-otkrytie-obrazovatelnogo-tsentra-v-astane-vash-put-k-uspeshnoy-karere</loc>
-        <lastmod>2025-07-15T14:34:02+00:00</lastmod>
+        <lastmod>2025-07-18T05:01:45+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/komfort-i-bezopasnost-vashego-biznesa-professionalnye-izmereniya-mikroklimata-v-almaty-i-astane</loc>
-        <lastmod>2025-07-15T14:34:02+00:00</lastmod>
+        <lastmod>2025-07-20T15:32:33+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/effektivnaya-ventilyatsiya-i-konditsionirovanie-dostigaem-idealnogo-mikroklimata-s-matematicheskim-modelirovaniem</loc>
-        <lastmod>2025-07-16T17:35:12+00:00</lastmod>
+        <lastmod>2025-07-18T15:45:19+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/rekuperatsiya-v-ventilyatsii-i-konditsionirovanii-ekonomte-na-otoplenii-i-sozdavayte-idealnyy-mikroklimat</loc>
-        <lastmod>2025-07-16T17:35:12+00:00</lastmod>
+        <lastmod>2025-07-20T15:33:12+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/bezopasnyy-i-komfortnyy-mikroklimat-dlya-meditsinskikh-uchrezhdeniy</loc>
-        <lastmod>2025-07-16T17:35:12+00:00</lastmod>
+        <lastmod>2025-07-19T11:29:07+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/articles/pozhary-v-ventilyatsii-realnaya-ugroza-kak-zashchitit-vashe-zdanie</loc>
-        <lastmod>2025-07-17T04:29:23+00:00</lastmod>
+        <lastmod>2025-07-19T11:20:47+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/tags/ventilyatsiya</loc>
+        <lastmod>2025-07-19T10:11:22+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/tags/konditsionirovanie</loc>
-        <lastmod>2025-07-13T04:35:55+00:00</lastmod>
-
-            </url>
-    <url>
-        <loc>http://localhost:8000/ru/videos/video-youtube</loc>
-        <lastmod>2025-07-16T20:00:10+00:00</lastmod>
-
-            </url>
-    <url>
-        <loc>http://localhost:8000/ru/videos/video-s-vimeo</loc>
-        <lastmod>2025-07-16T20:00:10+00:00</lastmod>
+        <lastmod>2025-07-19T11:21:39+00:00</lastmod>
 
             </url>
     <url>
         <loc>http://localhost:8000/ru/videos/moe-video</loc>
-        <lastmod>2025-07-16T20:00:10+00:00</lastmod>
+        <lastmod>2025-07-19T11:30:02+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/videos/vimeo-video</loc>
+        <lastmod>2025-07-18T15:47:06+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/videos/youtube-video</loc>
+        <lastmod>2025-07-20T19:36:22+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/videos/share-1</loc>
+        <lastmod>2025-07-19T03:38:38+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/videos/share-2</loc>
+        <lastmod>2025-07-19T03:49:43+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/videos/share-3</loc>
+        <lastmod>2025-07-19T03:51:15+00:00</lastmod>
+
+            </url>
+    <url>
+        <loc>http://localhost:8000/ru/videos/short-4</loc>
+        <lastmod>2025-07-19T10:18:54+00:00</lastmod>
 
             </url>
 </urlset>

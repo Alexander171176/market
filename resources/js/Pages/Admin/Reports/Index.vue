@@ -237,7 +237,7 @@ const createDOCX = () => {
         <template #header>
             <TitlePage>{{ t('reports') }}</TitlePage>
         </template>
-        <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-12xl mx-auto">
+        <div class="px-2 py-2 w-full max-w-12xl mx-auto">
             <div class="sm:flex sm:justify-between sm:items-center mb-4
                   p-4 bg-slate-50 dark:bg-slate-700 border border-blue-400 dark:border-blue-200
                   overflow-hidden shadow-lg shadow-gray-500 dark:shadow-slate-400
