@@ -186,6 +186,7 @@
 
 25) creating business logic app Article <br>
     `docker exec market-php-app php artisan make:model Admin/Article/Article -mf` <br>
+    `docker exec market-php-app php artisan make:migration create_article_related_table --create=article_related` <br>
     `docker exec market-php-app php artisan make:migration create_article_has_section_table --create=article_has_section` <br>
     `docker exec market-php-app php artisan migrate`<br>
     `docker exec market-php-app php artisan make:seeder ArticleSeeder` <br>
@@ -209,7 +210,6 @@
     `docker exec market-php-app php artisan make:seeder ArticleImageSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=ArticleImageSeeder` <br>
     `docker exec market-php-app php artisan make:resource Admin/Article/ArticleImageResource` <br>
-    `docker exec market-php-app php artisan make:migration create_article_related_table --create=article_related` <br>
     `docker exec market-php-app php artisan make:migration add_img_column_to_articles_table` <br>
     `docker exec market-php-app php artisan migrate` <br>
 
@@ -257,12 +257,10 @@
 34) creating business logic app Editor <br>
     `docker exec market-php-app php artisan make:controller Admin/Editor/EditorController --resource` <br>
 
-35) creating business logic app Diagram <br>
-  `docker exec market-php-app php artisan make:controller Admin/Diagram/DiagramController --resource` <br>
-
-36) creating business logic ap Banner
+35) creating business logic ap Banner
     `docker exec market-php-app php artisan make:model Admin/Banner/Banner -mf` <br>
     `docker exec market-php-app php artisan make:migration create_banner_has_section_table --create=banner_has_section` <br>
+    `docker exec market-php-app php artisan make:seeder BannerSeeder` <br>
     `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:resource Admin/Banner/BannerResource` <br>
     `docker exec market-php-app php artisan make:request Admin/Banner/BannerRequest` <br>
@@ -274,10 +272,11 @@
     `docker exec market-php-app php artisan make:resource Admin/Banner/BannerSharedResource` <br>
     `docker exec market-php-app php artisan migrate` <br>
 
-37) creating business logic ap Video
+36) creating business logic ap Video
     `docker exec market-php-app php artisan make:model Admin/Video/Video -mf` <br>
     `docker exec market-php-app php artisan make:migration create_section_has_video_table --create=section_has_video` <br>
     `docker exec market-php-app php artisan make:migration create_article_has_video_table --create=article_has_video` <br>
+    `docker exec market-php-app php artisan make:seeder VideoSeeder` <br>
     `docker exec market-php-app php artisan make:controller Admin/Invokable/RemoveSectionFromVideoController --invokable` <br>
     `docker exec market-php-app php artisan make:controller Admin/Invokable/RemoveArticleFromVideoController --invokable` <br>
     `docker exec market-php-app php artisan make:model Admin/Video/VideoImage -mf` <br>
@@ -293,25 +292,80 @@
     `docker exec market-php-app php artisan make:model User/Like/VideoLike` <br>
     `docker exec market-php-app php artisan migrate` <br>
 
-38) creating business logic ap Category
+37) creating business logic ap Category
     `docker exec market-php-app php artisan make:model Admin/Category/Category -mf` <br>
+    `docker exec market-php-app php artisan make:model Admin/Category/CategoryImage -mf` <br>
+    `docker exec market-php-app php artisan make:migration create_category_has_images_table --create=category_has_images` <br>
     `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:seeder CategorySeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=CategorySeeder` <br>
     `docker exec market-php-app php artisan make:resource Admin/Category/CategoryResource` <br>
-    `docker exec market-php-app php artisan make:resource Admin/Category/CategorySharedResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Category/CategorySharedResource`
+    `docker exec market-php-app php artisan make:resource Admin/Category/CategoryImageResource` <br>
     `docker exec market-php-app php artisan make:request Admin/Category/CategoryRequest` <br>
     `docker exec market-php-app php artisan make:controller Admin/Category/CategoryController --resource` <br>
 
-39) creating business logic app API <br>
+38) creating business logic ap Product
+    `docker exec market-php-app php artisan make:model Admin/Product/Product -mf` <br>
+    `docker exec market-php-app php artisan make:model Admin/Product/ProductImage -mf` <br>
+    `docker exec market-php-app php artisan make:migration create_product_has_images_table --create=product_has_images` <br>
+    `docker exec market-php-app php artisan make:migration create_product_likes_table --create=product_likes` <br>
+    `docker exec market-php-app php artisan make:migration create_product_related_table --create=product_related` <br>
+    `docker exec market-php-app php artisan migrate` <br>
+    `docker exec market-php-app php artisan make:model User/Like/ProductLike` <br>
+    `docker exec market-php-app php artisan make:seeder ProductSeeder` <br>
+    `docker exec market-php-app php artisan db:seed --class=ProductSeeder` <br>
+    `docker exec market-php-app php artisan make:model Admin/Product/ProductImage` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Product/ProductResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Product/ProductSharedResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Product/ProductImageResource` <br>
+    `docker exec market-php-app php artisan make:request Admin/Product/ProductRequest` <br>
+    `docker exec market-php-app php artisan make:controller Admin/Product/ProductController --resource` <br>
+
+39) creating business logic ap Product Variants
+    `docker exec market-php-app php artisan make:migration create_product_variants_table` <br>
+    `docker exec market-php-app php artisan make:model Admin/ProductVariant/ProductVariantImage -mf` <br>
+    `docker exec market-php-app php artisan make:migration create_product_variants_has_images_table --create=product_variants_has_images` <br>
+    `docker exec market-php-app php artisan make:model Admin/ProductVariant/ProductVariant` <br>
+    `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantSharedResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantImageResource` <br>
+    `docker exec market-php-app php artisan make:request Admin/ProductVariant/ProductVariantRequest` <br>
+
+40) creating business logic ap Properties
+    `docker exec market-php-app php artisan make:migration create_property_groups_table` <br>
+    `docker exec market-php-app php artisan make:migration create_properties_table` <br>
+    `docker exec market-php-app php artisan make:migration create_property_values_table` <br>
+    `docker exec market-php-app php artisan make:migration create_product_property_value_table` <br>
+    `docker exec market-php-app php artisan make:migration create_category_property_table` <br>
+    `docker exec market-php-app php artisan make:model Admin/PropertyGroup/PropertyGroup` <br>
+    `docker exec market-php-app php artisan make:resource Admin/PropertyGroup/PropertyGroupResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/PropertyGroup/PropertyGroupSharedResource` <br>
+    `docker exec market-php-app php artisan make:model Admin/Property/Property` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Property/PropertyResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/Property/PropertySharedResource` <br>
+    `docker exec market-php-app php artisan make:model Admin/PropertyValue/PropertyValue` <br>
+    `docker exec market-php-app php artisan make:resource Admin/PropertyValue/PropertyValueResource` <br>
+    `docker exec market-php-app php artisan make:resource Admin/PropertyValue/PropertyValueSharedResource` <br>
+    `docker exec market-php-app php artisan make:request Admin/PropertyGroup/PropertyGroupRequest` <br>
+    `docker exec market-php-app php artisan make:request Admin/Property/PropertyRequest` <br>
+    `docker exec market-php-app php artisan make:request Admin/PropertyValue/PropertyValueRequest` <br>
+
+41) creating business logic app API <br>
     `composer require "darkaonline/l5-swagger` <br>
     `docker exec market-php-app php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"` <br>
     `docker exec market-php-app php artisan make:controller Api/User/ApiUserController --api` <br>
     `docker exec market-php-app php artisan make:controller Api/Permission/ApiPermissionController --api` <br>
     `docker exec market-php-app php artisan make:controller Api/Role/ApiRoleController --api` <br>
+    `docker exec market-php-app php artisan make:controller Api/Category/ApiCategoryController --api` <br>
+    `docker exec market-php-app php artisan make:controller Api/Product/ApiProductController --api` <br>
     `docker exec market-php-app php artisan make:controller Api/Rubric/ApiRubricController --api` <br>
     `docker exec market-php-app php artisan make:controller Api/Section/ApiSectionController --api` <br>
     `docker exec market-php-app php artisan make:controller Api/Article/ApiArticleController --api` <br>
+    `docker exec market-php-app php artisan make:controller Api/Tag/ApiTagController --api` <br>
+    `docker exec market-php-app php artisan make:controller Api/Banner/ApiBannerController --api` <br>
+    `docker exec market-php-app php artisan make:controller Api/Video/ApiVideoController --api` <br>
+    `docker exec market-php-app php artisan make:controller Api/Comment/ApiCommentController --api` <br>
     `docker exec market-php-app php artisan make:controller Api/Parameter/ApiParameterController --api` <br>
     `docker exec market-php-app php artisan l5-swagger:generate` <br>
     `docker exec -it market-php-app rm /var/www/public/storage` Удалите текущую символьную ссылку <br>
@@ -324,7 +378,7 @@
     `docker-compose restart` <br>
     `docker exec market-php-app php artisan l5-swagger:generate` <br>
 
-40) Помощь в командах
+42) Помощь в командах
     Удалите существующие символические ссылки <br>
     `docker exec -it market-php-app rm /var/www/public/storage` <br>
     `docker exec -it market-php-app rm /var/www/storage/api-docs` <br>
@@ -347,7 +401,7 @@
     `docker restart market-php-app`  <br>
     `docker exec -it market-php-app php artisan route:list`  <br>
     `mkdir -p app/Services`  <br>
-41) `composer config --global disable-tls true` <br> отключение сертификатов, если нужно
+43) `composer config --global disable-tls true` <br> отключение сертификатов, если нужно
     `php --ini` <br> найти php.ini
     `composer diagnose` <br> диагностика composer
     `composer self-update` <br> обновление текущей версии composer
@@ -357,8 +411,8 @@
     `docker exec -it market-php-app composer install --no-cache --no-interaction --prefer-dist` <br> пересборка зависимостей composer
     `composer config --global disable-tls false` <br> включение сертификатов обратно
 
-42) creating business logic Backup
+44) creating business logic Backup
     `docker exec market-php-app php artisan make:controller Admin/System/DatabaseBackupController` <br>
     `docker exec market-php-app php artisan make:controller Admin/System/FileBackupController` <br>
 ____________________________
-43) 
+

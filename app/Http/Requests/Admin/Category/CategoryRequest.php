@@ -117,6 +117,27 @@ class CategoryRequest extends FormRequest
                 // Важно: Убедитесь, что в вашем lang файле есть сообщение для not_in
                 // 'parent_id.not_in' => 'Категория не может быть родителем самой себе.'
             ],
+
+            'images'             => ['nullable','array'],
+            'images.*.id'        => [
+                'nullable','integer',
+                Rule::exists('category_images','id'),
+                Rule::prohibitedIf(fn() => $this->isMethod('POST')),
+            ],
+            'images.*.order'     => ['nullable','integer','min:0'],
+            'images.*.alt'       => ['nullable','string','max:255'],
+            'images.*.caption'   => ['nullable','string','max:255'],
+            'images.*.file'      => [
+                'nullable',
+                'required_without:images.*.id',
+                'file',
+                'image',
+                'mimes:jpeg,jpg,png,gif,svg,webp',
+                'max:10240',
+            ],
+
+            'deletedImages'      => ['sometimes','array'],
+            'deletedImages.*'    => ['integer','exists:category_images,id'],
         ];
     }
 

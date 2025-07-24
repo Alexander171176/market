@@ -2,9 +2,11 @@
 
 namespace App\Models\Admin\Category;
 
+use App\Models\Admin\Property\Property;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder; // Импортируем Builder для скоупов
 
@@ -34,6 +36,16 @@ class Category extends Model
         'views' => 'integer',
         'parent_id' => 'integer', // Можно и не кастовать, Eloquent справится
     ];
+
+    /**
+     * Связь: Категория - Изображения (многие ко многим через CategoryImage)
+     */
+    public function images(): BelongsToMany
+    {
+        return $this->belongsToMany(CategoryImage::class, 'category_has_images', 'category_id', 'image_id')
+            ->withPivot('order')
+            ->orderBy('category_has_images.order', 'asc');
+    }
 
     /**
      * Родительская категория
@@ -141,6 +153,19 @@ class Category extends Model
         return $this->children()->exists();
         // Или, если дети уже загружены (через with('children'))
         // return $this->relationLoaded('children') && $this->children->isNotEmpty();
+    }
+
+    /**
+     * Характеристики, привязанные к категории.
+     */
+    public function properties(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Property::class,
+            'category_property',
+            'category_id',
+            'property_id'
+        );
     }
 
 }

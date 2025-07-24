@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Invokable\RemoveTagFromArticleController;
+use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use App\Http\Controllers\Admin\System\FileBackupController;
 use App\Http\Controllers\Admin\System\RobotController;
@@ -377,6 +378,7 @@ Route::group([
             Route::resource('/roles', RoleController::class);
             Route::resource('/permissions', PermissionController::class);
             Route::resource('/categories', CategoryController::class);
+            Route::resource('/products', ProductController::class);
             Route::resource('/rubrics', RubricController::class);
             Route::resource('/sections', SectionController::class);
             Route::resource('/articles', ArticleController::class);
@@ -410,12 +412,15 @@ Route::group([
                 Route::put('/settings/{setting}/value', [SettingController::class, 'updateValue'])->name('settings.updateValue');
 
                 // Клонирование (Используем имена моделей для параметров RMB)
+                Route::post('/categories/{category}/clone', [RubricController::class, 'clone'])->name('categories.clone');
+                Route::post('/products/{product}/clone', [ProductController::class, 'clone'])->name('products.clone');
                 Route::post('/rubrics/{rubric}/clone', [RubricController::class, 'clone'])->name('rubrics.clone');
                 Route::post('/sections/{section}/clone', [SectionController::class, 'clone'])->name('sections.clone');
                 Route::post('/articles/{article}/clone', [ArticleController::class, 'clone'])->name('articles.clone');
 
                 // Переключение активности (Используем имена моделей для параметров RMB)
                 Route::put('/categories/{category}/activity', [CategoryController::class, 'updateActivity'])->name('categories.updateActivity');
+                Route::put('/products/{product}/activity', [ProductController::class, 'updateActivity'])->name('products.updateActivity');
                 Route::put('/rubrics/{rubric}/activity', [RubricController::class, 'updateActivity'])->name('rubrics.updateActivity');
                 Route::put('/sections/{section}/activity', [SectionController::class, 'updateActivity'])->name('sections.updateActivity');
                 Route::put('/articles/{article}/activity', [ArticleController::class, 'updateActivity'])->name('articles.updateActivity');
@@ -429,6 +434,8 @@ Route::group([
                 // Переключение активности массово
                 Route::put('/admin/actions/categories/bulk-activity', [CategoryController::class, 'bulkUpdateActivity'])
                     ->name('categories.bulkUpdateActivity');
+                Route::put('/admin/actions/products/bulk-activity', [ProductController::class, 'bulkUpdateActivity'])
+                    ->name('products.bulkUpdateActivity');
                 Route::put('/admin/actions/rubrics/bulk-activity', [RubricController::class, 'bulkUpdateActivity'])
                     ->name('rubrics.bulkUpdateActivity');
                 Route::put('/admin/actions/sections/bulk-activity', [SectionController::class, 'bulkUpdateActivity'])
@@ -449,6 +456,9 @@ Route::group([
                     ->name('comments.bulkUpdateActivity');
 
                 // Переключение Left/Main/Right (Используем имена моделей для параметров RMB)
+                Route::put('/products/{product}/left', [ProductController::class, 'updateLeft'])->name('products.updateLeft');
+                Route::put('/products/{product}/main', [ProductController::class, 'updateMain'])->name('products.updateMain');
+                Route::put('/products/{product}/right', [ProductController::class, 'updateRight'])->name('products.updateRight');
                 Route::put('/articles/{article}/left', [ArticleController::class, 'updateLeft'])->name('articles.updateLeft');
                 Route::put('/articles/{article}/main', [ArticleController::class, 'updateMain'])->name('articles.updateMain');
                 Route::put('/articles/{article}/right', [ArticleController::class, 'updateRight'])->name('articles.updateRight');
@@ -459,6 +469,8 @@ Route::group([
                 Route::put('/videos/{video}/right', [VideoController::class, 'updateRight'])->name('videos.updateRight');
 
                 // Переключение активности в левой колонке массово
+                Route::put('/admin/actions/products/bulk-left', [ProductController::class, 'bulkUpdateLeft'])
+                    ->name('products.bulkUpdateLeft');
                 Route::put('/admin/actions/articles/bulk-left', [ArticleController::class, 'bulkUpdateLeft'])
                     ->name('articles.bulkUpdateLeft');
                 Route::put('/admin/actions/banners/bulk-left', [BannerController::class, 'bulkUpdateLeft'])
@@ -467,12 +479,16 @@ Route::group([
                     ->name('videos.bulkUpdateLeft');
 
                 // Переключение активности в главном массово
+                Route::put('/admin/actions/products/bulk-main', [ProductController::class, 'bulkUpdateMain'])
+                    ->name('products.bulkUpdateMain');
                 Route::put('/admin/actions/articles/bulk-main', [ArticleController::class, 'bulkUpdateMain'])
                     ->name('articles.bulkUpdateMain');
                 Route::put('/admin/actions/videos/bulk-main', [VideoController::class, 'bulkUpdateMain'])
                     ->name('videos.bulkUpdateMain');
 
                 // Переключение активности в правой колонке массово
+                Route::put('/admin/actions/products/bulk-right', [ProductController::class, 'bulkUpdateRight'])
+                    ->name('products.bulkUpdateRight');
                 Route::put('/admin/actions/articles/bulk-right', [ArticleController::class, 'bulkUpdateRight'])
                     ->name('articles.bulkUpdateRight');
                 Route::put('/admin/actions/banners/bulk-right', [BannerController::class, 'bulkUpdateRight'])
@@ -482,6 +498,7 @@ Route::group([
 
                 // Обновление сортировки для Drag and Drop
                 Route::put('/categories/update-sort-bulk', [CategoryController::class, 'updateSortBulk'])->name('categories.updateSortBulk');
+                Route::put('/products/update-sort-bulk', [ProductController::class, 'updateSortBulk'])->name('products.updateSortBulk');
                 Route::put('/rubrics/update-sort-bulk', [RubricController::class, 'updateSortBulk'])->name('rubrics.updateSortBulk');
                 Route::put('/sections/update-sort-bulk', [SectionController::class, 'updateSortBulk'])->name('sections.updateSortBulk');
                 Route::put('/articles/update-sort-bulk', [ArticleController::class, 'updateSortBulk'])->name('articles.updateSortBulk');
@@ -493,6 +510,7 @@ Route::group([
 
                 // Обновление сортировки (Имена параметров уже были правильные)
                 Route::put('/categories/{category}/sort', [CategoryController::class, 'updateSort'])->name('categories.updateSort');
+                Route::put('/products/{product}/sort', [ProductController::class, 'updateSort'])->name('products.updateSort');
                 Route::put('/rubrics/{rubric}/sort', [RubricController::class, 'updateSort'])->name('rubrics.updateSort');
                 Route::put('/sections/{section}/sort', [SectionController::class, 'updateSort'])->name('sections.updateSort');
                 Route::put('/tags/{tag}/sort', [TagController::class, 'updateSort'])->name('tags.updateSort');
@@ -506,6 +524,7 @@ Route::group([
                 Route::put('/comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');
 
                 // Массовое удаление
+                Route::delete('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])->name('products.bulkDestroy');
                 Route::delete('/rubrics/bulk-delete', [RubricController::class, 'bulkDestroy'])->name('rubrics.bulkDestroy');
                 Route::delete('/sections/bulk-delete', [SectionController::class, 'bulkDestroy'])->name('sections.bulkDestroy');
                 Route::delete('/articles/bulk-delete', [ArticleController::class, 'bulkDestroy'])->name('articles.bulkDestroy');

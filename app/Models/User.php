@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail; // Если используете верификацию email
 use App\Models\Admin\Comment\Comment; // Добавляем Comment
 use App\Models\User\Like\ArticleLike; // Добавляем ArticleLike
+use App\Models\User\Like\ProductLike;
 use App\Models\User\Like\VideoLike; // Добавляем VideoLike
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -97,6 +98,14 @@ class User extends Authenticatable /* implements MustVerifyEmail */
     public function videoLikes(): HasMany
     {
         return $this->hasMany(VideoLike::class, 'user_id');
+    }
+
+    /**
+     * Лайки товара, поставленные пользователем.
+     */
+    public function productLikes(): HasMany
+    {
+        return $this->hasMany(ProductLike::class, 'user_id');
     }
 
     // --- КОНЕЦ НОВЫХ СВЯЗЕЙ ---

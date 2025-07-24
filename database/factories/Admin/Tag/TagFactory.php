@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories\Admin\Article;
+namespace Database\Factories\Admin\Tag;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;

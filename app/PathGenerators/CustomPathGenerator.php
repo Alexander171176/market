@@ -8,6 +8,12 @@ use App\Models\Admin\Athlete\Athlete;
 use App\Models\Admin\Athlete\AthleteImage;
 use App\Models\Admin\Banner\Banner;
 use App\Models\Admin\Banner\BannerImage;
+use App\Models\Admin\Category\Category;
+use App\Models\Admin\Category\CategoryImage;
+use App\Models\Admin\Product\Product;
+use App\Models\Admin\Product\ProductImage;
+use App\Models\Admin\ProductVariant\ProductVariant;
+use App\Models\Admin\ProductVariant\ProductVariantImage;
 use App\Models\Admin\Tournament\Tournament;
 use App\Models\Admin\Tournament\TournamentImage;
 use App\Models\Admin\Video\Video;
@@ -50,29 +56,40 @@ class CustomPathGenerator implements PathGenerator
             return 'video_images/' . $media->model_id . '/';
         }
 
-        // Если медиа привязано к сущности Athlete ---
-        if ($media->model_type === Athlete::class) {
-            return 'athletes/' . $media->model_id . '/';
+        // Если медиа привязано к сущности Category ---
+        if ($media->model_type === Category::class) {
+            return 'categories/' . $media->model_id . '/';
         }
 
-        // Если медиа привязано к сущности AthleteImage
-        if ($media->model_type === AthleteImage::class) {
-            return 'athlete_images/' . $media->model_id . '/';
+        // Если медиа привязано к сущности CategoryImage
+        if ($media->model_type === CategoryImage::class) {
+            return 'category_images/' . $media->model_id . '/';
         }
 
-        // Если медиа привязано к сущности Tournament ---
-        if ($media->model_type === Tournament::class) {
-            return 'tournaments/' . $media->model_id . '/';
+        // Если медиа привязано к сущности Product ---
+        if ($media->model_type === Product::class) {
+            return 'products/' . $media->model_id . '/';
         }
 
-        // Если медиа привязано к сущности TournamentImage
-        if ($media->model_type === TournamentImage::class) {
-            return 'tournament_images/' . $media->model_id . '/';
+        // Если медиа привязано к сущности ProductImage
+        if ($media->model_type === ProductImage::class) {
+            return 'product_images/' . $media->model_id . '/';
+        }
+
+        // Если медиа привязано к сущности ProductVariant ---
+        if ($media->model_type === ProductVariant::class) {
+            return 'product_variants/' . $media->model_id . '/';
+        }
+
+        // Если медиа привязано к сущности ProductVariantImage
+        if ($media->model_type === ProductVariantImage::class) {
+            return 'product_variant_images/' . $media->model_id . '/';
         }
 
 
         // Дефолтный путь для остальных случаев
         return 'media/' . $media->model_id . '/';
+
     }
 
     public function getPathForConversions(Media $media): string

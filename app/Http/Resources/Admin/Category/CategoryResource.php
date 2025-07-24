@@ -36,6 +36,11 @@ class CategoryResource extends JsonResource
             'created_at' => $category->created_at?->isoFormat('DD.MM.YYYY HH:mm:ss'), // Пример форматирования
             'updated_at' => $category->updated_at?->isoFormat('DD.MM.YYYY HH:mm:ss'), // Пример форматирования
 
+            'images_count' => $this->whenCounted('images'),
+
+            // Связи
+            'images' => CategoryImageResource::collection($this->whenLoaded('images')),
+
             // --- Ключевой момент: рекурсивное включение дочерних элементов ---
             // Мы используем `whenLoaded`, чтобы включить 'children' только если
             // эта связь была явно загружена в контроллере (через `with('children')`).
