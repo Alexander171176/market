@@ -351,6 +351,7 @@ export default {
     previewNewImage: 'Жаңа суретті алдын ала қарау',
     printInMenu: 'мәзірде',
     privacyPolicy: 'Құпиялылық саясаты',
+    products: 'Тауарлар',
     profile: 'Профиль',
     profileInformation: 'Профиль туралы ақпарат',
     profileInformationDescription: 'Тіркелгіңіздің профиль ақпаратын және электрондық поштасын жаңартыңыз.',

@@ -351,6 +351,7 @@ export default {
     previewNewImage: 'Preview of a new image',
     printInMenu: 'in the menu',
     privacyPolicy: 'Privacy Policy',
+    products: 'Products',
     profile: 'Profile',
     profileInformation: 'Profile Information',
     profileInformationDescription: 'Update your account\'s profile information and email address.',

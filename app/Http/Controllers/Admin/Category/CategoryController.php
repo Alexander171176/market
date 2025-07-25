@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateActivityRequest;
 use App\Http\Resources\Admin\Category\CategoryResource;
 use App\Http\Resources\Admin\Category\CategorySharedResource;
 use App\Models\Admin\Category\Category;
+use App\Models\Admin\Category\CategoryImage;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse; // Добавлено для JsonResponse
 use Illuminate\Http\RedirectResponse;
@@ -18,6 +19,17 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
 
+/**
+ * Контроллер для управления Категориями в административной панели.
+ *
+ * Предоставляет CRUD операции, а также дополнительные действия:
+ * - Обновление активности и сортировки (одиночное и массовое)
+ *
+ * @version 1.1 (Улучшен с RMB, транзакциями, Form Requests)
+ * @author Александр Косолапов <kosolapov1976@gmail.com>
+ * @see \App\Models\Admin\Category\Category Модель Категории
+ * @see \App\Http\Requests\Admin\Category\CategoryRequest Запрос для создания/обновления
+ */
 class CategoryController extends Controller
 {
     protected array $availableLocales = ['ru', 'en', 'kk']; // Обновите список
@@ -49,11 +61,22 @@ class CategoryController extends Controller
             $categories = Category::query()
                 ->byLocale($currentLocale)
                 ->root()
-                ->with(['children' => fn($q) => $q->with(['children' => fn($q2) => $q2->with('children')])])
+                ->with([
+                    'images', // загрузка изображений для родительской категории
+                    'children' => fn($q) => $q
+                        ->with('images') // изображения для 1-го уровня детей
+                        ->with([
+                            'children' => fn($q2) => $q2
+                                ->with('images') // изображения для 2-го уровня детей
+                                ->with('children.images') // изображения для 3-го уровня
+                        ]),
+                ])
                 ->orderBy('sort')
                 ->get();
 
-            $categoriesCount = Category::query()->byLocale($currentLocale)->count();
+            $categoriesCount = Category::query()
+                ->byLocale($currentLocale)
+                ->count();
 
         } catch (Throwable $e) {
             Log::error("Ошибка загрузки категорий для Index (locale: {$currentLocale}): " . $e->getMessage(), ['exception' => $e]);
@@ -115,30 +138,83 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request): RedirectResponse
     {
-        // Авторизация выполняется в CategoryRequest->authorize()
-
         $data = $request->validated();
+        $imagesData = $data['images'] ?? [];
+
+        unset($data['images']);
 
         try {
-            $category = DB::transaction(function () use ($data) {
-                if (!isset($data['sort']) || is_null($data['sort'])) {
-                    $maxSort = Category::query()
-                        ->where('locale', $data['locale'])
-                        ->where('parent_id', $data['parent_id'] ?? null)
-                        ->max('sort');
-                    $data['sort'] = is_null($maxSort) ? 0 : $maxSort + 1;
+            DB::beginTransaction();
+
+            // Присвоение sort, если не задан
+            if (!isset($data['sort']) || is_null($data['sort'])) {
+                $maxSort = Category::query()
+                    ->where('locale', $data['locale'])
+                    ->where('parent_id', $data['parent_id'] ?? null)
+                    ->max('sort');
+                $data['sort'] = is_null($maxSort) ? 0 : $maxSort + 1;
+            }
+
+            $category = Category::create($data);
+
+            // Обработка изображений
+            $imageSyncData = [];
+            $imageIndex = 0;
+
+            foreach ($imagesData as $imageData) {
+                $fileKey = "images.{$imageIndex}.file";
+
+                if ($request->hasFile($fileKey)) {
+                    $image = CategoryImage::create([
+                        'order'   => $imageData['order']   ?? 0,
+                        'alt'     => $imageData['alt']     ?? '',
+                        'caption' => $imageData['caption'] ?? '',
+                    ]);
+
+                    try {
+                        $file = $request->file($fileKey);
+
+                        if ($file->isValid()) {
+                            $image
+                                ->addMedia($file)
+                                ->toMediaCollection('images');
+
+                            $imageSyncData[$image->id] = ['order' => $image->order];
+                        } else {
+                            Log::warning("Недопустимый файл изображения с индексом {$imageIndex} для категории {$category->id}", [
+                                'fileKey' => $fileKey,
+                                'error'   => $file->getErrorMessage(),
+                            ]);
+                            $image->delete();
+                            continue;
+                        }
+                    } catch (Throwable $e) {
+                        Log::error("Ошибка Spatie media-library в категории {$category->id}, индекс изображения - {$imageIndex}: {$e->getMessage()}", [
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+                        $image->delete();
+                        continue;
+                    }
                 }
-                $newCategory = Category::create($data);
-                Log::info('Категория создана: ', $newCategory->toArray());
-                return $newCategory;
-            });
+
+                $imageIndex++;
+            }
+
+            $category->images()->sync($imageSyncData);
+
+            DB::commit();
+
+            Log::info("Категория успешно создана", ['id' => $category->id, 'title' => $category->title]);
 
             return redirect()->route('admin.categories.index', ['locale' => $category->locale])
                 ->with('success', __('admin/controllers/categories.created'));
 
         } catch (Throwable $e) {
-            Log::error("Ошибка при создании категории: " . $e->getMessage(), ['exception' => $e, 'data' => $data]);
-            return back()->withInput()->with('error', __('admin/controllers/categories.create_error'));
+            DB::rollBack();
+            Log::error("Ошибка при создании категории: {$e->getMessage()}", [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withInput()->withErrors(['general' => __('admin/controllers/categories.create_error')]);
         }
     }
 
@@ -180,7 +256,12 @@ class CategoryController extends Controller
 
         return Inertia::render('Admin/Categories/Edit', [
             'targetLocale' => $targetLocale,
-            'category' => new CategoryResource($category->loadMissing('parent')),
+            'category' => new CategoryResource(
+                $category->loadMissing([
+                    'parent',
+                    'images' => fn($q) => $q->orderBy('order'),
+                ])
+            ),
             'potentialParents' => CategorySharedResource::collection($potentialParents),
             'availableLocales' => $this->availableLocales,
             'currentLocale' => $category->locale,
@@ -199,19 +280,40 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
         $data = $request->validated();
+
+        $imagesData       = $data['images'] ?? [];
+        $deletedImageIds  = $data['deletedImages'] ?? [];
         $originalParentId = $category->parent_id;
-        $originalLocale = $category->locale;
-        $categoryId = $category->id; // Сохраняем ID для лога
+        $originalLocale   = $category->locale;
+        $categoryId       = $category->id;
+
+        unset(
+            $data['images'],
+            $data['deletedImages'],
+            $data['_method']
+        );
 
         try {
-            DB::transaction(function () use ($category, $data, $originalParentId, $originalLocale) {
+            DB::transaction(function () use (
+                $category, $data, $originalParentId, $originalLocale,
+                $request, $imagesData, $deletedImageIds
+            ) {
+                // Удаляем изображения
+                if (!empty($deletedImageIds)) {
+                    $category->images()->detach($deletedImageIds);
+                    $this->deleteImages($deletedImageIds);
+                }
+
                 $recalculateSort = false;
 
-                if (isset($data['parent_id']) && $data['parent_id'] != $originalParentId) {
+                if (
+                    isset($data['parent_id']) && $data['parent_id'] != $originalParentId ||
+                    isset($data['locale']) && $data['locale'] !== $originalLocale
+                ) {
                     $recalculateSort = true;
-                } else if (isset($data['locale']) && $data['locale'] !== $originalLocale) {
-                    $recalculateSort = true;
-                    Log::warning("Locale changed for category ID {$category->id} from {$originalLocale} to {$data['locale']}");
+                    if (isset($data['locale']) && $data['locale'] !== $originalLocale) {
+                        Log::warning("Locale changed for category ID {$category->id} from {$originalLocale} to {$data['locale']}");
+                    }
                 }
 
                 if ($recalculateSort && (!isset($data['sort']) || is_null($data['sort']))) {
@@ -224,16 +326,64 @@ class CategoryController extends Controller
                 }
 
                 $category->update($data);
+
+                // Обработка изображений
+                $syncData = [];
+
+                foreach ($imagesData as $index => $imageData) {
+                    $fileKey = "images.{$index}.file";
+
+                    // Обновление существующего изображения
+                    if (!empty($imageData['id'])) {
+                        $img = CategoryImage::find($imageData['id']);
+                        if ($img && !in_array($img->id, $deletedImageIds, true)) {
+                            $img->update([
+                                'order'   => $imageData['order']   ?? $img->order,
+                                'alt'     => $imageData['alt']     ?? $img->alt,
+                                'caption' => $imageData['caption'] ?? $img->caption,
+                            ]);
+
+                            if ($request->hasFile($fileKey)) {
+                                $img->clearMediaCollection('images');
+                                $img->addMedia($request->file($fileKey))
+                                    ->toMediaCollection('images');
+                            }
+
+                            $syncData[$img->id] = ['order' => $img->order];
+                        }
+
+                        // Добавление нового изображения
+                    } elseif ($request->hasFile($fileKey)) {
+                        $new = CategoryImage::create([
+                            'order'   => $imageData['order']   ?? 0,
+                            'alt'     => $imageData['alt']     ?? '',
+                            'caption' => $imageData['caption'] ?? '',
+                        ]);
+
+                        $new->addMedia($request->file($fileKey))
+                            ->toMediaCollection('images');
+
+                        $syncData[$new->id] = ['order' => $new->order];
+                    }
+                }
+
+                $category->images()->sync($syncData);
             });
 
             Log::info("Категория обновлена (ID: {$categoryId})", $category->refresh()->toArray());
 
-            return redirect()->route('admin.categories.index', ['locale' => $category->locale])
+            return redirect()
+                ->route('admin.categories.index', ['locale' => $category->locale])
                 ->with('success', __('admin/controllers/categories.updated'));
 
         } catch (Throwable $e) {
-            Log::error("Ошибка при обновлении категории (ID: {$categoryId}): " . $e->getMessage(), ['exception' => $e, 'data' => $data]);
-            return back()->withInput()->with('error', __('admin/controllers/categories.update_error'));
+            Log::error("Ошибка при обновлении категории (ID: {$categoryId}): {$e->getMessage()}", [
+                'exception' => $e,
+                'data' => $data
+            ]);
+            return back()
+                ->withInput()
+                ->with('error', __('admin/controllers/categories.update_error'));
         }
     }
 
@@ -255,9 +405,10 @@ class CategoryController extends Controller
         $categoryId = $category->id;
 
         try {
-            DB::transaction(function () use ($category) {
-                $category->delete();
-            });
+            DB::beginTransaction();
+            $this->deleteImages($category->images()->pluck('id')->toArray());
+            $category->delete();
+            DB::commit();
 
             Log::info("Категория '{$categoryTitle}' (ID: {$categoryId}) удалена.");
             return redirect()->route('admin.categories.index', ['locale' => $locale])
@@ -500,6 +651,23 @@ class CategoryController extends Controller
             }
             return redirect()->back()->with('error', $message);
         }
+    }
+
+    /**
+     * Приватный метод удаления изображений (для Spatie)
+     *
+     * @param array $imageIds
+     * @return void
+     */
+    private function deleteImages(array $imageIds): void
+    {
+        if (empty($imageIds)) return;
+        $imagesToDelete = CategoryImage::whereIn('id', $imageIds)->get();
+        foreach ($imagesToDelete as $image) {
+            $image->clearMediaCollection('images');
+            $image->delete();
+        }
+        Log::info('Удалены записи CategoryImage и их медиа: ', ['image_ids' => $imageIds]);
     }
 
 }

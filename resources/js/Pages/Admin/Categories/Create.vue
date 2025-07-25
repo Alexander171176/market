@@ -23,10 +23,19 @@ import InputNumber from "@/Components/Admin/Input/InputNumber.vue";
 import CKEditor from "@/Components/Admin/CKEditor/CKEditor.vue";
 import TinyEditor from "@/Components/Admin/TinyEditor/TinyEditor.vue";
 import SelectParentCategory from "@/Components/Admin/Category/Select/SelectParentCategory.vue";
+import MultiImageUpload from "@/Components/Admin/Image/MultiImageUpload.vue";
+import { ref } from 'vue'
 
 // --- Инициализация ---
 const toast = useToast();
 const {t} = useI18n();
+
+/**
+ * Входные свойства компонента.
+ */
+defineProps({
+    images: Array, // Добавляем этот пропс для передачи списка изображений
+})
 
 /**
  * Форма для создания.
@@ -43,7 +52,14 @@ const form = useForm({
     meta_keywords: '', // meta keywords
     meta_desc: '', // meta description
     activity: false,
+    images: [], // Добавляем массив для загруженных изображений
 });
+
+const newImages = ref([]);
+
+const handleNewImagesUpdate = (updatedImages) => {
+    newImages.value = updatedImages;
+};
 
 /**
  * Опции для select.
@@ -140,10 +156,22 @@ const generateMetaFields = () => {
  */
 const submit = () => {
 
-    form.transform((data) => ({
-        ...data,
-        activity: data.activity ? 1 : 0,
-    }));
+    form.transform((data) => {
+        const transformed = {
+            ...data,
+            activity: data.activity ? 1 : 0,
+        };
+
+        // Преобразуем изображения в структуру с нужными ключами
+        newImages.value.forEach((image, index) => {
+            transformed[`images[${index}][file]`] = image.file;
+            transformed[`images[${index}][order]`] = image.order ?? 0;
+            transformed[`images[${index}][alt]`] = image.alt ?? '';
+            transformed[`images[${index}][caption]`] = image.caption ?? '';
+        });
+
+        return transformed;
+    });
 
     // console.log("Форма для отправки заполнена:", form.data());
 
@@ -195,7 +223,8 @@ const submit = () => {
                         <!-- Datepicker built with flatpickr -->
                     </div>
                 </div>
-                <form @submit.prevent="submit" class="p-3 w-full">
+                <form @submit.prevent="submit"
+                      enctype="multipart/form-data" class="p-3 w-full">
 
                     <div class="mb-3 flex justify-between flex-col lg:flex-row items-center gap-4">
 
@@ -343,6 +372,11 @@ const submit = () => {
                             </template>
                             {{ t('generateMetaTags') }}
                         </MetatagsButton>
+                    </div>
+
+                    <!-- Блок загрузки новых изображений -->
+                    <div class="mt-4">
+                        <MultiImageUpload @update:images="handleNewImagesUpdate" />
                     </div>
 
                     <div class="flex items-center justify-center mt-4">

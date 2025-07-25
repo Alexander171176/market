@@ -38,7 +38,6 @@ use App\Http\Controllers\Admin\Banner\BannerController;
 use App\Http\Controllers\Admin\Chart\ChartController;
 use App\Http\Controllers\Admin\Comment\CommentController;
 use App\Http\Controllers\Admin\Component\ComponentController;
-use App\Http\Controllers\Admin\Diagram\DiagramController;
 use App\Http\Controllers\Admin\Invokable\RemoveArticleFromSectionController;
 use App\Http\Controllers\Admin\Invokable\RemoveArticleFromTagController;
 use App\Http\Controllers\Admin\Invokable\RemoveArticleFromVideoController;
@@ -140,6 +139,12 @@ Route::group([
         Route::get('/videos', [$publicVideoController, 'index'])->name('videos.index');
         Route::get('/videos/{url}', [$publicVideoController, 'show'])->where('url', '.*')->name('public.videos.show');
         Route::post('/videos/{video}/like', [$publicVideoController, 'like'])->name('videos.like');
+
+        $publicCategoryController = "App\\Http\\Controllers\\Public\\{$siteLayout}\\CategoryController";
+        Route::get('/categories/{category:url}', [$publicCategoryController, 'show'])->where('url', '.*')->name('public.categories.show');
+
+        $publicProductController = "App\\Http\\Controllers\\Public\\{$siteLayout}\\ProductController";
+        Route::get('/products/{product:url}', [$publicProductController, 'show'])->where('url', '.*')->name('public.products.show');
 
         // TODO: Добавить другие публичные маршруты (поиск, контакты и т.д.)
 

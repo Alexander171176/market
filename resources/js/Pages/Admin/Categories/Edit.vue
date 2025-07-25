@@ -6,7 +6,7 @@
 import { useToast } from 'vue-toastification';
 import { useI18n } from 'vue-i18n';
 import {transliterate} from '@/utils/transliteration';
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue'
 import {useForm, usePage} from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import TitlePage from '@/Components/Admin/Headlines/TitlePage.vue';
@@ -26,6 +26,10 @@ import CKEditor from "@/Components/Admin/CKEditor/CKEditor.vue";
 import TinyEditor from "@/Components/Admin/TinyEditor/TinyEditor.vue";
 import SelectParentCategory from "@/Components/Admin/Category/Select/SelectParentCategory.vue";
 
+// Импорт двух отдельных компонентов для работы с изображениями:
+import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue'; // для загрузки новых изображений
+import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue';     // для редактирования существующих
+
 // --- Инициализация ---
 const toast = useToast();
 const { t } = useI18n();
@@ -40,12 +44,11 @@ const props = defineProps({
     },
 });
 
-
 /**
  * Формируем форму редактирования.
  */
 const form = useForm({
-    _method: 'PUT',
+    _method: 'POST',
     parent_id: props.category.parent_id ?? null,
     sort: props.category.sort ?? 0,
     title: props.category?.title,
@@ -57,6 +60,7 @@ const form = useForm({
     meta_keywords: props.category.meta_keywords ?? '',
     meta_desc: props.category.meta_desc ?? '',
     activity: Boolean(props.category.activity ?? false),
+    deletedImages: [] // массив для хранения ID удалённых изображений
 });
 
 /**
@@ -67,6 +71,53 @@ const parentOptions = buildParentOptions(page.props.potentialParents);
 
 // console.log('parent_id:', form.parent_id);
 // console.log('parentOptions:', parentOptions); // []
+
+/**
+ * Массив существующих изображений.
+ */
+const existingImages = ref(
+    (props.category.images || [])
+        .filter(img => img.url) // фильтруем изображения, у которых есть URL
+        .map(img => ({
+            id: img.id,
+            // Если есть WebP-версия, используем её, иначе — оригинальный URL
+            url: img.webp_url || img.url,
+            order: img.order || 0,
+            alt: img.alt || '',
+            caption: img.caption || ''
+        }))
+);
+
+/**
+ * Массив для новых изображений (будут содержать свойство file).
+ */
+const newImages = ref([]);
+
+/**
+ * Обработчик обновления существующих изображений, приходящих из компонента MultiImageEdit.
+ */
+const handleExistingImagesUpdate = (images) => {
+    existingImages.value = images;
+};
+
+/**
+ * Обработчик удаления изображения из существующего списка.
+ */
+const handleDeleteExistingImage = (deletedId) => {
+    if (!form.deletedImages.includes(deletedId)) {
+        form.deletedImages.push(deletedId);
+    }
+    existingImages.value = existingImages.value.filter(img => img.id !== deletedId);
+    // console.log("Deleted IDs:", form.deletedImages);
+    // console.log("Remaining images:", existingImages.value);
+};
+
+/**
+ * Обработчик обновления новых изображений из компонента MultiImageUpload.
+ */
+const handleNewImagesUpdate = (images) => {
+    newImages.value = images;
+};
 
 /**
  * Преобразует страницы в плоский массив с отступами по уровню вложенности.
@@ -167,11 +218,32 @@ const generateMetaFields = () => {
 const submit = () => {
     form.transform((data) => ({
         ...data,
-        activity: data.activity ? 1 : 0,
+        parent_id: data.parent_id ?? '', // важно!
+        activity: data.activity ? '1' : '0', // как строка
+        locale: data.locale || '',
+        title: data.title || '',
+        url: data.url || '',
+        sort: String(data.sort ?? '0'),
+        images: [
+            ...newImages.value.map(img => ({
+                file: img.file,
+                order: img.order,
+                alt: img.alt,
+                caption: img.caption
+            })),
+            ...existingImages.value.map(img => ({
+                id: img.id,
+                order: img.order,
+                alt: img.alt,
+                caption: img.caption
+            }))
+        ],
+        deletedImages: form.deletedImages
     }));
-    form.put(route('admin.categories.update', props.category.id), {
+    form.post(route('admin.categories.update', props.category.id), {
         errorBag: 'editCategory',
         preserveScroll: true,
+        forceFormData: true, // Принудительно отправляем как FormData
         onSuccess: () => {
             // console.log("Форма успешно отправлена.");
             toast.success('Категория успешно обновлена!'); // Можно добавить, если нужно кастомное
@@ -215,7 +287,8 @@ const submit = () => {
                         <!-- Datepicker built with flatpickr -->
                     </div>
                 </div>
-                <form @submit.prevent="submit" class="p-3 w-full">
+                <form @submit.prevent="submit"
+                      enctype="multipart/form-data" class="p-3 w-full">
 
                     <div class="mb-3 flex justify-between flex-col lg:flex-row items-center gap-4">
 
@@ -372,6 +445,19 @@ const submit = () => {
                             </template>
                             {{ t('generateMetaTags') }}
                         </MetatagsButton>
+                    </div>
+
+                    <!-- Блок редактирования существующих изображений -->
+                    <div class="mt-4">
+                        <MultiImageEdit
+                            :images="existingImages"
+                            @update:images="handleExistingImagesUpdate"
+                            @delete-image="handleDeleteExistingImage" />
+                    </div>
+
+                    <!-- Блок загрузки новых изображений -->
+                    <div class="mt-4">
+                        <MultiImageUpload @update:images="handleNewImagesUpdate" />
                     </div>
 
                     <div class="flex items-center justify-center mt-4">

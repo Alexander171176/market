@@ -48,6 +48,15 @@ const toggleExpand = () => {
     isExpanded.value = !isExpanded.value;
     // console.log('[CategoryTreeItem] isExpanded:', isExpanded.value);
 };
+
+// Функция для выбора изображения с наименьшим значением order
+const getPrimaryImage = (category) => {
+    if (category.images && category.images.length) {
+        // Создаем копию массива и сортируем по возрастанию order
+        return [...category.images].sort((a, b) => a.order - b.order)[0];
+    }
+    return null;
+};
 </script>
 
 <template>
@@ -97,10 +106,11 @@ const toggleExpand = () => {
                         {{ category.id }}
                     </span>
 
-                    <Link :href="route('admin.categories.edit', category.id)"
-                          class="font-medium text-teal-600 dark:text-teal-100
-                                 hover:text-indigo-600 dark:hover:text-indigo-300 truncate"
-                          :title="category.url">
+                    <Link
+                        :href="route('public.categories.show', { category: category.url })"
+                        class="font-medium text-teal-600 dark:text-teal-100 hover:underline
+                               hover:text-indigo-600 dark:hover:text-indigo-300 truncate"
+                        :title="category.url">
                         {{ category.title }}
                     </Link>
 
@@ -110,6 +120,27 @@ const toggleExpand = () => {
                           : 'bg-blue-200 dark:bg-blue-900/50 text-gray-900 dark:text-gray-100'">
                         {{ category.locale.toUpperCase() }}
                     </span>
+
+                    <div class="flex justify-center">
+                        <template v-if="category.images && category.images.length">
+                            <img
+                                :src="getPrimaryImage(category).webp_url || getPrimaryImage(category).url"
+                                :alt="getPrimaryImage(category).alt || t('defaultImageAlt')"
+                                :title="getPrimaryImage(category).caption || t('postImage')"
+                                class="h-6 w-8 object-cover rounded-sm
+                                       border border-slate-400 dark:border-slate-200 p-0.5"
+                            >
+                        </template>
+                        <template v-else>
+                            <img
+                                src="/storage/category_images/default-image.png"
+                                :alt="t('defaultImageTitle')"
+                                class="h-6 w-8 object-cover rounded-sm
+                                       border border-slate-400 dark:border-slate-200 p-0.5"
+                            >
+                        </template>
+                    </div>
+
                 </div>
 
                 <!-- Правая часть -->

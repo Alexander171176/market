@@ -304,6 +304,7 @@
     `docker exec market-php-app php artisan make:resource Admin/Category/CategoryImageResource` <br>
     `docker exec market-php-app php artisan make:request Admin/Category/CategoryRequest` <br>
     `docker exec market-php-app php artisan make:controller Admin/Category/CategoryController --resource` <br>
+    `docker exec market-php-app php artisan make:controller Public/Default/CategoryController` <br>
 
 38) creating business logic ap Product
     `docker exec market-php-app php artisan make:model Admin/Product/Product -mf` <br>
@@ -321,6 +322,7 @@
     `docker exec market-php-app php artisan make:resource Admin/Product/ProductImageResource` <br>
     `docker exec market-php-app php artisan make:request Admin/Product/ProductRequest` <br>
     `docker exec market-php-app php artisan make:controller Admin/Product/ProductController --resource` <br>
+    `docker exec market-php-app php artisan make:controller Public/Default/ProductController` <br>
 
 39) creating business logic ap Product Variants
     `docker exec market-php-app php artisan make:migration create_product_variants_table` <br>

@@ -268,6 +268,25 @@ class SettingController extends Controller
      * @param UpdateCountSettingRequest $request
      * @return RedirectResponse
      */
+    public function updateAdminCountProducts(UpdateCountSettingRequest $request): RedirectResponse
+    {
+        return $this->updateSettingAndRedirect(
+            $request,
+            'AdminCountProducts',
+            'site_settings.AdminCountProducts',
+            'number',
+            'admin',
+            'Количество элементов на странице успешно обновлено.',
+            'Ошибка обновления настройки количества элементов.'
+        );
+    }
+
+    /**
+     * Обновление количества элементов в рубриках
+     *
+     * @param UpdateCountSettingRequest $request
+     * @return RedirectResponse
+     */
     public function updateAdminCountRubrics(UpdateCountSettingRequest $request): RedirectResponse
     {
         return $this->updateSettingAndRedirect(
@@ -519,6 +538,25 @@ class SettingController extends Controller
             $request,
             'AdminSortCategories',
             'site_settings.AdminSortCategories',
+            'string',
+            'admin',
+            'Сортировка по умолчанию успешно обновлена.',
+            'Ошибка обновления настройки сортировки.'
+        );
+    }
+
+    /**
+     * Обновляет сортировку элементов в товаров
+     *
+     * @param UpdateSortRequest $request
+     * @return RedirectResponse
+     */
+    public function updateAdminSortProducts(UpdateSortRequest $request): RedirectResponse
+    {
+        return $this->updateSettingAndRedirect(
+            $request,
+            'AdminSortProducts',
+            'site_settings.AdminSortProducts',
             'string',
             'admin',
             'Сортировка по умолчанию успешно обновлена.',

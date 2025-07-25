@@ -351,6 +351,7 @@ export default {
     previewNewImage: 'Предпросмотр нового изображения',
     printInMenu: 'в меню',
     privacyPolicy: 'Политика конфиденциальности',
+    products: 'Товары',
     profile: 'Профиль',
     profileInformation: 'Информация профиля',
     profileInformationDescription: 'Обновите информацию профиля вашей учетной записи и адрес электронной почты.',

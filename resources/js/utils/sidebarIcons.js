@@ -42,6 +42,10 @@ export const sidebarIcons = {
         <path class="fill-current text-cyan-400" d="M23,6H12c-0.552,0-1-0.447-1-1s0.448-1,1-1h11c0.552,0,1,0.447,1,1S23.552,6,23,6z"></path>
         <path class="fill-current text-cyan-400" d="M12,20H1c-0.552,0-1-0.447-1-1s0.448-1,1-1h11c0.552,0,1,0.447,1,1S12.552,20,12,20z"></path>
     `,
+    products: `
+        <path class="fill-current text-cyan-600" d="M2,20a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V11H2Z"></path>
+        <path class="fill-current text-cyan-400" d="M23,7H19.58L15.868.5a1,1,0,1,0-1.736.992L17.277,7H6.723L9.868,1.5A1,1,0,1,0,8.132.5L4.42,7H1A1,1,0,0,0,1,9H23a1,1,0,0,0,0-2Z"></path>
+    `,
     rubrics: `
         <circle class="fill-current text-cyan-600" cx="16" cy="8" r="8"></circle>
         <circle class="fill-current text-cyan-400" cx="8" cy="16" r="8"></circle>
