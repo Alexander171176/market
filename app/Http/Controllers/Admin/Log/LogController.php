@@ -36,7 +36,7 @@ class LogController extends Controller
 
         $logContent = File::exists($logPath)
             ? mb_convert_encoding(File::get($logPath), 'UTF-8', 'UTF-8')
-            : 'Файл лога не найден.';
+            : __('admin/controllers.file_not_found_error');
 
         return Inertia::render('Admin/Log/Index', [
             'log' => $logContent,
@@ -62,7 +62,8 @@ class LogController extends Controller
             File::put($logPath, '');
         }
 
-        return redirect()->route('admin.logs.index', ['file' => $selected])->with('success', 'Лог очищен.');
+        return redirect()->route('admin.logs.index', ['file' => $selected])
+            ->with('success', __('admin/controllers.log_cleared_success'));
     }
 
     /**
@@ -79,6 +80,7 @@ class LogController extends Controller
             return response()->download($logPath, "{$selected}.log");
         }
 
-        return redirect()->route('admin.logs.index')->with('error', 'Файл не найден.');
+        return redirect()->route('admin.logs.index')
+            ->with('error', __('admin/controllers.file_not_found_error'));
     }
 }

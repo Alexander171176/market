@@ -26,6 +26,7 @@ class RobotController extends Controller
         $request->validate(['content' => 'required|string']);
         File::put(public_path($this->path), $request->input('content'));
 
-        return redirect()->route('admin.robot.index')->with('success', 'Файл robots.txt обновлён.');
+        return redirect()->route('admin.robot.index')
+            ->with('success', __('admin/controllers.system_robots_updated_success'));
     }
 }

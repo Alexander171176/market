@@ -126,7 +126,7 @@ class VideoController extends Controller
         if (!auth()->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Для постановки лайка нужно авторизоваться.',
+                'message' => __('admin/controllers.liked_auth_error'),
             ], 401);
         }
 
@@ -138,7 +138,7 @@ class VideoController extends Controller
         if ($alreadyLiked) {
             return response()->json([
                 'success' => false,
-                'message' => 'Вы уже поставили лайк.',
+                'message' => __('admin/controllers.liked_user_error'),
                 'likes'   => $video->likes()->count(),
             ]);
         }

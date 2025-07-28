@@ -42,7 +42,8 @@ class RemoveArticleFromSectionController extends Controller
                     'section_id' => $section->id,
                     'user_id' => auth()->id()
                 ]);
-                return back()->with('success', "Статья '{$article->title}' успешно отсоединена от секции '{$section->title}'.");
+                return back()
+                    ->with('success', "Статья '{$article->title}' успешно отсоединена от секции '{$section->title}'.");
             } else {
                 // detach() возвращает 0, если связь уже не существовала
                 Log::warning('Попытался отделить статью от раздела, но связи не было.', [

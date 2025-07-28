@@ -118,21 +118,22 @@ class ComponentController extends Controller
         $fullFilePath = $relativePath ? resource_path(ltrim($relativePath, '/')) : null;
 
         if (!$fullFilePath || !File::isWritable(dirname($fullFilePath)) || !$this->isPathAllowed($fullFilePath)) {
-            Log::error("Попытка записи в неразрешенный или несуществующий файл", ['key' => $fileKey, 'path' => $fullFilePath]);
+            Log::error("Попытка записи в неразрешенный или несуществующий файл",
+                ['key' => $fileKey, 'path' => $fullFilePath]);
             return redirect()->route('admin.components.index')
-                ->with('error', __('admin/controllers/components.flash_file_not_allowed'));
+                ->with('error', __('admin/controllers.file_not_allowed_error'));
         }
 
         try {
             File::put($fullFilePath, $newContent, true);
             Log::info("Файл компонента успешно сохранен", ['path' => $fileKey]);
             return redirect()->route('admin.components.index')
-                ->with('success', __('admin/controllers/components.flash_file_saved',
+                ->with('success', __('admin/controllers.file_saved_success',
                     ['filename' => basename($fileKey)]));
         } catch (Throwable $e) {
             Log::error("Ошибка сохранения файла компонента: {$fileKey}", ['exception' => $e]);
             return redirect()->route('admin.components.index')
-                ->with('error', __('admin/controllers/components.flash_file_save_error',
+                ->with('error', __('admin/controllers.file_save_error',
                     ['filename' => basename($fileKey)]));
         }
     }
@@ -167,7 +168,8 @@ class ComponentController extends Controller
 
         foreach ($this->editableDirectories as $relativePath) {
             $realAllowedDir = realpath(resource_path(ltrim($relativePath, '/')));
-            if ($realAllowedDir !== false && str_starts_with($realFullPath, $realAllowedDir . DIRECTORY_SEPARATOR)) {
+            if ($realAllowedDir !== false && str_starts_with($realFullPath, $realAllowedDir
+                    . DIRECTORY_SEPARATOR)) {
                 return true;
             }
         }

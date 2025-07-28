@@ -94,12 +94,14 @@ class UserController extends Controller
             $user->syncPermissions($permissionNames);
 
             DB::commit();
-            return redirect()->route('admin.users.index')->with('success', __('admin/controllers/users.created'));
+            return redirect()->route('admin.users.index')
+                ->with('success', __('admin/controllers.created_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при создании пользователя: " . $e->getMessage());
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/users.create_error'),]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.created_error'));
         }
     }
 
@@ -144,13 +146,15 @@ class UserController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('admin.users.index')->with('success', __('admin/controllers/users.updated'));
+            return redirect()->route('admin.users.index')
+                ->with('success', __('admin/controllers.updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при обновлении пользователя ID {$user->id}: " . $e->getMessage());
             Log::error("Тип ошибки: " . get_class($e));
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/users.update_error'),]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.updated_error'));
         }
     }
 
@@ -190,12 +194,14 @@ class UserController extends Controller
             app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
             Log::info("Пользователь удалён: ID {$user->id}");
-            return redirect()->route('admin.users.index')->with('success', __('admin/controllers/users.deleted'));
+            return redirect()->route('admin.users.index')
+                ->with('success', __('admin/controllers.deleted_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при удалении пользователя ID {$user->id}: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/users.delete_error'),]);
+            return back()
+                ->with('error', __('admin/controllers.deleted_error'));
         }
     }
 

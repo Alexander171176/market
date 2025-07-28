@@ -57,7 +57,7 @@ class RubricController extends Controller
             Log::error("Ошибка загрузки рубрик для Index: " . $e->getMessage());
             $rubrics = collect();
             $rubricsCount = 0;
-            session()->flash('error', __('admin/controllers/rubrics.index_load_error'));
+            session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Rubrics/Index', [
@@ -105,12 +105,14 @@ class RubricController extends Controller
             DB::commit();
 
             Log::info('Рубрика успешно создана: ', $rubric->toArray());
-            return redirect()->route('admin.rubrics.index')->with('success', 	__('admin/controllers/rubrics.created'));
+            return redirect()->route('admin.rubrics.index')
+                ->with('success', __('admin/controllers.created_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при создании рубрики: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/rubrics.create_error')]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.created_error'));
         }
     }
 
@@ -160,12 +162,14 @@ class RubricController extends Controller
             DB::commit();
 
             Log::info('Рубрика обновлена: ', $rubric->toArray());
-            return redirect()->route('admin.rubrics.index')->with('success', __('admin/controllers/rubrics.updated'));
+            return redirect()->route('admin.rubrics.index')
+                ->with('success', __('admin/controllers.updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при обновлении рубрики ID {$rubric->id}: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/rubrics.update_error')]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.updated_error'));
         }
     }
 
@@ -187,12 +191,14 @@ class RubricController extends Controller
             DB::commit();
 
             Log::info("Рубрика удалена: ID {$rubricId}, Title: {$rubricTitle}");
-            return redirect()->route('admin.rubrics.index')->with('success', __('admin/controllers/rubrics.deleted'));
+            return redirect()->route('admin.rubrics.index')
+                ->with('success', __('admin/controllers.deleted_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при удалении рубрики ID {$rubric->id}: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/rubrics.delete_error')]);
+            return back()
+                ->with('error', __('admin/controllers.deleted_error'));
         }
     }
 
@@ -222,12 +228,15 @@ class RubricController extends Controller
 
             Log::info('Рубрики удалены: ', $rubricIds);
             return redirect()->route('admin.rubrics.index')
-                ->with('success', __('admin/controllers/rubrics.bulk_deleted', ['count' => $count]));
+                ->with('success', __('admin/controllers.bulk_deleted_success',
+                    ['count' => $count]));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка при массовом удалении рубрик: " . $e->getMessage(), ['ids' => $rubricIds]);
-            return back()->withErrors(['general' => __('admin/controllers/rubrics.bulk_delete_error')]);
+            Log::error("Ошибка при массовом удалении рубрик: "
+                . $e->getMessage(), ['ids' => $rubricIds]);
+            return back()
+                ->with('error', __('admin/controllers.bulk_deleted_error'));
         }
     }
 
@@ -251,15 +260,15 @@ class RubricController extends Controller
             DB::commit();
 
             Log::info("Обновлено activity рубрики ID {$rubric->id} на {$rubric->activity}");
-            $actionText = $rubric->activity ? __('admin/controllers/common.activated')
-                : __('admin/controllers/common.deactivated');
+
             return back()
-                ->with('success', __('admin/controllers/rubrics.activity', ['title' => $rubric->title, 'action' => $actionText]));
+                ->with('success', __('admin/controllers.activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка обновления активности рубрики ID {$rubric->id}: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/rubrics.update_activity_error')]);
+            return back()
+                ->with('error', __('admin/controllers.activity_updated_error'));
         }
     }
 
@@ -267,20 +276,36 @@ class RubricController extends Controller
      * Обновление статуса активности массово
      *
      * @param Request $request
-     * @return JsonResponse Json ответ
+     * @return RedirectResponse
      */
-    public function bulkUpdateActivity(Request $request): JsonResponse
+    public function bulkUpdateActivity(Request $request): RedirectResponse
     {
         // TODO: Проверка прав доступа $this->authorize('update-rubrics', Rubric::class);
-        $data = $request->validate([
+        $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:rubrics,id',
             'activity' => 'required|boolean',
         ]);
 
-        Rubric::whereIn('id', $data['ids'])->update(['activity' => $data['activity']]);
+        try {
+            DB::beginTransaction();
+            foreach ($validated['rubrics'] as $rubricData) {
+                // Используем update для массового обновления, если возможно, или where/update
+                Rubric::where('id', $rubricData['id'])->update(['activity' => $rubricData['activity']]);
+            }
+            DB::commit();
 
-        return response()->json(['success' => true]);
+            Log::info('Массово обновлена активность',
+                ['count' => count($validated['rubrics'])]);
+            return back()
+                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
+            return back()
+                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+        }
     }
 
     /**
@@ -301,11 +326,13 @@ class RubricController extends Controller
             $rubric->save();
 
             Log::info("Обновлено sort рубрики ID {$rubric->id} на {$rubric->sort}");
-            return back();
+            return back()
+                ->with('success', __('admin/controllers.sort_updated_success'));
 
         } catch (Throwable $e) {
             Log::error("Ошибка обновления сортировки рубрики ID {$rubric->id}: " . $e->getMessage());
-            return back()->withErrors(['sort' => __('admin/controllers/rubrics.update_sort_error')]);
+            return back()
+                ->with('error', __('admin/controllers.sort_updated_error'));
         }
     }
 
@@ -336,13 +363,16 @@ class RubricController extends Controller
             }
             DB::commit();
 
-            Log::info('Массово обновлена сортировка рубрик', ['count' => count($validated['rubrics'])]);
-            return back();
+            Log::info('Массово обновлена сортировка рубрик',
+                ['count' => count($validated['rubrics'])]);
+            return back()
+                ->with('success', __('admin/controllers.bulk_sort_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка массового обновления сортировки рубрик: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/rubrics.update_sort_bulk_error')]);
+            return back()
+                ->with('error', __('admin/controllers.bulk_sort_updated_error'));
         }
     }
 
@@ -376,28 +406,15 @@ class RubricController extends Controller
             DB::commit();
 
             Log::info('Рубрика ID ' . $rubric->id . ' успешно клонирована в ID ' . $clonedRubric->id);
-            return redirect()->route('admin.rubrics.index')->with('success', __('admin/controllers/rubrics.cloned'));
+            return redirect()->route('admin.rubrics.index')
+                ->with('success', __('admin/controllers.cloned_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            $errorMessage = __('admin/controllers/rubrics.clone_error');
-
-            // Проверяем на ошибку уникальности
-            if ($e instanceof QueryException && (str_contains($e->getMessage(),
-                        'повторяющееся значение ключа нарушает ограничение уникальности') ||
-                    str_contains($e->getMessage(), 'Нарушение ограничений целостности') ) ) {
-                if (str_contains($e->getMessage(), 'rubrics_locale_title_unique')) {
-                    $errorMessage = __('admin/controllers/rubrics.clone_title_error');
-                } elseif (str_contains($e->getMessage(), 'rubrics_locale_url_unique')) {
-                    $errorMessage = __('admin/controllers/rubrics.clone_url_error');
-                } else {
-                    $errorMessage = __('admin/controllers/rubrics.clone_unique_error');
-                }
-                Log::warning("Ошибка уникальности при клонировании рубрики ID {$rubric->id}: " . $e->getMessage());
-            } else {
-                Log::error("Ошибка при клонировании рубрики ID {$rubric->id}: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            }
-            return back()->withInput()->withErrors(['general' => $errorMessage]);
+            Log::error("Ошибка при клонировании рубрики ID {$rubric->id}: "
+                . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.cloned_error'));
         }
     }
 

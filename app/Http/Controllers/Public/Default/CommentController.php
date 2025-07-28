@@ -62,7 +62,7 @@ class CommentController extends Controller
             Log::error("Ошибка при создании комментария: {$e->getMessage()}", $validated);
 
             return response()->json([
-                'message' => 'Ошибка при сохранении комментария',
+                'message' => __('admin/controllers.commented_saved_error'),
                 'error'   => $e->getMessage()
             ], 500);
         }
@@ -78,7 +78,8 @@ class CommentController extends Controller
             return response()->json($comment);
         }
 
-        return response()->json(['message' => 'Комментарий не найден или неактивен'], 404);
+        return response()
+            ->json(['message' => __('admin/controllers.comment_not_active_error')], 404);
     }
 
     /**
@@ -87,7 +88,8 @@ class CommentController extends Controller
     public function update(Request $request, Comment $comment): JsonResponse
     {
         if ($comment->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Вы не можете редактировать этот комментарий'], 403);
+            return response()
+                ->json(['message' => __('admin/controllers.comment_not_editing_error')], 403);
         }
 
         $validated = $request->validate([
@@ -100,7 +102,7 @@ class CommentController extends Controller
         } catch (\Exception $e) {
             Log::error("Ошибка при обновлении комментария: {$e->getMessage()}", ['id' => $comment->id]);
             return response()->json([
-                'message' => 'Ошибка при обновлении комментария',
+                'message' => __('admin/controllers.commented_updated_error'),
                 'error'   => $e->getMessage()
             ], 500);
         }
@@ -112,16 +114,18 @@ class CommentController extends Controller
     public function destroy(Comment $comment): JsonResponse
     {
         if ($comment->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Вы не можете удалить этот комментарий'], 403);
+            return response()
+                ->json(['message' => __('admin/controllers.comment_not_deleted_error')], 403);
         }
 
         try {
             $comment->delete();
-            return response()->json(['message' => 'Комментарий удалён'], 200);
+            return response()
+                ->json(['message' => __('admin/controllers.comment_deleted_success')], 200);
         } catch (\Exception $e) {
             Log::error("Ошибка при удалении комментария: {$e->getMessage()}", ['id' => $comment->id ?? null]);
             return response()->json([
-                'message' => 'Ошибка при удалении комментария',
+                'message' => __('admin/controllers.comment_deleted_error'),
                 'error'   => $e->getMessage()
             ], 500);
         }

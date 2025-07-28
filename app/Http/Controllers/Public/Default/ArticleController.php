@@ -93,7 +93,7 @@ class ArticleController extends Controller
         if (!auth()->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Для постановки лайка нужно авторизоваться.',
+                'message' => __('admin/controllers.liked_auth_error'),
             ], 401);
         }
 
@@ -103,7 +103,7 @@ class ArticleController extends Controller
         if ($article->likes()->where('user_id', $user->id)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Вы уже поставили лайк.',
+                'message' => __('admin/controllers.liked_user_error'),
                 'likes'   => $article->likes()->count(),
             ]);
         }

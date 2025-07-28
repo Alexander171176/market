@@ -59,7 +59,7 @@ class SettingController extends Controller
             Log::error("Ошибка загрузки рубрик для Index: " . $e->getMessage());
             $settings = collect();
             $settingsCount = 0;
-            session()->flash('error', 'Не удалось загрузить список параметров.');
+            session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Settings/Index', [
@@ -96,14 +96,17 @@ class SettingController extends Controller
                 'new_value' => $setting->value,
             ]);
 
-            return back()->with('success', __('admin/controllers/settings.value_updated'));
+            return back()
+                ->with('success', __('admin/controllers.value_updated_success'));
 
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            Log::error("Ошибка при обновлении значения настройки ID {$setting->id}: {$e->getMessage()}");
+            Log::error("Ошибка при обновлении значения настройки ID
+            {$setting->id}: {$e->getMessage()}");
 
-            return back()->withErrors(['value' => __('admin/controllers/settings.update_value_error')]);
+            return back()
+                ->with('error', __('admin/controllers.value_updated_error'));
         }
     }
 
@@ -121,7 +124,8 @@ class SettingController extends Controller
         if (in_array($setting->category, ['system', 'admin', 'public'], true)) {
             Log::info("Попытка изменения активности параметра ID {$setting->id} с категорией '{$setting->category}'.");
 
-            return back()->with('warning', __('admin/controllers/parameters.activity_update_forbidden', [
+            return back()
+                ->with('warning', __('admin/controllers.activity_update_forbidden_error', [
                 'category' => $setting->category,
             ]));
         }
@@ -133,15 +137,17 @@ class SettingController extends Controller
             $actionText = $setting->activity ? 'активирован' : 'деактивирован';
             Log::info("Параметр ID {$setting->id} успешно {$actionText}");
 
-            return back()->with('success', __('admin/controllers/parameters.update_activity_success', [
+            return back()
+                ->with('success', __('admin/controllers.activity_updated_success', [
                 'option' => $setting->option,
                 'action' => $actionText,
             ]));
         } catch (Throwable $e) {
-            Log::error("Ошибка обновления активности параметра ID {$setting->id}: " . $e->getMessage());
+            Log::error("Ошибка обновления активности параметра ID {$setting->id}: "
+                . $e->getMessage());
 
             return back()->withErrors([
-                'general' => __('admin/controllers/parameters.update_activity_error'),
+                'general' => __('admin/controllers.activity_updated_error'),
             ]);
         }
     }
@@ -150,19 +156,35 @@ class SettingController extends Controller
      * Обновление статуса активности массово
      *
      * @param Request $request
-     * @return JsonResponse Json ответ
+     * @return RedirectResponse
      */
-    public function bulkUpdateActivity(Request $request): JsonResponse
+    public function bulkUpdateActivity(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:settings,id',
             'activity' => 'required|boolean',
         ]);
 
-        Setting::whereIn('id', $data['ids'])->update(['activity' => $data['activity']]);
+        try {
+            DB::beginTransaction();
+            foreach ($validated['settings'] as $settingData) {
+                // Используем update для массового обновления, если возможно, или where/update
+                Setting::where('id', $settingData['id'])->update(['activity' => $settingData['activity']]);
+            }
+            DB::commit();
 
-        return response()->json(['success' => true]);
+            Log::info('Массово обновлена активность',
+                ['count' => count($validated['settings'])]);
+            return back()
+                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
+            return back()
+                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+        }
     }
 
     /**
@@ -212,7 +234,8 @@ class SettingController extends Controller
 
             DB::commit(); // Если используем транзакцию
 
-            Log::info("Настройка '{$optionKey}' обновлена на: " . $newValue . " пользователем ID: " . $request->user()?->id);
+            Log::info("Настройка '{$optionKey}' обновлена на: "
+                . $newValue . " пользователем ID: " . $request->user()?->id);
             return back()->with('success', $successMessage); // Возвращаем универсальное сообщение
 
         } catch (Throwable $e) {
@@ -238,8 +261,8 @@ class SettingController extends Controller
             'site_settings.AdminCountSettings',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -257,8 +280,8 @@ class SettingController extends Controller
             'site_settings.AdminCountCategories',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -276,8 +299,8 @@ class SettingController extends Controller
             'site_settings.AdminCountProducts',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -295,8 +318,8 @@ class SettingController extends Controller
             'site_settings.AdminCountRubrics',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -313,8 +336,8 @@ class SettingController extends Controller
             'AdminCountSections',
             'site_settings.AdminCountSections',
             'number', 'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -332,8 +355,8 @@ class SettingController extends Controller
             'site_settings.AdminCountArticles',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -349,9 +372,11 @@ class SettingController extends Controller
             $request,
             'AdminCountTags',
             'site_settings.AdminCountTags',
-            'number', 'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.');
+            'number',
+            'admin',
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
+        );
     }
 
     /**
@@ -368,8 +393,9 @@ class SettingController extends Controller
             'site_settings.AdminCountComments',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.');
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
+        );
     }
 
     /**
@@ -386,8 +412,8 @@ class SettingController extends Controller
             'site_settings.AdminCountBanners',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -405,8 +431,8 @@ class SettingController extends Controller
             'site_settings.AdminCountVideos',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -424,8 +450,8 @@ class SettingController extends Controller
             'site_settings.AdminCountUsers',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -443,8 +469,8 @@ class SettingController extends Controller
             'site_settings.AdminCountRoles',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -462,8 +488,8 @@ class SettingController extends Controller
             'site_settings.AdminCountPermissions',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -481,8 +507,8 @@ class SettingController extends Controller
             'site_settings.AdminCountPlugins',
             'number',
             'admin',
-            'Количество элементов на странице успешно обновлено.',
-            'Ошибка обновления настройки количества элементов.'
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
         );
     }
 
@@ -517,12 +543,15 @@ class SettingController extends Controller
             $this->clearSettingsCache('setting_' . $optionKey);
             $this->clearSettingsCache();
 
-            Log::info("Настройка '{$optionKey}' обновлена на: " . $newValue . " пользователем ID: " . $request->user()?->id);
-            return back()->with('success', "Сортировка по умолчанию успешно обновлена."); // Универсальное сообщение
+            Log::info("Настройка '{$optionKey}' обновлена на: "
+                . $newValue . " пользователем ID: " . $request->user()?->id);
+            return back()
+                ->with('success', __('admin/controllers.sort_pages_updated_success')); // Универсальное сообщение
 
         } catch (Throwable $e) {
             Log::error("Ошибка обновления настройки сортировки '{$optionKey}': " . $e->getMessage());
-            return back()->withInput()->withErrors(['value' => "Ошибка обновления настройки сортировки."]); // Универсальное сообщение
+            return back()->withInput()
+                ->with('error', __('admin/controllers.sort_pages_updated_error'));
         }
     }
 
@@ -540,8 +569,8 @@ class SettingController extends Controller
             'site_settings.AdminSortCategories',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -559,8 +588,8 @@ class SettingController extends Controller
             'site_settings.AdminSortProducts',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -578,8 +607,8 @@ class SettingController extends Controller
             'site_settings.AdminSortRubrics',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -597,8 +626,8 @@ class SettingController extends Controller
             'site_settings.AdminSortSections',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -616,8 +645,8 @@ class SettingController extends Controller
             'site_settings.AdminSortArticles',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -635,8 +664,8 @@ class SettingController extends Controller
             'site_settings.AdminSortTags',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -654,8 +683,8 @@ class SettingController extends Controller
             'site_settings.AdminSortComments',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -673,8 +702,8 @@ class SettingController extends Controller
             'site_settings.AdminSortBanners',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -692,8 +721,8 @@ class SettingController extends Controller
             'site_settings.AdminSortVideos',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -711,8 +740,8 @@ class SettingController extends Controller
             'site_settings.AdminSortUsers',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -730,8 +759,8 @@ class SettingController extends Controller
             'site_settings.AdminSortRoles',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -749,8 +778,8 @@ class SettingController extends Controller
             'site_settings.AdminSortPermissions',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
     }
 
@@ -768,86 +797,9 @@ class SettingController extends Controller
             'site_settings.AdminSortPlugins',
             'string',
             'admin',
-            'Сортировка по умолчанию успешно обновлена.',
-            'Ошибка обновления настройки сортировки.'
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
         );
-    }
-
-    // --- Настройки панели виджетов ---
-    /**
-     * Получает настройку цвета панели виджетов в админке
-     *
-     * @return JsonResponse
-     */
-    public function getWidgetPanelSettings(): JsonResponse
-    {
-        // TODO: Авторизация (может быть в middleware группы /api/admin)
-        try {
-            $settings = Cache::remember('widget_panel_settings', self::SETTINGS_CACHE_TTL, function () {
-                // Получаем значения или используем дефолты
-                $color = Setting::where('option', 'widgetHexColor')->value('value') ?? '155E75';
-                $opacity = Setting::where('option', 'widgetOpacity')->value('value') ?? 0.95;
-                // Валидируем полученные значения на всякий случай перед кэшированием
-                $color = preg_match('/^[0-9A-Fa-f]{6}$/i', $color) ? $color : '155E75';
-                $opacity = is_numeric($opacity) && $opacity >= 0 && $opacity <= 1 ? (float)$opacity : 0.95;
-                return ['color' => $color, 'opacity' => $opacity];
-            });
-            return response()->json($settings);
-        } catch (Throwable $e) {
-            Log::error('Ошибка получения настроек панели виджетов: ' . $e->getMessage());
-            // Возвращаем дефолтные значения при ошибке
-            return response()->json(['color' => '155E75', 'opacity' => 0.95], 500);
-        }
-    }
-
-    /**
-     * Обновляет настройку цвета панели виджетов в админке
-     *
-     * @param UpdateWidgetPanelRequest $request
-     * @return JsonResponse
-     */
-    public function updateWidgetPanelSettings(UpdateWidgetPanelRequest $request): JsonResponse // Используем свой Request и JSON ответ
-    {
-        // Авторизация и валидация в UpdateWidgetPanelRequest
-        $validated = $request->validated(); // 'color' (hex без #), 'opacity' (float 0-1)
-
-        try {
-            DB::beginTransaction();
-            // Используем updateOrCreate, указываем все поля для консистентности
-            Setting::updateOrCreate(
-                ['option' => 'widgetHexColor'],
-                [
-                    'value' => $validated['color'],
-                    'type' => 'string', // Тип значения
-                    'constant' => 'WIDGET_HEX_COLOR', // Константа
-                    'category' => 'widget_panel', // Категория
-                    'activity' => true, // Активна по умолчанию
-                ]
-            );
-            Setting::updateOrCreate(
-                ['option' => 'widgetOpacity'],
-                [
-                    'value' => (string)$validated['opacity'], // Сохраняем как строку
-                    'type' => 'float', // Указываем тип
-                    'constant' => 'WIDGET_OPACITY',
-                    'category' => 'widget_panel',
-                    'activity' => true,
-                ]
-            );
-            DB::commit();
-
-            $this->clearSettingsCache('widget_panel_settings'); // Очищаем кэш виджета
-            $this->clearSettingsCache(); // Очищаем общий кэш настроек
-            Log::info('Настройки панели виджетов обновлены', $validated);
-            // Возвращаем JSON с успехом
-            return response()->json(['success' => true, 'message' => 'Настройки панели виджетов обновлены.']);
-
-        } catch (Throwable $e) {
-            DB::rollBack();
-            Log::error('Ошибка обновления настроек панели виджетов: ' . $e->getMessage());
-            // Возвращаем JSON с ошибкой
-            return response()->json(['success' => false, 'message' => 'Ошибка сохранения настроек панели виджетов.'], 500);
-        }
     }
 
     /**
@@ -863,7 +815,7 @@ class SettingController extends Controller
     private function clearSettingsCache(string $specificKey = null): void
     {
         // TODO: Использовать ваши реальные базовые ключи кэша
-        $keysToForget = ['site_settings', 'setting_locale', 'widget_panel_settings', 'sidebar_settings'];
+        $keysToForget = ['site_settings', 'setting_locale', 'sidebar_settings'];
         if ($specificKey) {
             $keysToForget[] = $specificKey;
         }
@@ -872,7 +824,7 @@ class SettingController extends Controller
             $options = Setting::where('option', 'like', 'AdminCount%')
                 ->orWhere('option', 'like', 'AdminSort%')
                 // Добавим ключи сайдбара/виджета, если они есть в БД
-                ->orWhereIn('option', ['widgetHexColor', 'widgetOpacity', 'AdminSidebarLightColor', 'admin_sidebar_opacity']) // Пример
+                ->orWhereIn('option', ['AdminSidebarLightColor', ]) // Пример
                 ->pluck('option');
             foreach ($options as $option) {
                 $keysToForget[] = 'setting_' . $option; // Ключ для конкретной настройки

@@ -312,6 +312,7 @@
     `docker exec market-php-app php artisan make:migration create_product_has_images_table --create=product_has_images` <br>
     `docker exec market-php-app php artisan make:migration create_product_likes_table --create=product_likes` <br>
     `docker exec market-php-app php artisan make:migration create_product_related_table --create=product_related` <br>
+    `docker exec market-php-app php artisan make:migration create_category_product_table --create=category_has_product` <br>
     `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:model User/Like/ProductLike` <br>
     `docker exec market-php-app php artisan make:seeder ProductSeeder` <br>

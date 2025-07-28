@@ -101,10 +101,10 @@ class FileBackupController extends Controller
 
             $zip->close();
 
-            return response()->json(['message' => 'Archive created']);
+            return response()->json(['message' => __('admin/controllers.system_created_archive_success')]);
         }
 
-        return response()->json(['message' => 'Failed to create archive'], 500);
+        return response()->json(['message' => __('admin/controllers.system_created_archive_error')], 500);
     }
 
 
@@ -120,7 +120,7 @@ class FileBackupController extends Controller
         $targetPath = base_path();
 
         if (!File::exists($zipPath)) {
-            return back()->with('error', 'Файл не найден');
+            return back()->with('error', __('admin/controllers.system_file_not_found'));
         }
 
         $command = sprintf(
@@ -135,10 +135,11 @@ class FileBackupController extends Controller
         try {
             $process->mustRun();
         } catch (ProcessFailedException $e) {
-            return back()->with('error', 'Ошибка при восстановлении файлов: ' . $e->getMessage());
+            return back()->with('error', __('admin/controllers.system_files_error')
+                . $e->getMessage());
         }
 
-        return back()->with('success', 'Файлы успешно восстановлены');
+        return back()->with('success', __('admin/controllers.system_files_success'));
     }
 
     /**
@@ -151,12 +152,12 @@ class FileBackupController extends Controller
         $path = storage_path('app/' . self::BACKUP_DIR . '/' . $request->file);
 
         if (!File::exists($path)) {
-            return response()->json(['message' => 'Файл не найден'], 404);
+            return response()->json(['message' => __('admin/controllers.system_file_not_found')], 404);
         }
 
         File::delete($path);
 
-        return response()->json(['message' => 'Архив удалён']);
+        return response()->json(['message' => __('admin/controllers.system_deleted_archive_success')]);
     }
 
     /**

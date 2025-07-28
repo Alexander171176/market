@@ -51,7 +51,7 @@ class PermissionController extends Controller
             Log::error("Ошибка загрузки разрешений для Index: " . $e->getMessage());
             $permissions = collect(); // Пустая коллекция в случае ошибки
             $permissionsCount = 0;
-            session()->flash('error', __('admin/controllers/permissions.index_error'));
+            session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Permissions/Index', [
@@ -97,12 +97,13 @@ class PermissionController extends Controller
             Log::info('Разрешение создано:', ['name' => $data['name']]);
             app()[PermissionRegistrar::class]->forgetCachedPermissions(); // Очистка кэша Spatie
             return redirect()->route('admin.permissions.index')
-                ->with('success', __('admin/controllers/permissions.created'));
+                ->with('success', __('admin/controllers.created_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при создании разрешения: " . $e->getMessage());
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/permissions.create_error')	]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.created_error'));
         }
     }
 
@@ -143,12 +144,14 @@ class PermissionController extends Controller
 
             Log::info('Разрешение обновлено:', ['id' => $permission->id, 'name' => $permission->name]);
             app()[PermissionRegistrar::class]->forgetCachedPermissions(); // Очистка кэша Spatie
-            return redirect()->route('admin.permissions.index')->with('success', __('admin/controllers/permissions.updated'));
+            return redirect()->route('admin.permissions.index')
+                ->with('success', __('admin/controllers.updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при обновлении разрешения ID {$permission->id}: " . $e->getMessage());
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/permissions.update_error')]);
+            return back()
+                ->with('error', __('admin/controllers.updated_error'));
         }
     }
 
@@ -171,12 +174,14 @@ class PermissionController extends Controller
 
             Log::info('Разрешение удалено:', ['id' => $permission->id, 'name' => $permission->name]);
             app()[PermissionRegistrar::class]->forgetCachedPermissions(); // Очистка кэша Spatie
-            return redirect()->route('admin.permissions.index')->with('success', __('admin/controllers/permissions.deleted'));
+            return redirect()->route('admin.permissions.index')
+                ->with('success', __('admin/controllers.deleted_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при удалении разрешения ID {$permission->id}: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/permissions.delete_error')]);
+            return back()
+                ->with('error', __('admin/controllers.deleted_error'));
         }
     }
 

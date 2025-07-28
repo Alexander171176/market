@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin\Product;
 
+use App\Models\Admin\Category\Category;
 use App\Models\Admin\Comment\Comment;
 use App\Models\Admin\ProductVariant\ProductVariant;
 use App\Models\Admin\PropertyValue\PropertyValue;
@@ -15,6 +16,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Product extends Model
 {
     use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'products';
 
     protected $fillable = [
         'sort',
@@ -45,6 +53,53 @@ class Product extends Model
         'meta_keywords',
         'meta_desc',
         'admin',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    // protected $hidden = [
+    //     'created_at',
+    //     'updated_at',
+    // ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'sort'         => 'integer',
+        'activity'     => 'boolean',
+        'left'         => 'boolean',
+        'main'         => 'boolean',
+        'right'        => 'boolean',
+        'is_new'       => 'boolean',
+        'is_hit'       => 'boolean',
+        'is_sale'      => 'boolean',
+        'views'        => 'integer',
+        'quantity'     => 'integer',
+        'weight'       => 'integer',
+        'price'        => 'decimal:2',
+        'old_price'    => 'decimal:2',
+        'locale'       => 'string',
+        'sku'          => 'string',
+        'title'        => 'string',
+        'url'          => 'string',
+        'short'        => 'string',
+        'description'  => 'string',
+        'unit'         => 'string',
+        'availability' => 'string',
+        'currency'     => 'string',
+        'barcode'      => 'string',
+        'meta_title'   => 'string',
+        'meta_keywords'=> 'string',
+        'meta_desc'    => 'string',
+        'admin'        => 'string',
+        'created_at'   => 'datetime',
+        'updated_at'   => 'datetime',
     ];
 
     /**
@@ -81,17 +136,17 @@ class Product extends Model
         return $this->hasMany(ProductLike::class, 'product_id');
     }
 
-
     /**
      * Связь: Товар - Рекомендованные товары (самоссылочная)
      */
     public function relatedProducts(): BelongsToMany
     {
-        // Имя сводной таблицы 'product_related' и ключи - ВЕРНО
-        return $this->belongsToMany(self::class,
+        return $this->belongsToMany(
+            self::class,
             'product_related',
             'product_id',
-            'related_product_id');
+            'related_product_id'
+        );
     }
 
     /** Связь: характеристики и значения */
@@ -100,5 +155,18 @@ class Product extends Model
         return $this->belongsToMany(PropertyValue::class, 'product_property_value')
             ->withPivot('property_id')
             ->withTimestamps();
+    }
+
+    /**
+     * Связь: Товар - Категория
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Category::class,
+            'category_has_product',      // имя таблицы
+            'product_id',                // внешний ключ этой модели
+            'category_id'                // внешний ключ связанной модели
+        );
     }
 }

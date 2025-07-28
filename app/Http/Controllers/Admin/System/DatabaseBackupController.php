@@ -68,10 +68,12 @@ class DatabaseBackupController extends Controller
         try {
             $process->mustRun();
         } catch (ProcessFailedException $e) {
-            return back()->with('error', 'Ошибка при создании бэкапа: ' . $e->getMessage());
+            return back()
+                ->with('error', __('admin/controllers.system_created_backup_error') . $e->getMessage());
         }
 
-        return back()->with('success', 'Бэкап успешно создан');
+        return back()
+            ->with('success', __('admin/controllers.system_created_backup_success'));
     }
 
     /**
@@ -114,7 +116,8 @@ class DatabaseBackupController extends Controller
             $dump->mustRun();
         } catch (ProcessFailedException $e) {
             // safety‑dump не получился — лучше не продолжать
-            return back()->with('error', 'Не удалось создать резервную копию перед восстановлением: '
+            return back()
+                ->with('error', __('admin/controllers.system_created_archive_error')
                 . $e->getMessage());
         }
 
@@ -175,12 +178,11 @@ class DatabaseBackupController extends Controller
         $path = storage_path('app/' . self::BACKUP_DIR . "/{$request->file}");
 
         if (!File::exists($path)) {
-            return back()->with('error', 'Файл не найден');
+            return back()->with('error', __('admin/controllers.system_file_not_found'));
         }
 
         File::delete($path);
-
-        return back()->with('success', 'Бэкап успешно удалён');
+        return back()->with('success', __('admin/controllers.system_deleted_backup_success'));
     }
 
     /**
@@ -215,7 +217,7 @@ class DatabaseBackupController extends Controller
         $path = self::BACKUP_DIR . '/' . $filename;
 
         if (!Storage::disk('local')->exists($path)) {
-            return back()->with('error', 'Файл не найден для загрузки.');
+            return back()->with('error', __('admin/controllers.system_file_not_found'));
         }
 
         return Storage::disk('local')->download($path);

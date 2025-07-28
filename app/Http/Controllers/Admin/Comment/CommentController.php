@@ -10,6 +10,7 @@ use App\Models\Admin\Comment\Comment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,12 +27,12 @@ class CommentController extends Controller
 
         // Получаем настройки пагинации и сортировки
         $adminCountComments = config('site_settings.AdminCountComments', 15);
-        // Используем имя из конфига, если оно правильное, иначе 'idDesc'
-        $adminSortComments  = config('site_settings.AdminSortComments', 'idDesc'); // Было AdminSortArticles
+        $adminSortComments  = config('site_settings.AdminSortComments', 'idDesc');
 
         // Определяем поле и направление сортировки
         $sortField = 'id';
         $sortDirection = 'desc';
+
         // TODO: Добавить больше вариантов сортировки (по дате, пользователю, статусу и т.д.)
         if ($adminSortComments === 'idAsc') {
             $sortField = 'id';
@@ -68,23 +69,10 @@ class CommentController extends Controller
     public function edit(Comment $comment): Response // Используем RMB
     {
         // TODO: Проверка прав $this->authorize('edit-comments', $comment);
-        // Загружаем связанные модели
         $comment->load(['user:id,name', 'commentable', 'parent' => fn($q) => $q->with('user:id,name')]);
-
-        // TODO: Передать список пользователей, если нужно менять автора
-        // $users = User::select('id', 'name')->orderBy('name')->get();
-        // TODO: Передать список родительских комментариев (для той же сущности), если нужно менять родителя
-        // $parentOptions = Comment::where('id', '!=', $comment->id)
-        //                         ->where('commentable_id', $comment->commentable_id)
-        //                         ->where('commentable_type', $comment->commentable_type)
-        //                         ->select('id', 'content') // Или что-то для отображения
-        //                         ->orderBy('created_at')
-        //                         ->get();
 
         return Inertia::render('Admin/Comments/Edit', [
             'comment' => new CommentResource($comment),
-            // 'users' => UserResource::collection($users), // Если передаем список пользователей
-            // 'parentOptions' => $parentOptions,          // Если передаем список родителей
         ]);
     }
 
@@ -96,17 +84,17 @@ class CommentController extends Controller
         // authorize() в CommentRequest
         $data = $request->validated();
 
-        // Удаляем поля, которые обычно не должны меняться при редактировании комментария
         unset($data['user_id'], $data['commentable_id'], $data['commentable_type'], $data['parent_id']);
-        // Если разрешено менять родителя, уберите 'parent_id' из unset
 
         try {
             $comment->update($data); // Обновляем только 'content', 'approved', 'activity'
             Log::info('Комментарий обновлен: ID ' . $comment->id);
-            return redirect()->route('comments.index')->with('success', 'Комментарий успешно обновлен.');
+            return redirect()->route('comments.index')
+                ->with('success', __('admin/controllers.updated_success'));
         } catch (Throwable $e) {
             Log::error("Ошибка при обновлении комментария ID {$comment->id}: " . $e->getMessage());
-            return back()->withInput()->withErrors(['general' => 'Произошла ошибка при обновлении комментария.']);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.updated_error'));
         }
     }
 
@@ -120,10 +108,12 @@ class CommentController extends Controller
             // Транзакция не строго обязательна, т.к. дочерние удаляются через onDelete('cascade') в БД
             $comment->delete();
             Log::info('Комментарий удален: ID ' . $comment->id);
-            return redirect()->route('comments.index')->with('success', 'Комментарий успешно удален.');
+            return redirect()->route('comments.index')
+                ->with('success', __('admin/controllers.deleted_success'));
         } catch (Throwable $e) {
             Log::error("Ошибка при удалении комментария ID {$comment->id}: " . $e->getMessage());
-            return back()->withErrors(['general' => 'Произошла ошибка при удалении комментария.']);
+            return back()
+                ->with('error', __('admin/controllers.deleted_error'));
         }
     }
 
@@ -143,10 +133,23 @@ class CommentController extends Controller
             // Транзакция не строго обязательна
             Comment::whereIn('id', $commentIds)->delete(); // Используем delete()
             Log::info('Комментарии удалены: ', $commentIds);
-            return response()->json(['success' => true, 'message' => 'Выбранные комментарии удалены.', 'reload' => true]);
+
+            return response()
+                ->json(
+                    [
+                        'success' => true,
+                        'message' => __('admin/controllers.bulk_deleted_success'),
+                        'reload' => true
+                    ]);
         } catch (Throwable $e) {
-            Log::error("Ошибка при массовом удалении комментариев: " . $e->getMessage(), ['ids' => $commentIds]);
-            return response()->json(['success' => false, 'message' => 'Ошибка при удалении комментариев.'], 500);
+            Log::error("Ошибка при массовом удалении комментариев: "
+                . $e->getMessage(), ['ids' => $commentIds]);
+            return response()
+                ->json(
+                    [
+                        'success' => false,
+                        'message' => __('admin/controllers.bulk_deleted_error')
+                    ], 500);
         }
     }
 
@@ -166,8 +169,8 @@ class CommentController extends Controller
             'success' => true,
             'activity' => $comment->activity,
             'message' => $comment->activity
-                ? 'Комментарий активирован.'
-                : 'Комментарий деактивирован.',
+                ? __('admin/controllers.activated_success')
+                : __('admin/controllers.deactivated_success'),
         ]);
     }
 
@@ -175,20 +178,36 @@ class CommentController extends Controller
      * Обновление статуса активности массово
      *
      * @param Request $request
-     * @return JsonResponse Json ответ
+     * @return RedirectResponse
      */
-    public function bulkUpdateActivity(Request $request): JsonResponse
+    public function bulkUpdateActivity(Request $request): RedirectResponse
     {
         // TODO: Проверка прав $this->authorize('update-comments', $comment);
-        $data = $request->validate([
+        $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:comments,id',
             'activity' => 'required|boolean',
         ]);
 
-        Comment::whereIn('id', $data['ids'])->update(['activity' => $data['activity']]);
+        try {
+            DB::beginTransaction();
+            foreach ($validated['comments'] as $commentData) {
+                // Используем update для массового обновления, если возможно, или where/update
+                Comment::where('id', $commentData['id'])->update(['activity' => $commentData['activity']]);
+            }
+            DB::commit();
 
-        return response()->json(['success' => true]);
+            Log::info('Массово обновлена активность',
+                ['count' => count($validated['comments'])]);
+            return back()
+                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
+            return back()
+                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+        }
     }
 
     /**
@@ -203,7 +222,9 @@ class CommentController extends Controller
         return response()->json([
             'success' => true,
             'approved' => $comment->approved,
-            'message' => $comment->approved ? 'Комментарий одобрен' : 'Одобрение снято',
+            'message' => $comment->approved ?
+                __('admin/controllers.comment_approved')
+                : __('admin/controllers.comment_not_approved'),
         ]);
     }
 

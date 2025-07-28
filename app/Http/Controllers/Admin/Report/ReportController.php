@@ -118,7 +118,8 @@ class ReportController extends Controller
         $format = $validated['format'];
         $locale = $request->query('locale', $this->getCurrentLocale()); // Берем из запроса или текущую
 
-        Log::info("Запрошен экспорт отчета", ['type' => $type, 'format' => $format, 'locale' => $locale]);
+        Log::info("Запрошен экспорт отчета",
+            ['type' => $type, 'format' => $format, 'locale' => $locale]);
 
         try {
             // Получаем данные (загружаем ВСЕ для экспорта)
@@ -129,7 +130,8 @@ class ReportController extends Controller
             if ($data->isEmpty()) {
                 // TODO: Вернуть сообщение пользователю, что данных для экспорта нет
                 // Возможно, редирект назад с ошибкой?
-                return response()->streamDownload(function () { echo "Нет данных для экспорта."; }, "empty_report.txt");
+                return response()
+                    ->streamDownload(function () { echo "Нет данных для экспорта."; }, "empty_report.txt");
             }
 
             $filename = "report_{$type}_{$locale}_" . now()->format('YmdHis') . ".{$format}";
@@ -146,7 +148,8 @@ class ReportController extends Controller
             Log::warning("Неподдерживаемый формат отчета запрошен: " . $format);
             abort(400, $e->getMessage()); // Возвращаем ошибку клиенту
         } catch (Throwable $e) {
-            Log::error("Ошибка при генерации или загрузке отчета: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error("Ошибка при генерации или загрузке отчета: "
+                . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             // TODO: Вернуть пользователю сообщение об ошибке генерации отчета
             abort(500, 'Ошибка при генерации отчета.');
         }
@@ -172,7 +175,9 @@ class ReportController extends Controller
                     'sections' => fn($q) => $q->select('sections.id', 'sections.title', 'sections.locale')
                         ->where('activity', 1)
                         ->where('locale', $locale)
-                        ->withCount(['articles' => fn($aq) => $aq->where('activity', 1)->where('locale', $locale)])
+                        ->withCount(['articles' => fn($aq) => $aq
+                            ->where('activity', 1)
+                            ->where('locale', $locale)])
                         ->orderBy('sort', 'asc')
                 ])
                     ->where('locale', $locale)
@@ -181,14 +186,17 @@ class ReportController extends Controller
             case 'sections':
                 return Section::with([
                     // Загружаем только нужные поля статей
-                    'articles' => fn($q) => $q->select('articles.id', 'articles.title', 'articles.locale', 'articles.views', 'articles.likes')
+                    'articles' => fn($q) => $q
+                        ->select('articles.id', 'articles.title', 'articles.locale', 'articles.views', 'articles.likes')
                         ->where('activity', 1)
                         ->where('locale', $locale)
                         ->orderBy('sort', 'asc'),
                     // Можно загрузить рубрики, если нужно
                     'rubrics:id,title'
                 ])
-                    ->withCount(['articles' => fn($q) => $q->where('activity', 1)->where('locale', $locale)]) // Считаем только активные статьи
+                    ->withCount(['articles' => fn($q) => $q
+                        ->where('activity', 1)
+                        ->where('locale', $locale)]) // Считаем только активные статьи
                     ->where('activity', 1)
                     ->where('locale', $locale)
                     ->orderBy('sort', 'asc');

@@ -347,6 +347,7 @@ Route::group([
 
                 // Количество на странице
                 Route::put('/update-count/categories', [SettingController::class, 'updateAdminCountCategories'])->name('updateAdminCountCategories');
+                Route::put('/update-count/products', [SettingController::class, 'updateAdminCountProducts'])->name('updateAdminCountProducts');
                 Route::put('/update-count/rubrics', [SettingController::class, 'updateAdminCountRubrics'])->name('updateAdminCountRubrics');
                 Route::put('/update-count/sections', [SettingController::class, 'updateAdminCountSections'])->name('updateAdminCountSections');
                 Route::put('/update-count/articles', [SettingController::class, 'updateAdminCountArticles'])->name('updateAdminCountArticles');
@@ -362,6 +363,7 @@ Route::group([
 
                 // Тип сортировки
                 Route::put('/update-sort/categories', [SettingController::class, 'updateAdminSortCategories'])->name('updateAdminSortCategories');
+                Route::put('/update-sort/products', [SettingController::class, 'updateAdminSortProducts'])->name('updateAdminSortProducts');
                 Route::put('/update-sort/rubrics', [SettingController::class, 'updateAdminSortRubrics'])->name('updateAdminSortRubrics');
                 Route::put('/update-sort/sections', [SettingController::class, 'updateAdminSortSections'])->name('updateAdminSortSections');
                 Route::put('/update-sort/articles', [SettingController::class, 'updateAdminSortArticles'])->name('updateAdminSortArticles');

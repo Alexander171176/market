@@ -60,7 +60,7 @@ class ParameterController extends Controller
             Log::error("Ошибка загрузки параметров для Index: " . $e->getMessage());
             $settings = collect(); // Пустая коллекция в случае ошибки
             $settingsCount = 0;
-            session()->flash('error', __('admin/controllers/parameters.index_error'));
+            session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Parameters/Index', [
@@ -106,12 +106,14 @@ class ParameterController extends Controller
         try {
             Setting::create($data);
             Log::info('Параметр системы успешно создан: ', ['option' => $data['option']]);
-            // Редирект на индекс параметров
+
             return redirect()->route('admin.parameters.index')
-                ->with('success', __('admin/controllers/parameters.created'));
+                ->with('success', __('admin/controllers.created_success'));
+
         } catch (Throwable $e) {
             Log::error("Ошибка при создании параметра: " . $e->getMessage());
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/parameters.create_error')]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.created_error'));
         }
     }
 
@@ -153,12 +155,13 @@ class ParameterController extends Controller
 
             Log::info('Параметр системы обновлен: ', ['id' => $setting->id, 'option' => $setting->option]);
             return redirect()->route('admin.parameters.index')
-                ->with('success', __('admin/controllers/parameters.updated'));
+                ->with('success', __('admin/controllers.updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при обновлении параметра ID {$setting->id}: " . $e->getMessage());
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/parameters.update_error')]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.updated_error'));
         }
     }
 
@@ -180,12 +183,13 @@ class ParameterController extends Controller
 
             Log::info('Параметр системы удален: ID ' . $setting->id);
             return redirect()->route('admin.parameters.index')
-                ->with('success', __('admin/controllers/parameters.deleted'));
+                ->with('success', __('admin/controllers.deleted_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при удалении параметра ID {$setting->id}: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/parameters.delete_error')]);
+            return back()
+                ->with('error', __('admin/controllers.deleted_error'));
         }
     }
 
@@ -201,9 +205,11 @@ class ParameterController extends Controller
         $validated = $request->validated();
 
         if (in_array($setting->category, ['system', 'admin', 'public'], true)) {
-            Log::info("Попытка изменения активности параметра ID {$setting->id} с категорией '{$setting->category}'.");
+            Log::info("Попытка изменения активности параметра ID
+            {$setting->id} с категорией '{$setting->category}'.");
 
-            return back()->with('warning', __('admin/controllers/parameters.activity_update_forbidden', [
+            return back()
+                ->with('warning', __('admin/controllers.activity_update_forbidden', [
                 'category' => $setting->category,
             ]));
         }
@@ -215,16 +221,15 @@ class ParameterController extends Controller
             $actionText = $setting->activity ? 'активирован' : 'деактивирован';
             Log::info("Параметр ID {$setting->id} успешно {$actionText}");
 
-            return back()->with('success', __('admin/controllers/parameters.update_activity_success', [
+            return back()->with('success', __('admin/controllers.activity_updated_success', [
                 'option' => $setting->option,
                 'action' => $actionText,
             ]));
         } catch (Throwable $e) {
             Log::error("Ошибка обновления активности параметра ID {$setting->id}: " . $e->getMessage());
 
-            return back()->withErrors([
-                'general' => __('admin/controllers/parameters.update_activity_error'),
-            ]);
+            return back()
+                ->with('error', __('admin/controllers.activity_updated_error'));
         }
     }
 
@@ -232,19 +237,34 @@ class ParameterController extends Controller
      * Обновление статуса активности массово
      *
      * @param Request $request
-     * @return JsonResponse Json ответ
+     * @return RedirectResponse Json ответ
      */
-    public function bulkUpdateActivity(Request $request): JsonResponse
+    public function bulkUpdateActivity(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:settings,id',
             'activity' => 'required|boolean',
         ]);
 
-        Setting::whereIn('id', $data['ids'])->update(['activity' => $data['activity']]);
+        try {
+            DB::beginTransaction();
+            foreach ($validated['settings'] as $settingData) {
+                // Используем update для массового обновления, если возможно, или where/update
+                Setting::where('id', $settingData['id'])->update(['activity' => $settingData['activity']]);
+            }
+            DB::commit();
 
-        return response()->json(['success' => true]);
+            Log::info('Массово обновлена активность',
+                ['count' => count($validated['settings'])]);
+            return back()
+                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+        } catch (Throwable $e) {
+            DB::rollBack();
+            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
+            return back()
+                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+        }
     }
 
     /**
@@ -263,11 +283,14 @@ class ParameterController extends Controller
             $setting->sort = $validated['sort'];
             $setting->save();
             Log::info("Обновлено sort параметра ID {$setting->id} на {$setting->sort}");
-            return back();
+            return back()
+                ->with('success', __('admin/controllers.sort_updated_success'));
 
         } catch (Throwable $e) {
-            Log::error("Ошибка обновления сортировки параметра ID {$setting->id}: " . $e->getMessage());
-            return back()->withErrors(['sort' => __('admin/controllers/parameters.update_sort_error')]);
+            Log::error("Ошибка обновления сортировки параметра ID {$setting->id}: "
+                . $e->getMessage());
+            return back()
+                ->with('error', __('admin/controllers.sort_updated_error'));
         }
     }
 
@@ -298,12 +321,14 @@ class ParameterController extends Controller
             DB::commit();
 
             Log::info('Массово обновлена сортировка параметров', ['count' => count($validated['settings'])]);
-            return back();
+            return back()
+                ->with('success', __('admin/controllers.bulk_sort_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка массового обновления сортировки параметров: " . $e->getMessage());
-            return back()->withErrors(['general' => __('admin/controllers/parameters.bulk_update_sort_error')]);
+            return back()
+                ->with('error', __('admin/controllers.bulk_sort_updated_error'));
         }
     }
 

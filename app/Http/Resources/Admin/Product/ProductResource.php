@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Admin\Product;
 
+use App\Http\Resources\Admin\Category\CategorySharedResource;
 use App\Http\Resources\Admin\Comment\CommentResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -58,6 +59,7 @@ class ProductResource extends JsonResource
             'images' => ProductImageResource::collection($this->whenLoaded('images')),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
             'property_values' => PropertyValueResource::collection($this->whenLoaded('propertyValues')),
+            'categories' => CategorySharedResource::collection($this->whenLoaded('categories')),
             'related_products' => ProductSharedResource::collection($this->whenLoaded('relatedProducts')),
         ];
     }

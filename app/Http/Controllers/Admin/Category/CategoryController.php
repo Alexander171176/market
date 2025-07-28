@@ -51,7 +51,7 @@ class CategoryController extends Controller
 
         if (!in_array($currentLocale, $this->availableLocales)) {
             $currentLocale = config('app.fallback_locale', 'ru');
-            session()->flash('warning', __('admin/controllers/categories.index_locale_error'));
+            session()->flash('warning', __('admin/controllers.index_locale_error'));
         }
 
         $categories = collect();
@@ -79,8 +79,9 @@ class CategoryController extends Controller
                 ->count();
 
         } catch (Throwable $e) {
-            Log::error("Ошибка загрузки категорий для Index (locale: {$currentLocale}): " . $e->getMessage(), ['exception' => $e]);
-            session()->flash('error', __('admin/controllers/categories.index_error'));
+            Log::error("Ошибка загрузки категорий для Index (locale: {$currentLocale}): "
+                . $e->getMessage(), ['exception' => $e]);
+            session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Categories/Index', [
@@ -118,7 +119,7 @@ class CategoryController extends Controller
 
         } catch (Throwable $e) {
             Log::error("Ошибка загрузки родительских категорий для Create (locale: {$targetLocale}): " . $e->getMessage(), ['exception' => $e]);
-            session()->flash('error', __('admin/controllers/categories.parent_load_error'));
+            session()->flash('error', __('admin/categories.parent_load_error'));
         }
 
         return Inertia::render('Admin/Categories/Create', [
@@ -181,7 +182,8 @@ class CategoryController extends Controller
 
                             $imageSyncData[$image->id] = ['order' => $image->order];
                         } else {
-                            Log::warning("Недопустимый файл изображения с индексом {$imageIndex} для категории {$category->id}", [
+                            Log::warning("Недопустимый файл изображения с индексом {$imageIndex}
+                                                    для категории {$category->id}", [
                                 'fileKey' => $fileKey,
                                 'error'   => $file->getErrorMessage(),
                             ]);
@@ -189,7 +191,8 @@ class CategoryController extends Controller
                             continue;
                         }
                     } catch (Throwable $e) {
-                        Log::error("Ошибка Spatie media-library в категории {$category->id}, индекс изображения - {$imageIndex}: {$e->getMessage()}", [
+                        Log::error("Ошибка Spatie media-library в категории {$category->id},
+                                            индекс изображения - {$imageIndex}: {$e->getMessage()}", [
                             'trace' => $e->getTraceAsString(),
                         ]);
                         $image->delete();
@@ -204,17 +207,19 @@ class CategoryController extends Controller
 
             DB::commit();
 
-            Log::info("Категория успешно создана", ['id' => $category->id, 'title' => $category->title]);
+            Log::info("Категория успешно создана",
+                ['id' => $category->id, 'title' => $category->title]);
 
             return redirect()->route('admin.categories.index', ['locale' => $category->locale])
-                ->with('success', __('admin/controllers/categories.created'));
+                ->with('success', __('admin/controllers.created_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка при создании категории: {$e->getMessage()}", [
                 'trace' => $e->getTraceAsString(),
             ]);
-            return back()->withInput()->withErrors(['general' => __('admin/controllers/categories.create_error')]);
+            return back()->withInput()
+                ->with('error', __('admin/controllers.created_error'));
         }
     }
 
@@ -245,11 +250,12 @@ class CategoryController extends Controller
                 ->get(['id', 'title', 'parent_id', 'locale']);
 
         } catch (Throwable $e) {
-            Log::error("Ошибка загрузки родительских категорий для Edit (category ID: {$category->id}, locale: {$targetLocale}): " . $e->getMessage(), [
+            Log::error("Ошибка загрузки родительских категорий для Edit (category ID:
+            {$category->id}, locale: {$targetLocale}): " . $e->getMessage(), [
                 'exception' => $e
             ]);
             return redirect()->route('admin.categories.index', ['locale' => $targetLocale])
-                ->with('error', __('admin/controllers/categories.parent_load_error'));
+                ->with('error', __('admin/categories.parent_load_error'));
         }
 
         // Log::info('Потенциальные родители:', $potentialParents->toArray());
@@ -312,7 +318,8 @@ class CategoryController extends Controller
                 ) {
                     $recalculateSort = true;
                     if (isset($data['locale']) && $data['locale'] !== $originalLocale) {
-                        Log::warning("Locale changed for category ID {$category->id} from {$originalLocale} to {$data['locale']}");
+                        Log::warning("Locale changed for category ID {$category->id}
+                                                from {$originalLocale} to {$data['locale']}");
                     }
                 }
 
@@ -374,16 +381,15 @@ class CategoryController extends Controller
 
             return redirect()
                 ->route('admin.categories.index', ['locale' => $category->locale])
-                ->with('success', __('admin/controllers/categories.updated'));
+                ->with('success', __('admin/controllers.updated_success'));
 
         } catch (Throwable $e) {
             Log::error("Ошибка при обновлении категории (ID: {$categoryId}): {$e->getMessage()}", [
                 'exception' => $e,
                 'data' => $data
             ]);
-            return back()
-                ->withInput()
-                ->with('error', __('admin/controllers/categories.update_error'));
+            return back()->withInput()
+                ->with('error', __('admin/controllers.updated_error'));
         }
     }
 
@@ -412,12 +418,12 @@ class CategoryController extends Controller
 
             Log::info("Категория '{$categoryTitle}' (ID: {$categoryId}) удалена.");
             return redirect()->route('admin.categories.index', ['locale' => $locale])
-                ->with('success', __('admin/controllers/categories.deleted'));
+                ->with('success', __('admin/controllers.deleted_success'));
 
         } catch (Throwable $e) {
             Log::error("Ошибка при удалении категории '{$categoryTitle}' (ID: {$categoryId}): " . $e->getMessage(), ['exception' => $e]);
             return redirect()->route('admin.categories.index', ['locale' => $locale])
-                ->with('error', __('admin/controllers/categories.delete_error'));
+                ->with('error', __('admin/controllers.deleted_error'));
         }
     }
 
@@ -441,19 +447,16 @@ class CategoryController extends Controller
             $category->save();
             DB::commit();
 
-            $action = $category->activity ? __('admin/controllers/categories.activated') : __('admin/controllers/categories.deactivated');
-            $message = __('admin/controllers/categories.activity', ['title' => $category->title, 'action' => $action]);
-            Log::info("Активность категории '{$category->title}' (ID: {$category->id}) обновлена: {$action}");
-
-            $actionText = $category->activity ? __('admin/controllers/common.activated')
-                : __('admin/controllers/common.deactivated');
+            Log::info("Обновлено activity статьи ID {$category->id} на {$category->activity}");
             return back()
-                ->with('success', __('admin/controllers/categories.activity', ['title' => $category->title, 'action' => $actionText]));
+                ->with('success', __('admin/controllers.activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка обновления активности категории (ID: {$category->id}): " . $e->getMessage(), ['exception' => $e]);
-            return back()->withErrors(['general' => __('admin/controllers/categories.update_activity_error')]);
+            Log::error("Ошибка обновления активности категории (ID: {$category->id}): "
+                . $e->getMessage(), ['exception' => $e]);
+            return back()
+                ->with('error', __('admin/controllers.activity_updated_error'));
         }
     }
 
@@ -480,7 +483,7 @@ class CategoryController extends Controller
         $activity = $validated['activity'];
 
         if (empty($categoryIds)) {
-            $message = __('admin/controllers/categories.bulk_update_activity_no_selection');
+            $message = __('admin/controllers.bulk_updated_activity_no_selection');
             if ($request->expectsJson()) return response()->json(['message' => $message], 400);
             return back()->with('warning', $message);
         }
@@ -488,9 +491,7 @@ class CategoryController extends Controller
         try {
             // Обновляем одним запросом
             $updatedCount = Category::whereIn('id', $categoryIds)->update(['activity' => $activity]);
-
-            $action = $activity ? __('admin/controllers/categories.activated') : __('admin/controllers/categories.deactivated');
-            $message = __('admin/controllers/categories.bulk_update_activity_success');
+            $message = __('admin/controllers.bulk_activity_updated_success');
             Log::info($message, ['ids' => $categoryIds, 'activity' => $activity]);
 
             if ($request->expectsJson()) {
@@ -500,7 +501,8 @@ class CategoryController extends Controller
 
         } catch (Throwable $e) {
             Log::error("Ошибка при массовом обновлении активности категорий: " . $e->getMessage(), ['exception' => $e, 'ids' => $categoryIds]);
-            $errorMessage = __('admin/controllers/categories.bulk_update_activity_error');
+            $errorMessage = __('admin/controllers.bulk_activity_updated_error');
+
             if ($request->expectsJson()) {
                 return response()->json(['message' => $errorMessage], 500);
             }
@@ -536,7 +538,7 @@ class CategoryController extends Controller
             $category->save();
 
             Log::info("Сортировка категории '{$category->title}' (ID: {$category->id}) изменена с {$originalSort} на {$newSort}");
-            $message = __('admin/controllers/categories.order_updated');
+            $message = __('admin/controllers.sort_updated_success');
 
             if ($request->expectsJson()) {
                 return response()->json(['message' => $message, 'sort' => $category->sort]);
@@ -545,7 +547,8 @@ class CategoryController extends Controller
 
         } catch (Throwable $e) {
             Log::error("Ошибка при обновлении сортировки категории (ID: {$category->id}): " . $e->getMessage(), ['exception' => $e]);
-            $errorMessage = __('admin/controllers/categories.update_sort_error');
+            $errorMessage = __('admin/controllers.sort_updated_error');
+
             if ($request->expectsJson()) {
                 return response()->json(['message' => $errorMessage], 500);
             }
@@ -568,8 +571,12 @@ class CategoryController extends Controller
         $categoriesData = $request->input('categories');
         $locale = $request->input('locale');
 
-        if (!is_array($categoriesData) || empty($categoriesData) || !$locale || !in_array($locale, $this->availableLocales)) {
-            $message = __('admin/controllers/categories.invalid_input');
+        if (!is_array($categoriesData)
+            || empty($categoriesData)
+            || !$locale
+            || !in_array($locale, $this->availableLocales)) {
+            $message = __('admin/controllers.invalid_input_error');
+
             if ($request->expectsJson()) {
                 return response()->json(['message' => $message], 400);
             }
@@ -577,15 +584,24 @@ class CategoryController extends Controller
         }
 
         foreach ($categoriesData as $index => $categoryItem) {
-            if (!isset($categoryItem['id'], $categoryItem['sort']) || !is_numeric($categoryItem['id']) || !is_numeric($categoryItem['sort'])) {
-                $message = __('admin/controllers/categories.invalid_category_ids') . "{$index}.";
+            if (!isset($categoryItem['id'], $categoryItem['sort'])
+                || !is_numeric($categoryItem['id'])
+                || !is_numeric($categoryItem['sort'])) {
+
+                $message = __('admin/controllers.invalid_category_ids_error')
+                    . "{$index}.";
+
                 if ($request->expectsJson()) {
                     return response()->json(['message' => $message], 400);
                 }
                 return redirect()->back()->with('error', $message);
             }
-            if (isset($categoryItem['parent_id']) && !is_numeric($categoryItem['parent_id']) && !is_null($categoryItem['parent_id'])) {
-                $message = __('admin/controllers/categories.invalid_parent_ids') . "{$index}.";
+            if (isset($categoryItem['parent_id'])
+                && !is_numeric($categoryItem['parent_id'])
+                && !is_null($categoryItem['parent_id'])) {
+
+                $message = __('admin/controllers.invalid_parent_ids_error') . "{$index}.";
+
                 if ($request->expectsJson()) {
                     return response()->json(['message' => $message], 400);
                 }
@@ -597,20 +613,30 @@ class CategoryController extends Controller
 
         try {
             DB::transaction(function () use ($categoriesData, $locale, $categoryIds) {
-                $existingCategoriesCount = Category::query()->whereIn('id', $categoryIds)->where('locale', $locale)->count();
+                $existingCategoriesCount = Category::query()
+                    ->whereIn('id', $categoryIds)->where('locale', $locale)->count();
+
                 if ($existingCategoriesCount !== count($categoryIds)) {
-                    throw new \InvalidArgumentException(__('admin/controllers/categories.invalid_category_ids'));
+                    throw new \InvalidArgumentException(
+                        __('admin/controllers.invalid_category_ids_error')
+                    );
                 }
 
                 $parentIds = array_filter(array_unique(array_column($categoriesData, 'parent_id')));
                 if (!empty($parentIds)) {
-                    $existingParentsCount = Category::query()->whereIn('id', $parentIds)->where('locale', $locale)->count();
+                    $existingParentsCount = Category::query()->whereIn('id', $parentIds)
+                        ->where('locale', $locale)->count();
                     if ($existingParentsCount !== count($parentIds)) {
-                        throw new \InvalidArgumentException(__('admin/controllers/categories.invalid_parent_ids'));
+                        throw new \InvalidArgumentException(
+                            __('admin/controllers.invalid_parent_ids_error')
+                        );
                     }
                     foreach ($categoriesData as $categoryItem) {
-                        if (!is_null($categoryItem['parent_id']) && $categoryItem['id'] == $categoryItem['parent_id']) {
-                            throw new \InvalidArgumentException(__('admin/controllers/categories.parent_loop_error') . " (ID: {$categoryItem['id']})");
+                        if (!is_null($categoryItem['parent_id'])
+                            && $categoryItem['id'] == $categoryItem['parent_id']) {
+                            throw new \InvalidArgumentException(
+                                __('admin/controllers.parent_loop_error')
+                                . " (ID: {$categoryItem['id']})");
                         }
                     }
                 }
@@ -625,7 +651,7 @@ class CategoryController extends Controller
                 }
             });
 
-            $message = __('admin/controllers/categories.order_updated');
+            $message = __('admin/controllers.bulk_sort_updated_success');
             Log::info("Порядок категорий для локали '{$locale}' обновлен.", ['ids' => $categoryIds]);
 
             if ($request->expectsJson()) {
@@ -635,7 +661,8 @@ class CategoryController extends Controller
 
         } catch (\InvalidArgumentException $e) {
             $message = $e->getMessage();
-            Log::warning("Ошибка валидации при обновлении порядка категорий (locale: {$locale}): {$message}", ['data' => $categoriesData]);
+            Log::warning("Ошибка валидации при обновлении порядка категорий
+            (locale: {$locale}): {$message}", ['data' => $categoriesData]);
 
             if ($request->expectsJson()) {
                 return response()->json(['message' => $message], 400);
@@ -643,8 +670,9 @@ class CategoryController extends Controller
             return redirect()->back()->with('error', $message);
 
         } catch (Throwable $e) {
-            $message = __('admin/controllers/categories.bulk_update_sort_error');
-            Log::error("Ошибка при обновлении порядка категорий (locale: {$locale}): " . $e->getMessage(), ['exception' => $e, 'data' => $categoriesData]);
+            $message = __('admin/controllers.bulk_sort_updated_error');
+            Log::error("Ошибка при обновлении порядка категорий (locale: {$locale}): "
+                . $e->getMessage(), ['exception' => $e, 'data' => $categoriesData]);
 
             if ($request->expectsJson()) {
                 return response()->json(['message' => $message], 500);

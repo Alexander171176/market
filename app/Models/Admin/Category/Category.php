@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin\Category;
 
+use App\Models\Admin\Product\Product;
 use App\Models\Admin\Property\Property;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,16 @@ class Category extends Model
         return $this->belongsToMany(CategoryImage::class, 'category_has_images', 'category_id', 'image_id')
             ->withPivot('order')
             ->orderBy('category_has_images.order', 'asc');
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'category_has_product',      // имя таблицы
+            'category_id',               // внешний ключ этой модели
+            'product_id'                 // внешний ключ связанной модели
+        );
     }
 
     /**

@@ -60,8 +60,6 @@ Route::prefix('comments')->name('api.comments.')->group(function () use ($public
 // Настройки сайта (для админки)
 Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/downtimeSite', [AdminSettingController::class, 'getDowntimeSiteSetting'])->name('downtime');
-    Route::get('/widget-panel', [AdminSettingController::class, 'getWidgetPanelSettings'])->name('widget-panel.get');
-    Route::post('/widget-panel', [AdminSettingController::class, 'updateWidgetPanelSettings'])->name('widget-panel.update');
     // TODO: Добавить другие маршруты для настроек админки?
 });
 

@@ -39,7 +39,7 @@ class SitemapController extends Controller
 
         return Inertia::render('Admin/Systems/SitemapPage', [
             'content' => $xml,
-            'flash'   => ['success' => 'sitemap.xml обновлён'],
+            'flash'   => ['success' => __('admin/controllers.system_xml_updated_success')],
         ]);
     }
 
