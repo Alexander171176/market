@@ -29,6 +29,6 @@ class UpdateSettingValueRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateSettingValueRequest');
+        return Lang::get('admin/requests');
     }
 }

@@ -58,6 +58,6 @@ class UpdateSortSettingRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateSortSettingRequest');
+        return Lang::get('admin/requests');
     }
 }

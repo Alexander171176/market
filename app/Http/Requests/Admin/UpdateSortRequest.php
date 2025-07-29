@@ -25,6 +25,6 @@ class UpdateSortRequest extends FormRequest {
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateSortRequest');
+        return Lang::get('admin/requests');
     }
 }

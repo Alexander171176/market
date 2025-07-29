@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 
 class UpdateLeftRequest extends FormRequest
 {
@@ -14,4 +15,9 @@ class UpdateLeftRequest extends FormRequest
         return true;
     }
     public function rules(): array { return ['left' => 'required|boolean']; }
+
+    public function messages(): array
+    {
+        return Lang::get('admin/requests');
+    }
 }

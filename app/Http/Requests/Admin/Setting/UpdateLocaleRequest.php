@@ -44,6 +44,6 @@ class UpdateLocaleRequest extends FormRequest
      */
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateLocaleRequest');
+        return Lang::get('admin/requests');
     }
 }

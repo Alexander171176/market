@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 
 class UpdateActivityRequest extends FormRequest {
     public function authorize(): bool {
@@ -10,4 +11,9 @@ class UpdateActivityRequest extends FormRequest {
         return true;
     }
     public function rules(): array { return ['activity' => 'required|boolean']; }
+
+    public function messages(): array
+    {
+        return Lang::get('admin/requests');
+    }
 }

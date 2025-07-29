@@ -76,7 +76,7 @@ class TagRequest extends FormRequest
      */
     public function messages(): array
     {
-        return Lang::get('admin/requests/TagRequest');
+        return Lang::get('admin/requests');
     }
 
     /**

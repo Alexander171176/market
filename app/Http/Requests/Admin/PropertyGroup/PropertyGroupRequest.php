@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\PropertyGroup;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 
 class PropertyGroupRequest extends FormRequest
 {
@@ -31,14 +32,6 @@ class PropertyGroupRequest extends FormRequest
      */
     public function messages(): array
     {
-        return [
-            'sort.integer'        => 'Поле сортировки должно быть целым числом.',
-            'sort.min'            => 'Сортировка не может быть меньше нуля.',
-            'activity.required'   => 'Поле активности обязательно для заполнения.',
-            'activity.boolean'    => 'Поле активности должно быть логическим значением.',
-            'name.required'       => 'Пожалуйста, укажите название группы характеристик.',
-            'name.string'         => 'Название должно быть строкой.',
-            'name.max'            => 'Название не должно превышать 255 символов.',
-        ];
+        return Lang::get('admin/requests');
     }
 }

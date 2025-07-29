@@ -62,7 +62,7 @@ class RoleRequest extends FormRequest
      */
     public function messages(): array
     {
-        return Lang::get('admin/requests/RoleRequest');
+        return Lang::get('admin/requests');
     }
 
     /**

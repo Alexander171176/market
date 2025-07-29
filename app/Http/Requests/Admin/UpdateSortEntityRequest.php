@@ -31,6 +31,6 @@ class UpdateSortEntityRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateSortEntityRequest');
+        return Lang::get('admin/requests');
     }
 }

@@ -71,7 +71,7 @@ class BannerRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/BannerRequest');
+        return Lang::get('admin/requests');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Comment;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\Rule;
 use App\Models\Admin\Comment\Comment; // Убедитесь, что путь к модели Comment верный
 use App\Models\User;
@@ -83,20 +84,7 @@ class CommentRequest extends FormRequest
      */
     public function messages(): array
     {
-        // Используем array_merge для сохранения стандартных сообщений Laravel
-        return array_merge(parent::messages(), [
-            'user_id.exists' => 'Выбранный пользователь не существует.',
-            'commentable_id.required' => 'Не указана сущность, к которой относится комментарий.',
-            'commentable_type.required' => 'Не указан тип сущности, к которой относится комментарий.',
-            'commentable_type.in' => 'Комментирование данного типа сущностей не поддерживается.',
-            'parent_id.exists' => 'Выбранный родительский комментарий не существует или не может быть выбран.', // Уточнено
-            'content.required' => 'Текст комментария обязателен.',
-            'content.max' => 'Текст комментария слишком длинный.',
-            'approved.required' => 'Необходимо указать статус одобрения.',
-            'approved.boolean' => 'Статус одобрения должен быть Да/Нет.', // Уточнено
-            'activity.required' => 'Необходимо указать статус активности.',
-            'activity.boolean' => 'Статус активности должен быть Да/Нет.', // Уточнено
-        ]);
+        return Lang::get('admin/requests');
     }
 
     /**

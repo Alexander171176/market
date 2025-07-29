@@ -28,7 +28,6 @@ class ParameterRequest extends FormRequest
             'activity' => 'required|boolean',
             'type' => [
                 'nullable', 'string', 'max:255',
-                Rule::in(['string', 'text', 'number', 'integer', 'float', 'boolean', 'checkbox', 'json', 'array', 'select']),
             ],
             'option' => [
                 'required', 'string', 'max:255',
@@ -46,6 +45,6 @@ class ParameterRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/SettingRequest');
+        return Lang::get('admin/requests');
     }
 }

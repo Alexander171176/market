@@ -80,7 +80,7 @@ class RubricRequest extends FormRequest
      */
     public function messages(): array
     {
-        return Lang::get('admin/requests/RubricRequest');
+        return Lang::get('admin/requests');
     }
 
     /**

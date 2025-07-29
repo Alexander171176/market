@@ -79,7 +79,7 @@ class SectionRequest extends FormRequest
      */
     public function messages(): array
     {
-        return Lang::get('admin/requests/SectionRequest');
+        return Lang::get('admin/requests');
     }
 
     /**

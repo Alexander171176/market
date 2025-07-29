@@ -53,23 +53,31 @@ const saveChanges = async () => {
                     {{ t('componentEditorWarning') }}
             </span>
                 <!-- Tabs -->
-                <ul class="flex items-center justify-center flex-row pb-4 px-4 text-sm overflow-x-auto flex-nowrap">
-                    <li v-for="tab in Object.keys(fileContents)" :key="tab" class="inline mr-1">
-                        <a
-                            href="#"
-                            @click.prevent="selectedGroup = tab"
-                            :class="{
-                            'block px-3 py-1 rounded-t-md bg-blue-600 text-white border border-gray-300 whitespace-nowrap': selectedGroup === tab,
-                            'block px-3 py-1 rounded-t-md bg-zinc-200 dark:bg-zinc-400 border border-zinc-500 text-black whitespace-nowrap': selectedGroup !== tab
-                        }"
+                <div class="overflow-x-auto border-b border-gray-300">
+                    <ul class="flex flex-row space-x-1 px-3 py-1 text-xs whitespace-nowrap">
+                        <li
+                            v-for="tab in Object.keys(fileContents)"
+                            :key="tab"
                         >
-                            {{ tab }}
-                        </a>
-                    </li>
-                </ul>
+                            <a
+                                href="#"
+                                @click.prevent="selectedGroup = tab"
+                                :class="{
+                                    'px-2 py-0.5 rounded-t-md bg-blue-600 text-white border border-gray-300':
+                                    selectedGroup === tab,
+                                    'px-2 py-0.5 rounded-t-md bg-zinc-200 dark:bg-zinc-400 border border-zinc-500 text-black':
+                                    selectedGroup !== tab
+                                }"
+                                class="block"
+                            >
+                                {{ tab }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
                 <!-- Links for the selected tab -->
-                <div class="flex items-center justify-center flex-row flex-wrap pb-4">
+                <div class="flex items-center justify-center flex-row flex-wrap py-4">
                     <div class="flex items-center overflow-x-auto">
                         <a
                             v-for="(content, fileName) in fileContents[selectedGroup]"
@@ -77,7 +85,7 @@ const saveChanges = async () => {
                             href="#"
                             @click.prevent="selectFile(fileName, selectedGroup)"
                             :class="{
-                            'block mr-1 px-3 py-1 text-sm border border-gray-500 rounded-sm hover:text-rose-700 dark:hover:text-red-300 hover:bg-teal-400 dark:hover:bg-teal-700': true,
+                            'block mr-1 px-2 py-0.5 text-xs border border-gray-500 rounded-sm hover:text-slate-700 dark:hover:text-slate-200 hover:bg-teal-400 dark:hover:bg-teal-700': true,
                             'bg-teal-600 text-white': selectedFile === fileName && selectedGroup === selectedGroup,
                             'bg-slate-200 text-black dark:border-slate-400 dark:bg-slate-600 dark:text-slate-100': selectedFile !== fileName || selectedGroup !== selectedGroup,
                         }"
@@ -88,9 +96,11 @@ const saveChanges = async () => {
                 </div>
 
                 <div v-if="selectedFile"
-                     class="border border-gray-400 bg-slate-100 dark:bg-slate-200 overflow-hidden shadow-xl sm:rounded-lg p-4">
-                    <h2 class="mb-1 font-semibold text-gray-900">
-                        <span class="text-sm text-blue-500">{{ t('editingFile') }}</span> {{ selectedFile }}
+                     class="border border-gray-400
+                            bg-slate-100 dark:bg-slate-200
+                            overflow-hidden shadow-xl sm:rounded-lg p-4">
+                    <h2 class="mb-1 font-semibold text-blue-500 text-sm">
+                        <span class="text-gray-900">{{ t('editingFile') }} </span> {{ selectedFile }}
                     </h2>
                     <!--                <HighlightEditor v-model="fileContent" class="w-full" />-->
                     <CodeMirrorEditor v-model="fileContent" theme="dark"
@@ -98,12 +108,12 @@ const saveChanges = async () => {
                     <div class="flex justify-end mt-2">
                         <button @click="saveChanges"
                                 class="flex items-center
-                       btn px-3 py-1
-                       bg-teal-500
-                       text-white text-md font-semibold
-                       rounded-md shadow-md
-                       transition-colors duration-300 ease-in-out
-                       hover:bg-teal-600 focus:bg-teal-600 focus:outline-none">
+                                       btn px-3 py-1
+                                       bg-teal-500
+                                       text-white text-md font-semibold
+                                       rounded-md shadow-md
+                                       transition-colors duration-300 ease-in-out
+                                       hover:bg-teal-600 focus:bg-teal-600 focus:outline-none">
                             <svg class="w-4 h-4 fill-current text-slate-100 mr-1" viewBox="0 0 16 16">
                                 <path
                                     d="M14.3 2.3L5 11.6 1.7 8.3c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4 4c.2.2.4.3.7.3.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4-.4-.4-1-.4-1.4 0z"></path>

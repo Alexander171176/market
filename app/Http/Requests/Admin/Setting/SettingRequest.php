@@ -38,6 +38,6 @@ class SettingRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/SettingRequest');
+        return Lang::get('admin/requests');
     }
 }

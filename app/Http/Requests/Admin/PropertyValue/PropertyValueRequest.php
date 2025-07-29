@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\PropertyValue;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\Rule;
 
 class PropertyValueRequest extends FormRequest
@@ -47,22 +48,6 @@ class PropertyValueRequest extends FormRequest
 
     public function messages(): array
     {
-        return [
-            'property_id.required' => 'Необходимо указать характеристику.',
-            'property_id.integer'  => 'Поле характеристики должно быть числом.',
-            'property_id.exists'   => 'Указанная характеристика не найдена.',
-
-            'sort.integer'         => 'Поле сортировки должно быть числом.',
-            'sort.min'             => 'Поле сортировки не может быть меньше нуля.',
-
-            'value.required'       => 'Необходимо указать значение.',
-            'value.string'         => 'Значение должно быть строкой.',
-            'value.max'            => 'Значение не должно превышать 255 символов.',
-            'value.unique'         => 'Такое значение уже существует в рамках данной характеристики.',
-
-            'slug.string'          => 'Slug должен быть строкой.',
-            'slug.max'             => 'Slug не должен превышать 255 символов.',
-            'slug.regex'           => 'Slug может содержать только строчные латинские буквы, цифры и дефисы.',
-        ];
+        return Lang::get('admin/requests');
     }
 }

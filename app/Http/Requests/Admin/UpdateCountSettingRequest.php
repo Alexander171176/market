@@ -56,6 +56,6 @@ class UpdateCountSettingRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateCountSettingRequest');
+        return Lang::get('admin/requests');
     }
 }

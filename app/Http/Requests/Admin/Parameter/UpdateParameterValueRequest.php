@@ -21,6 +21,6 @@ class UpdateParameterValueRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateParameterValueRequest');
+        return Lang::get('admin/requests');
     }
 }

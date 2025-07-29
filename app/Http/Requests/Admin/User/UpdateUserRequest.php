@@ -31,6 +31,6 @@ class UpdateUserRequest extends FormRequest
 
     public function messages(): array
     {
-        return Lang::get('admin/requests/UpdateUserRequest');
+        return Lang::get('admin/requests');
     }
 }

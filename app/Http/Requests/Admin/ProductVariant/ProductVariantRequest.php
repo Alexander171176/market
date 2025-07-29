@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\ProductVariant;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\Rule;
 
 class ProductVariantRequest extends FormRequest
@@ -65,33 +66,6 @@ class ProductVariantRequest extends FormRequest
 
     public function messages(): array
     {
-        return [
-            'product_id.required'    => 'Товар обязателен для выбора.',
-            'product_id.exists'      => 'Выбранный товар не существует.',
-            'sort.integer'           => 'Сортировка должна быть целым числом.',
-            'activity.required'      => 'Поле активности обязательно.',
-            'activity.boolean'       => 'Поле активности должно быть логическим значением.',
-            'title.required'         => 'Название варианта обязательно.',
-            'title.string'           => 'Название должно быть строкой.',
-            'title.max'              => 'Название не должно превышать 255 символов.',
-            'title.unique'           => 'Такой вариант с этим артикулом уже существует.',
-            'sku.max'                => 'Артикул не должен превышать 255 символов.',
-            'short.max'              => 'Краткое описание не должно превышать 255 символов.',
-            'quantity.integer'       => 'Количество должно быть целым числом.',
-            'weight.integer'         => 'Вес должен быть целым числом.',
-            'price.numeric'          => 'Цена должна быть числом.',
-            'old_price.numeric'      => 'Старая цена должна быть числом.',
-            'currency.required'      => 'Поле валюты обязательно.',
-            'currency.size'          => 'Валюта должна состоять из 3 символов.',
-            'barcode.max'            => 'Штрих-код не должен превышать 255 символов.',
-            'options.array'          => 'Опции должны быть массивом.',
-            'admin.max'              => 'Заметка не должна превышать 255 символов.',
-
-            'images.*.file.image'     => 'Файл должен быть изображением.',
-            'images.*.file.mimes'     => 'Допустимые форматы: jpeg, jpg, png, gif, svg, webp.',
-            'images.*.file.max'       => 'Изображение не должно превышать 10 МБ.',
-            'images.*.id.prohibited'  => 'ID изображения нельзя указывать при создании.',
-            'deletedImages.*.exists'  => 'Некоторые изображения для удаления не найдены.',
-        ];
+        return Lang::get('admin/requests');
     }
 }

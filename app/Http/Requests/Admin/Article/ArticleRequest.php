@@ -85,7 +85,7 @@ class ArticleRequest extends FormRequest
     // Сообщения валидации полей (оставляем ваши, но можно добавить для published_at, связей, deletedImages)
     public function messages(): array
     {
-        return Lang::get('admin/requests/ArticleRequest');
+        return Lang::get('admin/requests');
     }
 
     /**

@@ -126,7 +126,7 @@ class VideoRequest extends FormRequest
      */
     public function messages(): array
     {
-        return Lang::get('admin/requests/VideoRequest');
+        return Lang::get('admin/requests');
     }
 
     /**
