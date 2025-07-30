@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Invokable\RemoveTagFromArticleController;
 use App\Http\Controllers\Admin\Product\ProductController;
+use App\Http\Controllers\Admin\ProductVariant\ProductVariantController;
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use App\Http\Controllers\Admin\System\FileBackupController;
 use App\Http\Controllers\Admin\System\RobotController;
@@ -400,6 +401,22 @@ Route::group([
             Route::resource('/plugins', PluginController::class);
             Route::get('/reports/download', [ReportController::class, 'download'])->name('reports.download'); // Выносим отдельно
 
+            // Маршрут для получения всех вариантов для конкретного товара
+            Route::get('/products/{product}/variants', [ProductController::class, 'getVariants'])
+                ->name('products.variants.index');
+
+            // Группа маршрутов для CRUD операций с вариантами товара
+            Route::prefix('product-variants')->name('product-variants.')->group(function () {
+                Route::post('/', [ProductVariantController::class, 'store'])
+                    ->name('store');
+                Route::get('/{product_variant}', [ProductVariantController::class, 'show'])
+                    ->name('show');
+                Route::put('/{product_variant}', [ProductVariantController::class, 'update'])
+                    ->name('update');
+                Route::delete('/{product_variant}', [ProductVariantController::class, 'destroy'])
+                    ->name('destroy');
+            });
+
             // --- Маршруты удаления связей ManyToMany ---
             Route::delete('/roles/{role}/permissions/{permission}', RemovePermissionFromRoleController::class)->name('roles.permissions.destroy');
             Route::delete('/users/{user}/roles/{role}', RemoveRoleFromUserController::class)->name('users.roles.destroy');
@@ -426,17 +443,42 @@ Route::group([
                 Route::post('/articles/{article}/clone', [ArticleController::class, 'clone'])->name('articles.clone');
 
                 // Переключение активности (Используем имена моделей для параметров RMB)
-                Route::put('/categories/{category}/activity', [CategoryController::class, 'updateActivity'])->name('categories.updateActivity');
-                Route::put('/products/{product}/activity', [ProductController::class, 'updateActivity'])->name('products.updateActivity');
-                Route::put('/rubrics/{rubric}/activity', [RubricController::class, 'updateActivity'])->name('rubrics.updateActivity');
-                Route::put('/sections/{section}/activity', [SectionController::class, 'updateActivity'])->name('sections.updateActivity');
-                Route::put('/articles/{article}/activity', [ArticleController::class, 'updateActivity'])->name('articles.updateActivity');
-                Route::put('/tags/{tag}/activity', [TagController::class, 'updateActivity'])->name('tags.updateActivity');
-                Route::put('/banners/{banner}/activity', [BannerController::class, 'updateActivity'])->name('banners.updateActivity');
-                Route::put('/videos/{video}/activity', [VideoController::class, 'updateActivity'])->name('videos.updateActivity');
-                Route::put('/settings/{setting}/activity', [ParameterController::class, 'updateActivity'])->name('settings.updateActivity');
-                Route::put('/plugins/{plugin}/activity', [PluginController::class, 'updateActivity'])->name('plugins.updateActivity');
-                Route::put('/comments/{comment}/activity', [CommentController::class, 'updateActivity'])->name('comments.updateActivity');
+                Route::put('/categories/{category}/activity',
+                    [CategoryController::class, 'updateActivity'])
+                    ->name('categories.updateActivity');
+                Route::put('/products/{product}/activity',
+                    [ProductController::class, 'updateActivity'])
+                    ->name('products.updateActivity');
+                Route::put('/product-variants/{product_variant}/activity',
+                    [ProductVariantController::class, 'updateActivity'])
+                    ->name('product-variants.updateActivity');
+                Route::put('/rubrics/{rubric}/activity',
+                    [RubricController::class, 'updateActivity'])
+                    ->name('rubrics.updateActivity');
+                Route::put('/sections/{section}/activity',
+                    [SectionController::class, 'updateActivity'])
+                    ->name('sections.updateActivity');
+                Route::put('/articles/{article}/activity',
+                    [ArticleController::class, 'updateActivity'])
+                    ->name('articles.updateActivity');
+                Route::put('/tags/{tag}/activity',
+                    [TagController::class, 'updateActivity'])
+                    ->name('tags.updateActivity');
+                Route::put('/banners/{banner}/activity',
+                    [BannerController::class, 'updateActivity'])
+                    ->name('banners.updateActivity');
+                Route::put('/videos/{video}/activity',
+                    [VideoController::class, 'updateActivity'])
+                    ->name('videos.updateActivity');
+                Route::put('/settings/{setting}/activity',
+                    [ParameterController::class, 'updateActivity'])
+                    ->name('settings.updateActivity');
+                Route::put('/plugins/{plugin}/activity',
+                    [PluginController::class, 'updateActivity'])
+                    ->name('plugins.updateActivity');
+                Route::put('/comments/{comment}/activity',
+                    [CommentController::class, 'updateActivity'])
+                    ->name('comments.updateActivity');
 
                 // Переключение активности массово
                 Route::put('/admin/actions/categories/bulk-activity', [CategoryController::class, 'bulkUpdateActivity'])
@@ -504,16 +546,28 @@ Route::group([
                     ->name('videos.bulkUpdateRight');
 
                 // Обновление сортировки для Drag and Drop
-                Route::put('/categories/update-sort-bulk', [CategoryController::class, 'updateSortBulk'])->name('categories.updateSortBulk');
-                Route::put('/products/update-sort-bulk', [ProductController::class, 'updateSortBulk'])->name('products.updateSortBulk');
-                Route::put('/rubrics/update-sort-bulk', [RubricController::class, 'updateSortBulk'])->name('rubrics.updateSortBulk');
-                Route::put('/sections/update-sort-bulk', [SectionController::class, 'updateSortBulk'])->name('sections.updateSortBulk');
-                Route::put('/articles/update-sort-bulk', [ArticleController::class, 'updateSortBulk'])->name('articles.updateSortBulk');
-                Route::put('/tags/update-sort-bulk', [TagController::class, 'updateSortBulk'])->name('tags.updateSortBulk');
-                Route::put('/banners/update-sort-bulk', [BannerController::class, 'updateSortBulk'])->name('banners.updateSortBulk');
-                Route::put('/videos/update-sort-bulk', [VideoController::class, 'updateSortBulk'])->name('videos.updateSortBulk');
-                Route::put('/plugins/update-sort-bulk', [PluginController::class, 'updateSortBulk'])->name('plugins.updateSortBulk');
-                Route::put('/settings/update-sort-bulk', [ParameterController::class, 'updateSortBulk'])->name('settings.updateSortBulk');
+                Route::put('/categories/update-sort-bulk', [CategoryController::class, 'updateSortBulk'])
+                    ->name('categories.updateSortBulk');
+                Route::put('/products/update-sort-bulk', [ProductController::class, 'updateSortBulk'])
+                    ->name('products.updateSortBulk');
+                Route::put('/product-variants/update-sort-bulk', [ProductVariantController::class, 'updateSortBulk'])
+                    ->name('product-variants.updateSortBulk');
+                Route::put('/rubrics/update-sort-bulk', [RubricController::class, 'updateSortBulk'])
+                    ->name('rubrics.updateSortBulk');
+                Route::put('/sections/update-sort-bulk', [SectionController::class, 'updateSortBulk'])
+                    ->name('sections.updateSortBulk');
+                Route::put('/articles/update-sort-bulk', [ArticleController::class, 'updateSortBulk'])
+                    ->name('articles.updateSortBulk');
+                Route::put('/tags/update-sort-bulk', [TagController::class, 'updateSortBulk'])
+                    ->name('tags.updateSortBulk');
+                Route::put('/banners/update-sort-bulk', [BannerController::class, 'updateSortBulk'])
+                    ->name('banners.updateSortBulk');
+                Route::put('/videos/update-sort-bulk', [VideoController::class, 'updateSortBulk'])
+                    ->name('videos.updateSortBulk');
+                Route::put('/plugins/update-sort-bulk', [PluginController::class, 'updateSortBulk'])
+                    ->name('plugins.updateSortBulk');
+                Route::put('/settings/update-sort-bulk', [ParameterController::class, 'updateSortBulk'])
+                    ->name('settings.updateSortBulk');
 
                 // Обновление сортировки (Имена параметров уже были правильные)
                 Route::put('/categories/{category}/sort', [CategoryController::class, 'updateSort'])->name('categories.updateSort');

@@ -103,6 +103,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px solid gray;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: opacity 0.3s ease;
     opacity: 0.7;

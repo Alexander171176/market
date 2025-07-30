@@ -7,7 +7,8 @@ import { useToast } from "vue-toastification";
 import { useI18n } from 'vue-i18n';
 import { transliterate } from '@/utils/transliteration';
 import {defineProps, onMounted, ref} from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3'
+import axios from 'axios';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import TitlePage from '@/Components/Admin/Headlines/TitlePage.vue';
 import DefaultButton from '@/Components/Admin/Buttons/DefaultButton.vue';
@@ -28,7 +29,10 @@ import VueMultiselect from 'vue-multiselect';
 
 // Импорт двух отдельных компонентов для работы с изображениями:
 import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue'; // для загрузки новых изображений
-import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue';     // для редактирования существующих
+import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue';
+import VariantList from '@/Components/Admin/ProductVariant/VariantList.vue'
+import CreateVariantModal from '@/Components/Admin/ProductVariant/CreateVariantModal.vue'
+import EditVariantModal from '@/Components/Admin/ProductVariant/EditVariantModal.vue'     // для редактирования существующих
 
 // --- Инициализация ---
 const toast = useToast();
@@ -43,9 +47,36 @@ const props = defineProps({
     related_products: { type: Array, default: () => [] } // задаём дефолтное значение
 });
 
-/**
- * Формируем форму редактирования.
- */
+// --- Логика вариантов ---
+const showCreateModal = ref(false);
+const showEditModal = ref(false);
+const selectedVariant = ref(null);
+
+// ИСПРАВЛЕНИЕ: Убираем .data. Теперь props.product.variants
+const variants = ref(Array.isArray(props.product.variants) ? [...props.product.variants] : []);
+
+const openEditModal = (variant) => {
+    selectedVariant.value = variant;
+    showEditModal.value = true;
+};
+
+const refreshVariants = async () => {
+    try {
+        // ИСПРАВЛЕНИЕ: Убираем .data из props.product.id
+        const response = await axios.get(route('admin.products.variants.index', props.product.id));
+        variants.value = response.data;
+        toast.success('Список вариантов обновлен!');
+    } catch (e) {
+        console.error('Ошибка загрузки вариантов', e);
+        toast.error('Не удалось обновить список вариантов.');
+    } finally {
+        showCreateModal.value = false;
+        showEditModal.value = false;
+    }
+};
+
+// --- Форма ---
+// ИСПРАВЛЕНИЕ: Убираем все .data из полей формы
 const form = useForm({
     _method: 'PUT',
     sort: props.product.sort ?? 0,
@@ -67,7 +98,6 @@ const form = useForm({
     meta_keywords: props.product.meta_keywords ?? '',
     meta_desc: props.product.meta_desc ?? '',
     admin: props.product.admin ?? '',
-
     activity: Boolean(props.product.activity),
     left: Boolean(props.product.left),
     main: Boolean(props.product.main),
@@ -75,10 +105,9 @@ const form = useForm({
     is_new: Boolean(props.product.is_new),
     is_hit: Boolean(props.product.is_hit),
     is_sale: Boolean(props.product.is_sale),
-
     categories: props.product.categories ?? [],
     related_products: props.product.related_products ?? [],
-    deletedImages: [] // массив для хранения ID удалённых изображений
+    deletedImages: []
 });
 
 /**
@@ -229,17 +258,68 @@ const submitForm = () => {
 
     form.post(route('admin.products.update', props.product.id), {
         preserveScroll: true,
-        forceFormData: true, // Принудительно отправляем как FormData
-        onSuccess: (page) => {
-            //console.log("Edit.vue onSuccess:", page);
-            toast.success('Товар успешно обновлен!'); // Можно добавить, если нужно кастомное
+        forceFormData: true,
+        onSuccess: () => {
+            toast.success('Товар успешно обновлен!');
         },
         onError: (errors) => {
             console.error("❌ Ошибка при обновлении товара:", errors);
             const firstError = errors[Object.keys(errors)[0]];
-            toast.error(firstError || 'Пожалуйста, проверьте правильность заполнения полей.')
+            toast.error(firstError || 'Пожалуйста, проверьте правильность заполнения полей.');
         }
     });
+};
+
+/**
+ * Обрабатывает событие обновления порядка сортировки от компонента таблицы (Drag and drop).
+ */
+const handleVariantSortOrderUpdate = (orderedIds) => {
+    const startSort = 0; // если нет постраничности — просто от 1
+
+    const sortData = orderedIds.map((id, index) => ({
+        id: id,
+        sort: startSort + index + 1,
+    }));
+
+    router.put(route('admin.actions.product-variants.updateSortBulk'), {
+        product_variants: sortData,
+    }, {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: () => {
+            toast.success('Порядок вариантов успешно обновлён.');
+        },
+        onError: (errors) => {
+            console.error('Ошибка обновления сортировки вариантов:', errors);
+            toast.error(errors.product_variants || 'Ошибка сортировки вариантов.');
+        },
+    });
+};
+
+/**
+ * Отправляет запрос для изменения статуса активности.
+ */
+const toggleActivity = (variant) => {
+    const newActivity = !variant.activity;
+    const actionText = newActivity ? t('activated') : t('deactivated');
+
+    router.put(route('admin.actions.product-variants.updateActivity',
+            { product_variant: variant.id }),
+        { activity: newActivity },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                // ВАЖНО: обновляем локально
+                variant.activity = newActivity;
+                toast.success(`Вариант "${variant.title}" ${actionText}.`);
+            },
+            onError: (errors) => {
+                toast.error(errors.activity || errors.general
+                    || `Ошибка изменения активности для "${variant.title}".`);
+            },
+        }
+    );
 };
 
 </script>
@@ -249,10 +329,10 @@ const submitForm = () => {
         <template #header>
             <TitlePage>{{ t('editProduct') }}: {{ props.product.title }}</TitlePage>
         </template>
-        <div class="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-12xl mx-auto">
+        <div class="px-2 py-2 w-full max-w-12xl mx-auto">
             <div class="p-4 bg-slate-50 dark:bg-slate-700
                         border border-blue-400 dark:border-blue-200
-                        shadow-lg shadow-gray-500 dark:shadow-slate-400
+                        overflow-hidden shadow-md shadow-gray-500 dark:shadow-slate-400
                         bg-opacity-95 dark:bg-opacity-95">
                 <div class="sm:flex sm:justify-between sm:items-center mb-2">
                     <!-- Кнопка назад -->
@@ -716,6 +796,53 @@ const submitForm = () => {
                         <MultiImageUpload @update:images="handleNewImagesUpdate" />
                     </div>
 
+                    <!-- Варианты товара -->
+                    <div class="mt-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-md font-semibold text-indigo-600 dark:text-sky-500">
+                                {{ t('productVariants')}}
+                            </h3>
+                            <button type="button"
+                                    class="flex items-center btn px-2 py-0.5
+                                            bg-sky-600 text-white text-sm font-semibold
+                                            rounded-sm shadow-md
+                                            transition-colors duration-300 ease-in-out
+                                            hover:bg-sky-700 focus:bg-sky-700 focus:outline-none"
+                                    @click="showCreateModal = true">
+                                <span>
+                                    <svg class="w-4 h-4 fill-current opacity-50 shrink-0"
+                                         viewBox="0 0 16 16">
+                                        <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z"></path>
+                                    </svg>
+                                </span>
+                                <span class="ml-2">{{ t('addProductVariant')}}</span>
+                            </button>
+                        </div>
+
+                        <VariantList
+                            :variants="variants"
+                            @toggle-activity="toggleActivity"
+                            @edit="openEditModal"
+                            @deleted="refreshVariants"
+                            @update-sort-order="handleVariantSortOrderUpdate"
+                        />
+
+                        <CreateVariantModal
+                            v-if="showCreateModal"
+                            :product-id="product.id"
+                            @close="showCreateModal = false"
+                            @created="refreshVariants"
+                        />
+
+                        <EditVariantModal
+                            v-if="showEditModal && selectedVariant"
+                            :variant="selectedVariant"
+                            :product-id="product.id"
+                            @close="showEditModal = false"
+                            @updated="refreshVariants"
+                        />
+                    </div>
+
                     <div class="flex items-center justify-center mt-4">
                         <DefaultButton :href="route('admin.products.index')" class="mb-3">
                             <template #icon>
@@ -739,6 +866,7 @@ const submitForm = () => {
                         </PrimaryButton>
                     </div>
                 </form>
+
             </div>
         </div>
     </AdminLayout>

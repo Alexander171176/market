@@ -84,11 +84,14 @@ const truncateText = (text, maxLength = 30) => {
 </script>
 
 <template>
-    <div class="bg-white dark:bg-slate-700 shadow-lg rounded-sm border border-slate-200 dark:border-slate-600 relative">
+    <div class="bg-white dark:bg-slate-700 shadow-lg rounded-sm
+                border border-slate-200 dark:border-slate-600 relative">
         <div class="overflow-x-auto">
-            <table v-if="products.length > 0" class="table-auto w-full text-slate-700 dark:text-slate-100">
+            <table v-if="products.length > 0"
+                   class="table-auto w-full text-slate-700 dark:text-slate-100">
                 <thead
-                    class="text-sm uppercase bg-slate-200 dark:bg-cyan-900 border border-solid border-gray-300 dark:border-gray-700">
+                    class="text-sm uppercase bg-slate-200 dark:bg-cyan-900
+                           border border-solid border-gray-300 dark:border-gray-700">
                 <tr>
                     <th class="px-2 py-3 w-px">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -156,14 +159,18 @@ const truncateText = (text, maxLength = 30) => {
                     handle=".handle"
                 >
                     <template #item="{ element: product }">
-                        <tr class="text-sm font-semibold border-b-2 hover:bg-slate-100 dark:hover:bg-cyan-800">
+                        <tr class="text-sm font-semibold border-b-2
+                                   hover:bg-slate-100 dark:hover:bg-cyan-800">
                             <td class="px-2 py-1 text-center cursor-move handle">
-                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-300"
+                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M7 4h2v2H7V4zm4 0h2v2h-2V4zM7 8h2v2H7V8zm4 0h2v2h-2V8zM7 12h2v2H7v-2zm4 0h2v2h-2v-2z" />
                                 </svg>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center text-blue-600 dark:text-blue-200">{{ product.id }}</div>
+                                <div class="text-center text-blue-600 dark:text-blue-200">
+                                    {{ product.id }}
+                                </div>
                             </td>
                             <td class="first:pl-5 last:pr-5 py-1">
                                 <div class="flex justify-center">
@@ -185,7 +192,8 @@ const truncateText = (text, maxLength = 30) => {
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
-                                <div class="text-center uppercase text-orange-500 dark:text-orange-200">
+                                <div class="text-center uppercase
+                                            text-orange-500 dark:text-orange-200">
                                     {{ product.locale }}
                                 </div>
                             </td>
@@ -204,8 +212,10 @@ const truncateText = (text, maxLength = 30) => {
                                 <div class="text-left">
                                     <span v-for="section in product.sections" :key="section.id">
                                         <span :title="section.title"
-                                              class="py-0.5 px-1.5 mr-0.5 badge bg-blue-500 dark:bg-blue-200
-                                                     rounded-sm text-xs text-slate-100 dark:text-slate-900">
+                                              class="py-0.5 px-1.5 mr-0.5 badge
+                                                     bg-blue-500 dark:bg-blue-200
+                                                     rounded-sm text-xs
+                                                     text-slate-100 dark:text-slate-900">
                                             {{ section.id }}
                                         </span>
                                     </span>
@@ -242,7 +252,8 @@ const truncateText = (text, maxLength = 30) => {
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 py-1 whitespace-nowrap">
                                 <div class="text-center">
-                                    <input type="checkbox" :checked="selectedProducts.includes(product.id)"
+                                    <input type="checkbox"
+                                           :checked="selectedProducts.includes(product.id)"
                                            @change="$emit('toggle-select', product.id)"/>
                                 </div>
                             </td>

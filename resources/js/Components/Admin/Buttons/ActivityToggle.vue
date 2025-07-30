@@ -15,7 +15,10 @@ const buttonClass = computed(() => [
 </script>
 
 <template>
-    <button :class="buttonClass" :title="title" @click="$emit('toggle-activity')">
+    <button type="button"
+            :class="buttonClass"
+            :title="title"
+            @click="$emit('toggle-activity')">
         <svg v-if="isActive"
              class="w-6 h-6 fill-current text-yellow-300
                     hover:text-gray-500 dark:hover:text-white"

@@ -12,6 +12,7 @@ use App\Http\Requests\Admin\UpdateSortEntityRequest;
 use App\Http\Resources\Admin\Category\CategoryResource;
 use App\Http\Resources\Admin\Product\ProductResource;
 use App\Http\Resources\Admin\Product\ProductSharedResource;
+use App\Http\Resources\Admin\ProductVariant\ProductVariantResource;
 use App\Models\Admin\Category\Category;
 use App\Models\Admin\Product\Product;
 use App\Models\Admin\Product\ProductImage;
@@ -199,7 +200,8 @@ class ProductController extends Controller
         // TODO: Проверка прав $this->authorize('update-products', $product);
 
         // Загружаем все необходимые связи
-        $product->load(['categories', 'images' => fn($q) => $q->orderBy('order', 'asc'), 'relatedProducts']);
+        $product->load(['categories', 'images', 'variants' => fn($q) => $q
+            ->orderBy('sort', 'asc'), 'relatedProducts']);
 
         // Загружаем данные для селектов
         $categories = Category::select('id', 'title', 'locale')->orderBy('title')->get();
@@ -588,9 +590,6 @@ class ProductController extends Controller
             $product->activity = $validated['activity'];
             $product->save();
 
-            $actionText = $product->activity ? __('admin/controllers.activated_success')
-                : __('admin/controllers/products.deactivated');
-
             Log::info("Обновлено activity товара ID {$product->id} на {$product->activity}");
             return back()
                 ->with('success', __('admin/controllers.activity_updated_success'));
@@ -766,6 +765,22 @@ class ProductController extends Controller
             return back()->withInput()
                 ->with('error', __('admin/controllers.cloned_error'));
         }
+    }
+
+    /**
+     * Получить все варианты для указанного товара.
+     * Возвращает JSON ответ для AJAX запросов.
+     *
+     * @param Product $product
+     * @return JsonResponse
+     */
+    public function getVariants(Product $product): JsonResponse
+    {
+        // Загружаем варианты с сортировкой
+        $variants = $product->variants()->orderBy('sort', 'asc')->get();
+
+        // Возвращаем их как коллекцию ресурсов
+        return response()->json(ProductVariantResource::collection($variants));
     }
 
 

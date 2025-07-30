@@ -334,6 +334,7 @@
     `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantSharedResource` <br>
     `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantImageResource` <br>
     `docker exec market-php-app php artisan make:request Admin/ProductVariant/ProductVariantRequest` <br>
+    `docker exec market-php-app php artisan make:controller Admin/ProductVariant/ProductVariantController --resource` <br>
 
 40) creating business logic ap Properties
     `docker exec market-php-app php artisan make:migration create_property_groups_table` <br>
