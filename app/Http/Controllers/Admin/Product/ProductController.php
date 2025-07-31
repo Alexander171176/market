@@ -200,8 +200,15 @@ class ProductController extends Controller
         // TODO: Проверка прав $this->authorize('update-products', $product);
 
         // Загружаем все необходимые связи
-        $product->load(['categories', 'images', 'variants' => fn($q) => $q
-            ->orderBy('sort', 'asc'), 'relatedProducts']);
+        $product->load([
+            'categories',
+            'images',
+            'relatedProducts',
+            'variants' => function ($query) {
+                // Загружаем сами варианты и для каждого из них - его изображения
+                $query->with('images')->orderBy('sort', 'asc');
+            }
+        ]);
 
         // Загружаем данные для селектов
         $categories = Category::select('id', 'title', 'locale')->orderBy('title')->get();
@@ -776,8 +783,11 @@ class ProductController extends Controller
      */
     public function getVariants(Product $product): JsonResponse
     {
-        // Загружаем варианты с сортировкой
-        $variants = $product->variants()->orderBy('sort', 'asc')->get();
+        // Загружаем варианты и СРАЗУ ЖЕ их изображения
+        $variants = $product->variants()
+            ->with('images') // Жадная загрузка изображений для вариантов
+            ->orderBy('sort', 'asc')
+            ->get();
 
         // Возвращаем их как коллекцию ресурсов
         return response()->json(ProductVariantResource::collection($variants));

@@ -10,6 +10,8 @@ import ActivityCheckbox from '@/Components/Admin/Checkbox/ActivityCheckbox.vue';
 import LabelCheckbox from '@/Components/Admin/Checkbox/LabelCheckbox.vue';
 import MetaDescTextarea from '@/Components/Admin/Textarea/MetaDescTextarea.vue';
 import TinyEditor from '@/Components/Admin/TinyEditor/TinyEditor.vue';
+import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue'
+import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue'
 
 const toast = useToast()
 const { t } = useI18n()
@@ -29,10 +31,10 @@ const props = defineProps({
 const form = ref({});
 const errors = ref({});
 const processing = ref(false);
+const existingImages = ref([]);
+const newImages = ref([]);
+const deletedImageIds = ref([]); // Используем отдельный ref для ID удаленных
 
-// --- Заполнение формы при открытии модального окна ---
-// 2. Используем 'watch' для отслеживания изменений props.variant.
-//    Когда модальное окно открывается и получает новый вариант, мы заполняем нашу локальную форму.
 watch(() => props.variant, (newVariant) => {
     if (newVariant) {
         form.value = {
@@ -54,50 +56,113 @@ watch(() => props.variant, (newVariant) => {
             activity: Boolean(newVariant.activity),
         };
 
+        existingImages.value = (newVariant.images || [])
+            .filter(img => img.url)
+            .map(img => ({
+                id: img.id,
+                url: img.webp_url || img.url,
+                order: img.order || 0,
+                alt: img.alt || '',
+                caption: img.caption || ''
+            }));
+
+        newImages.value = [];
+        deletedImageIds.value = [];
         errors.value = {};
     }
-}, {
-    immediate: true,
-    deep: true,
-});
+}, { immediate: true, deep: true });
 
-// --- Отправка формы ---
-// 3. Асинхронная функция для отправки данных через axios.
+const handleExistingImagesUpdate = (images) => {
+    existingImages.value = images;
+};
+
+const handleDeleteExistingImage = (deletedId) => {
+    if (!deletedImageIds.value.includes(deletedId)) {
+        deletedImageIds.value.push(deletedId);
+    }
+    existingImages.value = existingImages.value.filter(img => img.id !== deletedId);
+};
+
+const handleNewImagesUpdate = (images) => {
+    newImages.value = images;
+};
+
 const submit = async () => {
-    // Проверка, что вариант существует
     if (!props.variant) return;
 
     processing.value = true;
-    errors.value = {}; // Очищаем старые ошибки перед новым запросом
+    errors.value = {};
 
-    // console.log('Submitting form:', form.value); // ⬅️ отладка
+    const formData = new FormData();
+
+    // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ**: Используем POST-запрос с подменой метода
+    formData.append('_method', 'PUT');
+
+    // Добавляем основные поля формы
+    for (const key in form.value) {
+        let value = form.value[key];
+        // Корректно отправляем булевы значения как 1 или 0
+        if (typeof value === 'boolean') {
+            value = value ? '1' : '0';
+        }
+        // Не добавляем null или undefined значения
+        if (value !== null && value !== undefined) {
+            formData.append(key, value);
+        }
+    }
+
+    // Добавляем ID удаленных изображений
+    deletedImageIds.value.forEach(id => {
+        formData.append('deletedImages[]', id);
+    });
+
+    // Объединяем существующие и новые изображения для отправки
+    const allImages = [
+        ...existingImages.value,
+        ...newImages.value
+    ];
+
+    allImages.forEach((image, index) => {
+        if (image.id) { // Существующее изображение
+            formData.append(`images[${index}][id]`, image.id);
+        } else if (image.file) { // Новое изображение
+            formData.append(`images[${index}][file]`, image.file);
+        }
+        formData.append(`images[${index}][order]`, image.order || 0);
+        formData.append(`images[${index}][alt]`, image.alt || '');
+        formData.append(`images[${index}][caption]`, image.caption || '');
+    });
 
     try {
-        // 4. Отправляем PUT-запрос с помощью axios. Он не будет вызывать ошибку Inertia.
-        const response = await axios.put(route('admin.product-variants.update', props.variant.id), form.value);
+        // **КЛЮЧЕВОЕ ИЗМЕНЕНИЕ**: Отправляем POST вместо PUT
+        const response = await axios.post(
+            route('admin.product-variants.update', props.variant.id),
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
 
-        // 5. Обрабатываем успешный JSON-ответ от сервера.
         if (response.data.success) {
             toast.success('Вариант успешно обновлен!');
-            emit('updated'); // Сообщаем родительскому компоненту, что данные изменились
-            emit('close');   // Закрываем модальное окно
+            emit('updated'); // Отправляем событие для обновления списка в родителе
+            emit('close');
         }
     } catch (error) {
-        // 6. Обрабатываем ошибки.
         if (error.response && error.response.status === 422) {
-            // Если это ошибка валидации (статус 422), сохраняем ошибки в нашу переменную.
             errors.value = error.response.data.errors;
-            toast.error('Ошибка валидации. Проверьте правильность заполнения полей.');
+            toast.error('Ошибка валидации. Проверьте поля.');
         } else {
-            // Для всех других ошибок выводим общее сообщение.
             console.error('Ошибка при обновлении варианта:', error);
-            toast.error('Произошла непредвиденная ошибка при сохранении.');
+            toast.error(error.response?.data?.message || 'Произошла ошибка при сохранении.');
         }
     } finally {
-        // 7. В любом случае (успех или ошибка) завершаем состояние загрузки.
         processing.value = false;
     }
 };
+
 </script>
 
 <template>
@@ -127,7 +192,7 @@ const submit = async () => {
                 </button>
             </div>
 
-            <form v-if="variant" @submit.prevent="submit">
+            <form v-if="variant" @submit.prevent="submit" enctype="multipart/form-data">
                 <div class="space-y-2">
 
                     <div class="mb-1 flex justify-between flex-col lg:flex-row items-center gap-2">
@@ -430,6 +495,19 @@ const submit = async () => {
                         </div>
                     </div>
 
+                </div>
+
+                <!-- Блок редактирования существующих изображений -->
+                <div class="mt-4">
+                    <MultiImageEdit
+                        :images="existingImages"
+                        @update:images="handleExistingImagesUpdate"
+                        @delete-image="handleDeleteExistingImage" />
+                </div>
+
+                <!-- Блок загрузки новых изображений -->
+                <div class="mt-4">
+                    <MultiImageUpload @update:images="handleNewImagesUpdate" />
                 </div>
 
                 <div

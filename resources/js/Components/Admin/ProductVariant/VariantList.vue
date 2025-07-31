@@ -63,6 +63,11 @@ const handleDragEnd = () => {
                             <path d="M12.707,2.293a1,1,0,0,0-1.414,0l-5,5A1,1,0,0,0,7.707,8.707L12,4.414l4.293,4.293a1,1,0,0,0,1.414-1.414Z"></path><path d="M16.293,15.293,12,19.586,7.707,15.293a1,1,0,0,0-1.414,1.414l5,5a1,1,0,0,0,1.414,0l5-5a1,1,0,0,0-1.414-1.414Z"></path>
                         </svg>
                     </th>
+                    <th class="flex justify-center px-4 py-3">
+                        <svg class="w-6 h-6 fill-current shrink-0" viewBox="0 0 512 512">
+                            <path d="M0 96C0 60.7 28.7 32 64 32l384 0c35.3 0 64 28.7 64 64l0 320c0 35.3-28.7 64-64 64L64 480c-35.3 0-64-28.7-64-64L0 96zM323.8 202.5c-4.5-6.6-11.9-10.5-19.8-10.5s-15.4 3.9-19.8 10.5l-87 127.6L170.7 297c-4.6-5.7-11.5-9-18.7-9s-14.2 3.3-18.7 9l-64 80c-5.8 7.2-6.9 17.1-2.9 25.4s12.4 13.6 21.6 13.6l96 0 32 0 208 0c8.9 0 17.1-4.9 21.2-12.8s3.6-17.4-1.4-24.7l-120-176zM112 192a48 48 0 1 0 0-96 48 48 0 1 0 0 96z"></path>
+                        </svg>
+                    </th>
                     <th class="font-medium px-4 py-3 text-center">ID</th>
                     <th class="font-medium px-4 py-3 text-left">{{ t('title') }}</th>
                     <th class="font-medium px-4 py-3 text-left">{{ t('sku') }}</th>
@@ -85,6 +90,25 @@ const handleDragEnd = () => {
                                      fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M7 4h2v2H7V4zm4 0h2v2h-2V4zM7 8h2v2H7V8zm4 0h2v2h-2V8zM7 12h2v2H7v-2zm4 0h2v2h-2v-2z" />
                                 </svg>
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <!-- Условие: показываем изображение, только если оно есть -->
+                                <div v-if="variant.images && variant.images.length > 0">
+                                    <img
+                                        :src="variant.images[0].webp_url || variant.images[0].url"
+                                        :alt="variant.title"
+                                        class="w-8 h-8 object-cover rounded-md mx-auto shadow-lg"
+                                    >
+                                </div>
+                                <!-- Иначе показываем плейсхолдер -->
+                                <div v-else class="w-8 h-8 flex items-center justify-center
+                                                   bg-slate-100 dark:bg-slate-600
+                                                   rounded-md mx-auto">
+                                    <svg class="w-6 h-6 text-slate-400" fill="none"
+                                         stroke="currentColor" viewBox="0 0 24 24"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path></svg>
+                                </div>
                             </td>
                             <td class="px-4 py-2 text-center">{{ variant.id }}</td>
                             <td class="px-4 py-2">{{ variant.title }}</td>

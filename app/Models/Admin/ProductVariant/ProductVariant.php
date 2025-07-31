@@ -6,6 +6,7 @@ use App\Models\Admin\Product\Product;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductVariant extends Model
 {
@@ -57,6 +58,23 @@ class ProductVariant extends Model
         'old_price'    => 'decimal:2',
         'options'      => 'array', // JSON поле
     ];
+
+    /**
+     * Вариант товара может иметь много изображений.
+     * Определяет связь "многие-ко-многим".
+     */
+
+    public function images(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductVariantImage::class,
+            'product_variant_has_images',
+            'product_variant_id',
+            'image_id'
+        )
+            ->withPivot('order')
+            ->orderBy('product_variant_images.order', 'asc');
+    }
 
     /**
      * Связь: Вариант принадлежит товару.

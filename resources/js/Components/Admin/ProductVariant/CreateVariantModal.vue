@@ -10,6 +10,7 @@ import ActivityCheckbox from '@/Components/Admin/Checkbox/ActivityCheckbox.vue';
 import LabelCheckbox from '@/Components/Admin/Checkbox/LabelCheckbox.vue';
 import MetaDescTextarea from '@/Components/Admin/Textarea/MetaDescTextarea.vue';
 import TinyEditor from '@/Components/Admin/TinyEditor/TinyEditor.vue';
+import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue';
 
 const toast = useToast()
 const { t } = useI18n()
@@ -35,7 +36,7 @@ const form = ref({
     availability: '',
     old_price: 0, // Используем null для необязательных числовых полей
     price: 0,
-    currency: '',
+    currency: 'USD',
     barcode: '',
     options: '',
     short: '',
@@ -43,37 +44,67 @@ const form = ref({
     admin: ''
 })
 
-const errors = ref({})
-const processing = ref(false)
+const newImages = ref([]);
+const errors = ref({});
+const processing = ref(false);
+
+const handleNewImagesUpdate = (images) => {
+    newImages.value = images;
+};
 
 const submit = async () => {
-    processing.value = true
-    errors.value = {}
+    processing.value = true;
+    errors.value = {};
+
+    const formData = new FormData();
+
+    // Добавляем все поля из form
+    for (const key in form.value) {
+        let value = form.value[key];
+        if (typeof value === 'boolean') {
+            value = value ? '1' : '0';
+        }
+        if (value !== null && value !== undefined) {
+            formData.append(key, value);
+        }
+    }
+
+    // Добавляем новые изображения
+    newImages.value.forEach((image, index) => {
+        formData.append(`images[${index}][file]`, image.file);
+        formData.append(`images[${index}][order]`, image.order || 0);
+        formData.append(`images[${index}][alt]`, image.alt || '');
+        formData.append(`images[${index}][caption]`, image.caption || '');
+    });
 
     try {
-        // 2. Используем axios.post
-        const response = await axios.post(route('admin.product-variants.store'), form.value)
+        const response = await axios.post(
+            route('admin.product-variants.store'),
+            formData, // Отправляем formData
+            {
+                headers: { // Обязательно указываем заголовок
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
 
-        // 3. Обрабатываем успешный JSON-ответ
         if (response.data.success) {
-            toast.success('Вариант успешно создан!')
-            emit('created') // Сообщаем родителю об успехе
-            emit('close')   // Закрываем модальное окно
+            toast.success('Вариант успешно создан!');
+            emit('created');
+            emit('close');
         }
     } catch (error) {
-        // 4. Обрабатываем ошибки, особенно ошибки валидации (статус 422)
         if (error.response && error.response.status === 422) {
-            errors.value = error.response.data.errors
-            toast.error('Ошибка валидации. Проверьте поля.')
+            errors.value = error.response.data.errors;
+            toast.error('Ошибка валидации. Проверьте поля.');
         } else {
-            console.error('Ошибка при создании варианта:', error)
-            toast.error('Произошла непредвиденная ошибка.')
+            console.error('Ошибка при создании варианта:', error);
+            toast.error('Произошла непредвиденная ошибка.');
         }
     } finally {
-        // 5. В любом случае завершаем состояние загрузки
-        processing.value = false
+        processing.value = false;
     }
-}
+};
 </script>
 
 <template>
@@ -103,7 +134,7 @@ const submit = async () => {
                 </button>
             </div>
 
-            <form @submit.prevent="submit">
+            <form @submit.prevent="submit" enctype="multipart/form-data">
                 <div class="space-y-2">
 
                     <div class="mb-1 flex justify-between flex-col lg:flex-row items-center gap-2">
@@ -406,6 +437,10 @@ const submit = async () => {
                         </div>
                     </div>
 
+                </div>
+
+                <div class="mt-4">
+                    <MultiImageUpload @update:images="handleNewImagesUpdate" />
                 </div>
 
                 <div

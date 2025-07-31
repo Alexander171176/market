@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\ProductVariant\ProductVariantRequest;
 use App\Http\Requests\Admin\UpdateActivityRequest;
 use App\Http\Resources\Admin\ProductVariant\ProductVariantResource;
 use App\Models\Admin\ProductVariant\ProductVariant;
+use App\Models\Admin\ProductVariant\ProductVariantImage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -36,10 +37,41 @@ class ProductVariantController extends Controller
     {
         $data = $request->validated();
 
+        // Извлекаем данные по изображениям
+        $imagesData = $data['images'] ?? [];
+        unset($data['images']); // Убираем из основного массива данных
+
         try {
             DB::beginTransaction();
 
+            // 1. Создаем сам вариант товара
             $variant = ProductVariant::create($data);
+
+            // 2. Обработка и привязка изображений, если они есть
+            if (!empty($imagesData)) {
+                $syncData = [];
+                foreach ($imagesData as $index => $imageData) {
+                    $fileKey = "images.{$index}.file";
+
+                    if ($request->hasFile($fileKey)) {
+                        // Создаем запись об изображении
+                        $newImage = ProductVariantImage::create([
+                            'order'   => $imageData['order'] ?? 0,
+                            'alt'     => $imageData['alt'] ?? '',
+                            'caption' => $imageData['caption'] ?? '',
+                        ]);
+
+                        // Прикрепляем файл с помощью Spatie MediaLibrary
+                        $newImage->addMedia($request->file($fileKey))
+                            ->toMediaCollection('images');
+
+                        // Готовим данные для синхронизации с pivot-таблицей
+                        $syncData[$newImage->id] = ['order' => $newImage->order];
+                    }
+                }
+                // 3. Синхронизируем изображения с вариантом
+                $variant->images()->sync($syncData);
+            }
 
             DB::commit();
             Log::info('Вариант товара создан', ['id' => $variant->id]);
@@ -63,20 +95,7 @@ class ProductVariantController extends Controller
     }
 
     /**
-     * Получение данных одного варианта (для редактирования)
-     *
-     * @param ProductVariant $product_variant
-     * @return ProductVariantResource
-     */
-    public function show(ProductVariant $product_variant): ProductVariantResource
-    {
-        return new ProductVariantResource(
-            $product_variant->load(['images', 'propertyValues'])
-        );
-    }
-
-    /**
-     * Обновление существующего варианта товара
+     * Обновление существующего варианта товара вместе с изображениями.
      *
      * @param ProductVariantRequest $request
      * @param ProductVariant $product_variant
@@ -86,13 +105,70 @@ class ProductVariantController extends Controller
     {
         $data = $request->validated();
 
+        // Извлекаем данные по изображениям
+        $imagesData = $data['images'] ?? [];
+        $deletedImageIds = $data['deletedImages'] ?? [];
+
+        // Убираем ненужные ключи из основного массива данных
+        unset($data['images'], $data['deletedImages'], $data['_method']);
+
         try {
             DB::beginTransaction();
 
+            // 1. Удаляем изображения, отмеченные для удаления
+            if (!empty($deletedImageIds)) {
+                $product_variant->images()->detach($deletedImageIds);
+                $this->deleteVariantImages($deletedImageIds);
+            }
+
+            // 2. Обновляем основные поля варианта
             $product_variant->update($data);
+
+            // 3. Обработка новых и существующих изображений
+            $syncData = [];
+            foreach ($imagesData as $index => $imageData) {
+                $fileKey = "images.{$index}.file";
+
+                // а) Обновляем существующее изображение
+                if (!empty($imageData['id'])) {
+                    $image = ProductVariantImage::find($imageData['id']);
+                    if ($image && !in_array($image->id, $deletedImageIds, true)) {
+                        $image->update([
+                            'order'   => $imageData['order'] ?? $image->order,
+                            'alt'     => $imageData['alt'] ?? $image->alt,
+                            'caption' => $imageData['caption'] ?? $image->caption,
+                        ]);
+
+                        // Если пришел новый файл для замены
+                        if ($request->hasFile($fileKey)) {
+                            $image->clearMediaCollection('images');
+                            $image->addMedia($request->file($fileKey))
+                                ->toMediaCollection('images');
+                        }
+                        $syncData[$image->id] = ['order' => $image->order];
+                    }
+                    // б) Добавляем новое изображение
+                } elseif ($request->hasFile($fileKey)) {
+                    $newImage = ProductVariantImage::create([
+                        'order'   => $imageData['order'] ?? 0,
+                        'alt'     => $imageData['alt'] ?? '',
+                        'caption' => $imageData['caption'] ?? '',
+                    ]);
+                    $newImage->addMedia($request->file($fileKey))
+                        ->toMediaCollection('images');
+
+                    $syncData[$newImage->id] = ['order' => $newImage->order];
+                }
+            }
+
+            // 4. Синхронизируем pivot-таблицу для изображений
+            $product_variant->images()->sync($syncData);
 
             DB::commit();
             Log::info('Вариант товара обновлён', ['id' => $product_variant->id]);
+
+            // Загружаем обновленный вариант со связями для ответа
+            $product_variant->load('images');
 
             return response()->json([
                 'success' => true,
@@ -215,6 +291,24 @@ class ProductVariantController extends Controller
 
             return back()->with('error', __('admin/controllers.bulk_sort_updated_error'));
         }
+    }
+
+    /**
+     * Приватный метод для удаления изображений варианта товара.
+     *
+     * @param array $imageIds
+     * @return void
+     */
+    private function deleteVariantImages(array $imageIds): void
+    {
+        if (empty($imageIds)) return;
+
+        $imagesToDelete = ProductVariantImage::whereIn('id', $imageIds)->get();
+        foreach ($imagesToDelete as $image) {
+            $image->clearMediaCollection('images'); // Удаление файлов через Spatie
+            $image->delete(); // Удаление записи из таблицы
+        }
+        Log::info('Удалены изображения варианта товара: ', ['image_ids' => $imageIds]);
     }
 
 }
