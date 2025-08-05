@@ -329,6 +329,7 @@
     `docker exec market-php-app php artisan make:migration create_product_variants_table` <br>
     `docker exec market-php-app php artisan make:model Admin/ProductVariant/ProductVariantImage -mf` <br>
     `docker exec market-php-app php artisan make:migration create_product_variants_has_images_table --create=product_variants_has_images` <br>
+    `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:model Admin/ProductVariant/ProductVariant` <br>
     `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantResource` <br>
     `docker exec market-php-app php artisan make:resource Admin/ProductVariant/ProductVariantSharedResource` <br>
@@ -342,6 +343,13 @@
     `docker exec market-php-app php artisan make:migration create_property_values_table` <br>
     `docker exec market-php-app php artisan make:migration create_product_property_value_table` <br>
     `docker exec market-php-app php artisan make:migration create_category_property_table` <br>
+    `docker exec market-php-app php artisan make:seeder PropertyGroupSeeder` <br>
+    `docker exec market-php-app php artisan db:seed --class=PropertyGroupSeeder` <br>
+    `docker exec market-php-app php artisan make:seeder PropertySeeder` <br>
+    `docker exec market-php-app php artisan db:seed --class=PropertySeeder` <br>
+    `docker exec market-php-app php artisan make:seeder PropertyValueSeeder` <br>
+    `docker exec market-php-app php artisan db:seed --class=PropertyValueSeeder` <br>
+    `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:model Admin/PropertyGroup/PropertyGroup` <br>
     `docker exec market-php-app php artisan make:resource Admin/PropertyGroup/PropertyGroupResource` <br>
     `docker exec market-php-app php artisan make:resource Admin/PropertyGroup/PropertyGroupSharedResource` <br>
@@ -354,6 +362,8 @@
     `docker exec market-php-app php artisan make:request Admin/PropertyGroup/PropertyGroupRequest` <br>
     `docker exec market-php-app php artisan make:request Admin/Property/PropertyRequest` <br>
     `docker exec market-php-app php artisan make:request Admin/PropertyValue/PropertyValueRequest` <br>
+    `docker exec market-php-app php artisan make:controller Admin/PropertyGroup/PropertyGroupController --resource` <br>
+    `docker exec market-php-app php artisan make:controller Admin/Property/PropertyController --resource` <br>
 
 41) creating business logic app API <br>
     `composer require "darkaonline/l5-swagger` <br>

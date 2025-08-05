@@ -163,6 +163,9 @@ return [
     // Сипаттамалар
     'property_group_id.integer' => 'Топ идентификаторы бүтін сан болуы керек.',
     'property_group_id.exists' => 'Таңдалған топ табылмады.',
+    'property_values.array' => 'Сипаттар өрісі массив болуы керек.',
+    'property_values.*.integer' => 'Әр сипат мәні сан болуы керек.',
+    'property_values.*.exists' => 'Таңдалған сипат мәні жоқ.',
     'type.required' => 'Мүмкіндік түрін көрсетіңіз.',
     'type.string' => 'Тип жол болуы керек.',
     'type.max' => 'Түр 50 таңбадан аспауы керек.',

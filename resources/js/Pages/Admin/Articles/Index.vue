@@ -449,30 +449,38 @@ const toggleSelectArticle = (articleId) => {
  * Выполняет массовое включение/выключение активности выбранных.
  */
 const bulkToggleActivity = (newActivity) => {
+    // Эта проверка остается, она полезна
     if (!selectedArticles.value.length) {
-        toast.warning('Выберите статьи для активации/деактивации статьи');
+        toast.warning('Выберите статьи для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.articles.bulkUpdateActivity'), {
+
+    // Заменяем axios.put на router.put
+    router.put(
+        // 1. Имя маршрута и данные остаются теми же
+        route('admin.actions.articles.bulkUpdateActivity'),
+        {
             ids: selectedArticles.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedArticles.value]
-            selectedArticles.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedArticles.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        // 2. Добавляем объект опций Inertia
+        {
+            preserveScroll: true,
+            // Говорим Inertia перезагрузить props с сервера после успеха.
+            // Это автоматически обновит вашу таблицу без ручного цикла forEach.
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность массово обновлена');
+                // Очищаем массив выбранных статей
+                selectedArticles.value = [];
+            },
+            onError: (errors) => {
+                // Показываем первую ошибку валидации или общее сообщение
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**

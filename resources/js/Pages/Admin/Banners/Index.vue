@@ -364,29 +364,32 @@ const toggleSelectBanner = (bannerId) => {
  */
 const bulkToggleActivity = (newActivity) => {
     if (!selectedBanners.value.length) {
-        toast.warning('Выберите баннер для активации/деактивации баннеров');
+        toast.warning('Выберите баннеры для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.banners.bulkUpdateActivity'), {
+
+    // Заменяем axios.put на router.put
+    router.put(
+        route('admin.actions.banners.bulkUpdateActivity'),
+        {
             ids: selectedBanners.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedBanners.value]
-            selectedBanners.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedBanners.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Главное: заставляем Inertia обновить данные с сервера
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность баннеров массово обновлена');
+                // Очищаем выделение
+                selectedBanners.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**

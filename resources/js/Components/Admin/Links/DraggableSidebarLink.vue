@@ -65,6 +65,8 @@ const linkInfo = {
     permissions: {label: t('permissions'), route: 'admin.permissions.index'},
     categories: {label: t('categories'), route: 'admin.categories.index'},
     products: {label: t('products'), route: 'admin.products.index'},
+    properties: {label: t('properties'), route: 'admin.properties.index'},
+    propertyGroups: {label: t('propertyGroups'), route: 'admin.property-groups.index'},
     rubrics: {label: t('rubrics'), route: 'admin.rubrics.index'},
     sections: {label: t('sections'), route: 'admin.sections.index'},
     articles: {label: t('posts'), route: 'admin.articles.index'},

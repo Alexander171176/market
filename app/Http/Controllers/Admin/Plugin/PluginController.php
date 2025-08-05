@@ -243,22 +243,24 @@ class PluginController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['plugins'] as $pluginData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Plugin::where('id', $pluginData['id'])->update(['activity' => $pluginData['activity']]);
-            }
+
+            // Исправление: используем один запрос whereIn и правильный ключ 'ids'
+            Plugin::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['plugins'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность плагинов', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности плагинов: " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

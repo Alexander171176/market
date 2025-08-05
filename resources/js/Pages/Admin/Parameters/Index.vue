@@ -18,7 +18,6 @@ import BulkActionSelect from "@/Components/Admin/Parameters/Select/BulkActionSel
 import ParameterTable from '@/Components/Admin/Parameters/Table/ParameterTable.vue';
 import CountTable from '@/Components/Admin/Count/CountTable.vue';
 import DangerModal from '@/Components/Admin/Modal/DangerModal.vue';
-import axios from 'axios';
 
 // --- Инициализация экземпляр i18n, toast ---
 const {t} = useI18n();
@@ -266,26 +265,29 @@ const bulkToggleActivity = (newActivity) => {
         toast.warning('Выберите параметры для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.settings.bulkUpdateActivity'), {
+
+    // Заменяем axios.put на router.put
+    router.put(
+        route('admin.actions.settings.bulkUpdateActivity'),
+        {
             ids: selectedSettings.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность парметров массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedSettings.value]
-            selectedSettings.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedSettings.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность параметров')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Говорим Inertia перезагрузить props с сервера после успеха
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность параметров массово обновлена');
+                // Очищаем массив выделенных элементов
+                selectedSettings.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность параметров';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**

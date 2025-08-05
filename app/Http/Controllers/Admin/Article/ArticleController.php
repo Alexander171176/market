@@ -617,7 +617,6 @@ class ArticleController extends Controller
      */
     public function bulkUpdateActivity(Request $request): RedirectResponse
     {
-        // TODO: Проверка прав $this->authorize('update-articles', $article);
         $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:articles,id',
@@ -626,22 +625,25 @@ class ArticleController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['articles'] as $articleData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Article::where('id', $articleData['id'])->update(['activity' => $articleData['activity']]);
-            }
+
+            // Используем whereIn для одного эффективного запроса
+            Article::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['articles'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность статей', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            // Inertia с `preserveState: false` ожидает редирект, `back()` идеален
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
             Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

@@ -453,26 +453,29 @@ const bulkToggleActivity = (newActivity) => {
         toast.warning('Выберите товары для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.products.bulkUpdateActivity'), {
+
+    // Заменяем axios.put на router.put
+    router.put(
+        route('admin.actions.products.bulkUpdateActivity'),
+        {
             ids: selectedProducts.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedProducts.value]
-            selectedProducts.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedProducts.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Заставляем Inertia обновить props с сервера, это перезагрузит таблицу
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность товаров массово обновлена');
+                // Очищаем массив выделенных элементов
+                selectedProducts.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**
@@ -675,8 +678,10 @@ const handleBulkAction = (event) => {
                     @toggle-select="toggleSelectProduct"
                     @toggle-all="toggleAll"
                 />
-                <div class="flex justify-between items-center flex-col md:flex-row my-1" v-if="productsCount">
-                    <ItemsPerPageSelect :items-per-page="itemsPerPage" @update:itemsPerPage="itemsPerPage = $event"/>
+                <div class="flex justify-between items-center flex-col md:flex-row my-1"
+                     v-if="productsCount">
+                    <ItemsPerPageSelect :items-per-page="itemsPerPage"
+                                        @update:itemsPerPage="itemsPerPage = $event"/>
                     <Pagination :current-page="currentPage"
                                 :items-per-page="itemsPerPage"
                                 :total-items="filteredProducts.length"

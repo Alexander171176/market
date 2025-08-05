@@ -639,6 +639,7 @@ class VideoController extends Controller
      */
     public function bulkUpdateActivity(Request $request): RedirectResponse
     {
+        // TODO: Проверка прав доступа $this->authorize('update-videos', Video::class);
         $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:videos,id',
@@ -647,22 +648,21 @@ class VideoController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['videos'] as $videoData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Video::where('id', $videoData['id'])->update(['activity' => $videoData['activity']]);
-            }
+            Video::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['videos'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность видео', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности видео: " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

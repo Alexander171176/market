@@ -22,8 +22,6 @@ class DatabaseSeeder extends Seeder
             ArticleImageSeeder::class,
             PluginsSeeder::class,
             // CommentsSeeder::class,
-            AthleteSeeder::class,
-            TournamentSeeder::class,
             // CategorySeeder::class,
             // Добавьте сюда другие сидеры по мере необходимости
         ]);

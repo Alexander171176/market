@@ -79,6 +79,10 @@ class ProductRequest extends FormRequest
 
             'deletedImages'      => ['sometimes', 'array'],
             'deletedImages.*'    => ['integer', Rule::exists('product_images', 'id')],
+
+            // Характеристики
+            'property_values'    => ['nullable', 'array'],
+            'property_values.*'  => ['integer', 'exists:property_values,id'],
         ];
     }
 

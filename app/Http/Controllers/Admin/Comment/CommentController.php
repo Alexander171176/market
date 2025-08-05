@@ -182,7 +182,7 @@ class CommentController extends Controller
      */
     public function bulkUpdateActivity(Request $request): RedirectResponse
     {
-        // TODO: Проверка прав $this->authorize('update-comments', $comment);
+        // TODO: Проверка прав $this->authorize('update-comments', Comment::class);
         $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:comments,id',
@@ -191,22 +191,24 @@ class CommentController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['comments'] as $commentData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Comment::where('id', $commentData['id'])->update(['activity' => $commentData['activity']]);
-            }
+
+            // Исправление: используем один запрос whereIn и правильный ключ 'ids'
+            Comment::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['comments'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность комментариев', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности комментариев: " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

@@ -305,29 +305,31 @@ const toggleSelectTag = (tagId) => {
  */
 const bulkToggleActivity = (newActivity) => {
     if (!selectedTags.value.length) {
-        toast.warning('Выберите теги для активации/деактивации тегов');
+        toast.warning('Выберите теги для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.tags.bulkUpdateActivity'), {
+
+    router.put(
+        route('admin.actions.tags.bulkUpdateActivity'),
+        {
             ids: selectedTags.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedTags.value]
-            selectedTags.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedTags.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Заставляем Inertia обновить props с сервера, это перезагрузит таблицу
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность тегов массово обновлена');
+                // Очищаем массив выделенных элементов
+                selectedTags.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**

@@ -243,27 +243,31 @@ class ParameterController extends Controller
     {
         $validated = $request->validate([
             'ids'      => 'required|array',
-            'ids.*'    => 'required|integer|exists:settings,id',
+            'ids.*'    => 'required|integer|exists:settings,id', // Проверяем таблицу 'settings'
             'activity' => 'required|boolean',
         ]);
 
         try {
             DB::beginTransaction();
-            foreach ($validated['settings'] as $settingData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Setting::where('id', $settingData['id'])->update(['activity' => $settingData['activity']]);
-            }
+
+            // Исправление: используем один запрос whereIn и правильный ключ 'ids'
+            // Модель Setting, так как таблица settings
+            Setting::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['settings'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность параметров (settings)', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
+
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности параметров (settings): " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

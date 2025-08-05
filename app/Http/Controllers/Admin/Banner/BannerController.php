@@ -551,22 +551,24 @@ class BannerController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['banners'] as $bannerData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Banner::where('id', $bannerData['id'])->update(['activity' => $bannerData['activity']]);
-            }
+
+            // Исправление: используем один запрос whereIn и правильный ключ 'ids'
+            Banner::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['banners'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность баннеров', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности баннеров: " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

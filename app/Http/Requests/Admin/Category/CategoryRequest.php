@@ -87,6 +87,9 @@ class CategoryRequest extends FormRequest
 
             'deletedImages'      => ['sometimes', 'array'],
             'deletedImages.*'    => ['integer', 'exists:category_images,id'],
+
+            'property_ids'   => ['nullable', 'array'],
+            'property_ids.*' => ['integer', 'exists:properties,id'],
         ];
     }
 

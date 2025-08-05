@@ -9,6 +9,7 @@ use App\Http\Resources\Admin\Category\CategoryResource;
 use App\Http\Resources\Admin\Category\CategorySharedResource;
 use App\Models\Admin\Category\Category;
 use App\Models\Admin\Category\CategoryImage;
+use App\Models\Admin\Property\Property;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse; // Добавлено для JsonResponse
 use Illuminate\Http\RedirectResponse;
@@ -141,8 +142,9 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         $imagesData = $data['images'] ?? [];
+        $propertyIds = $data['property_ids'] ?? [];
 
-        unset($data['images']);
+        unset($data['images'], $data['property_ids']);
 
         try {
             DB::beginTransaction();
@@ -157,6 +159,8 @@ class CategoryController extends Controller
             }
 
             $category = Category::create($data);
+
+            $category->properties()->sync($propertyIds);
 
             // Обработка изображений
             $imageSyncData = [];
@@ -237,6 +241,7 @@ class CategoryController extends Controller
         // TODO: Проверка прав $this->authorize('edit-categories', Category::class);
 
         $targetLocale = $request->query('locale', config('app.fallback_locale', 'ru'));
+
         if (!in_array($targetLocale, $this->availableLocales)) {
             Log::warning("Недопустимая локаль '{$targetLocale}' в edit. Используется fallback.");
             $targetLocale = config('app.fallback_locale', 'ru');
@@ -260,17 +265,21 @@ class CategoryController extends Controller
 
         // Log::info('Потенциальные родители:', $potentialParents->toArray());
 
+        $allProperties = Property::orderBy('name')->get(['id', 'name']); // Загружаем все характеристики
+
         return Inertia::render('Admin/Categories/Edit', [
             'targetLocale' => $targetLocale,
             'category' => new CategoryResource(
                 $category->loadMissing([
                     'parent',
                     'images' => fn($q) => $q->orderBy('order'),
+                    'properties' // <-- Загружаем привязанные характеристики
                 ])
             ),
             'potentialParents' => CategorySharedResource::collection($potentialParents),
             'availableLocales' => $this->availableLocales,
             'currentLocale' => $category->locale,
+            'allProperties' => $allProperties,
         ]);
     }
 
@@ -292,16 +301,18 @@ class CategoryController extends Controller
         $originalParentId = $category->parent_id;
         $originalLocale   = $category->locale;
         $categoryId       = $category->id;
+        $propertyIds = $data['property_ids'] ?? [];
 
         unset(
             $data['images'],
             $data['deletedImages'],
+            $data['property_ids'],
             $data['_method']
         );
 
         try {
             DB::transaction(function () use (
-                $category, $data, $originalParentId, $originalLocale,
+                $category, $data, $propertyIds, $originalParentId, $originalLocale,
                 $request, $imagesData, $deletedImageIds
             ) {
                 // Удаляем изображения
@@ -333,6 +344,8 @@ class CategoryController extends Controller
                 }
 
                 $category->update($data);
+
+                $category->properties()->sync($propertyIds);
 
                 // Обработка изображений
                 $syncData = [];

@@ -7,7 +7,6 @@ import {defineProps, ref, computed, watch} from 'vue';
 import { useI18n } from 'vue-i18n';
 import {useToast} from 'vue-toastification';
 import {router} from '@inertiajs/vue3';
-import axios from 'axios';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import TitlePage from '@/Components/Admin/Headlines/TitlePage.vue';
 import DefaultButton from "@/Components/Admin/Buttons/DefaultButton.vue";
@@ -294,29 +293,32 @@ const toggleSelectPlugin = (pluginId) => {
  */
 const bulkToggleActivity = (newActivity) => {
     if (!selectedPlugins.value.length) {
-        toast.warning('Выберите модули для активации/деактивации модулей');
+        toast.warning('Выберите модули для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.plugins.bulkUpdateActivity'), {
+
+    // Заменяем axios.put на router.put
+    router.put(
+        route('admin.actions.plugins.bulkUpdateActivity'),
+        {
             ids: selectedPlugins.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedPlugins.value]
-            selectedPlugins.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedPlugins.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Говорим Inertia обновить props с сервера, это перезагрузит таблицу
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность модулей массово обновлена');
+                // Очищаем массив выделенных элементов
+                selectedPlugins.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**

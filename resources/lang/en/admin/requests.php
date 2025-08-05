@@ -163,6 +163,9 @@ return [
     // Properties
     'property_group_id.integer' => 'Group ID must be an integer.',
     'property_group_id.exists' => 'The selected group was not found.',
+    'property_values.array' => 'The Properties field must be an array.',
+    'property_values.*.integer' => 'Each property value must be a number.',
+    'property_values.*.exists' => 'The selected property value does not exist.',
     'type.required' => 'Specify the property type.',
     'type.string' => 'Type must be a string.',
     'type.max' => 'Type must be 50 characters or less.',

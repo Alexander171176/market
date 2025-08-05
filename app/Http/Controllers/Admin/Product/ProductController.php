@@ -13,9 +13,11 @@ use App\Http\Resources\Admin\Category\CategoryResource;
 use App\Http\Resources\Admin\Product\ProductResource;
 use App\Http\Resources\Admin\Product\ProductSharedResource;
 use App\Http\Resources\Admin\ProductVariant\ProductVariantResource;
+use App\Http\Resources\Admin\Property\PropertyResource;
 use App\Models\Admin\Category\Category;
 use App\Models\Admin\Product\Product;
 use App\Models\Admin\Product\ProductImage;
+use App\Models\Admin\Property\Property;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -88,9 +90,9 @@ class ProductController extends Controller
     {
         // TODO: Проверка прав $this->authorize('create-products', Product::class);
 
-        $allProducts = Product::select('id', 'title', 'locale')->orderBy('title')->get(); // связанные статьи
+        $allProducts = Product::select('id', 'title', 'locale')->orderBy('title')->get(); // связанные товары
 
-        $categories = Category::select('id', 'title', 'locale')->orderBy('title')->get(); // секции
+        $categories = Category::select('id', 'title', 'locale')->orderBy('title')->get(); // категории
 
         return Inertia::render('Admin/Products/Create', [
             'related_products' => ProductSharedResource::collection($allProducts), // Используем Shared
@@ -100,7 +102,7 @@ class ProductController extends Controller
 
     /**
      * Сохранение нового товара в базе данных.
-     * Использует SectionRequest для валидации и авторизации.
+     * Использует ProductRequest для валидации и авторизации.
      * Синхронизирует связанные изображения, товары.
      *
      * @param ProductRequest $request
@@ -112,7 +114,8 @@ class ProductController extends Controller
         $imagesData   = $data['images'] ?? [];
         $categoryIds   = collect($data['categories'] ?? [])->pluck('id')->toArray();
         $relatedIds   = collect($data['related_products'] ?? [])->pluck('id')->toArray();
-        unset($data['images'], $data['related_products']);
+        $propertyValueIds = $data['property_values'] ?? [];
+        unset($data['images'], $data['related_products'], $data['property_values']);
 
         try {
             DB::beginTransaction();
@@ -121,6 +124,7 @@ class ProductController extends Controller
             // Связи
             $product->categories()->sync($categoryIds);
             $product->relatedProducts()->sync($relatedIds);
+            $product->propertyValues()->sync($propertyValueIds);
 
             // Обработка изображений
             $imageSyncData = [];
@@ -204,6 +208,7 @@ class ProductController extends Controller
             'categories',
             'images',
             'relatedProducts',
+            'propertyValues',
             'variants' => function ($query) {
                 // Загружаем сами варианты и для каждого из них - его изображения
                 $query->with('images')->orderBy('sort', 'asc');
@@ -216,10 +221,16 @@ class ProductController extends Controller
         // Загружаем данные для селектов
         $allProducts = Product::where('id', '<>', $product->id)->select('id', 'title', 'locale')->orderBy('title')->get(); // Исключаем текущую
 
+        $allProperties = Property::with(['values' => fn($q) => $q->orderBy('sort')])
+            ->where('activity', true)
+            ->orderBy('sort')
+            ->get();
+
         return Inertia::render('Admin/Products/Edit', [
             'product' => new ProductResource($product),
             'categories' => CategoryResource::collection($categories),
             'related_products' => ProductSharedResource::collection($allProducts), // Используем Shared
+            'allProperties' => PropertyResource::collection($allProperties),
         ]);
     }
 
@@ -241,6 +252,7 @@ class ProductController extends Controller
         $deletedImageIds  = $data['deletedImages'] ?? [];
         $categoryIds      = collect($data['categories'] ?? [])->pluck('id')->toArray();
         $relatedIds       = collect($data['related_products'] ?? [])->pluck('id')->toArray();
+        $propertyValueIds = $data['property_values'] ?? [];
 
         // Убираем ненужные ключи из $data
         unset(
@@ -248,6 +260,7 @@ class ProductController extends Controller
             $data['deletedImages'],
             $data['categories'],
             $data['related_products'],
+            $data['property_values'],
             $data['_method']
         );
 
@@ -268,6 +281,7 @@ class ProductController extends Controller
             // 3) Синхронизация связей
             $product->categories()->sync($categoryIds);
             $product->relatedProducts()->sync($relatedIds);
+            $product->propertyValues()->sync($propertyValueIds);
 
             // 4) Обработка изображений
             $syncData = [];
@@ -617,7 +631,7 @@ class ProductController extends Controller
      */
     public function bulkUpdateActivity(Request $request): RedirectResponse
     {
-        // TODO: Проверка прав $this->authorize('update-products', $product);
+        // TODO: Проверка прав $this->authorize('update-products', Product::class);
         $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:products,id',
@@ -626,22 +640,24 @@ class ProductController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['products'] as $productData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Product::where('id', $productData['id'])->update(['activity' => $productData['activity']]);
-            }
+
+            // Исправление: используем один запрос whereIn и правильный ключ 'ids'
+            Product::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['products'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность товаров', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности товаров: " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

@@ -254,26 +254,29 @@ const bulkToggleActivity = (newActivity) => {
         toast.warning('Выберите комментарии для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.comments.bulkUpdateActivity'), {
+
+    // Заменяем axios.put на router.put
+    router.put(
+        route('admin.actions.comments.bulkUpdateActivity'),
+        {
             ids: selectedComments.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedComments.value]
-            selectedComments.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedComments.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Заставляем Inertia обновить данные с сервера, это обновит таблицу
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность комментариев массово обновлена');
+                // Очищаем массив выделенных элементов
+                selectedComments.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**

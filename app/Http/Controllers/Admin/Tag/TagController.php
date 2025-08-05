@@ -252,7 +252,7 @@ class TagController extends Controller
      */
     public function bulkUpdateActivity(Request $request): RedirectResponse
     {
-        // TODO: Проверка прав $this->authorize('edit-tags', Tag::class);
+        // TODO: Проверка прав доступа $this->authorize('update-tags', Tag::class);
         $validated = $request->validate([
             'ids'      => 'required|array',
             'ids.*'    => 'required|integer|exists:tags,id',
@@ -261,22 +261,24 @@ class TagController extends Controller
 
         try {
             DB::beginTransaction();
-            foreach ($validated['tags'] as $tagData) {
-                // Используем update для массового обновления, если возможно, или where/update
-                Tag::where('id', $tagData['id'])->update(['activity' => $tagData['activity']]);
-            }
+
+            // Исправление: используем один запрос whereIn и правильный ключ 'ids'
+            Tag::whereIn('id', $validated['ids'])
+                ->update(['activity' => $validated['activity']]);
+
             DB::commit();
 
-            Log::info('Массово обновлена активность',
-                ['count' => count($validated['tags'])]);
-            return back()
-                ->with('success', __('admin/controllers.bulk_activity_updated_success'));
+            Log::info('Массово обновлена активность тегов', [
+                'count' => count($validated['ids']),
+                'activity' => $validated['activity'],
+            ]);
+
+            return back()->with('success', __('admin/controllers.bulk_activity_updated_success'));
 
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка массового обновления активности: " . $e->getMessage());
-            return back()
-                ->with('error', __('admin/controllers.bulk_activity_updated_error'));
+            Log::error("Ошибка массового обновления активности тегов: " . $e->getMessage());
+            return back()->with('error', __('admin/controllers.bulk_activity_updated_error'));
         }
     }
 

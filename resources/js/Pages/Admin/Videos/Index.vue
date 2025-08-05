@@ -414,29 +414,31 @@ const toggleSelectVideo = (videoId) => {
  */
 const bulkToggleActivity = (newActivity) => {
     if (!selectedVideos.value.length) {
-        toast.warning('Выберите видео для активации/деактивации видео');
+        toast.warning('Выберите видео для активации/деактивации');
         return;
     }
-    axios
-        .put(route('admin.actions.videos.bulkUpdateActivity'), {
+
+    router.put(
+        route('admin.actions.videos.bulkUpdateActivity'),
+        {
             ids: selectedVideos.value,
             activity: newActivity,
-        })
-        .then(() => {
-            toast.success('Активность массово обновлена')
-            // сразу очистим выбор
-            const updatedIds = [...selectedVideos.value]
-            selectedVideos.value = []
-            // и оптимистично поправим флаг в таблице
-            paginatedVideos.value.forEach((a) => {
-                if (updatedIds.includes(a.id)) {
-                    a.activity = newActivity
-                }
-            })
-        })
-        .catch(() => {
-            toast.error('Не удалось обновить активность')
-        })
+        },
+        {
+            preserveScroll: true,
+            // Заставляем Inertia обновить props с сервера, это перезагрузит таблицу
+            preserveState: false,
+            onSuccess: () => {
+                toast.success('Активность видео массово обновлена');
+                // Очищаем массив выделенных элементов
+                selectedVideos.value = [];
+            },
+            onError: (errors) => {
+                const errorMessage = errors[Object.keys(errors)[0]] || 'Не удалось обновить активность';
+                toast.error(errorMessage);
+            }
+        }
+    );
 };
 
 /**
