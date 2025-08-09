@@ -30,7 +30,8 @@ class PropertySeeder extends Seeder
 
             $properties = [
                 [
-                    'property_group_id' => $groupDesign?->id, // Используем `?->id` для безопасности
+                    'property_group_id' => $groupDesign?->id,
+                    'locale' => 'ru',
                     'name' => 'Цвет',
                     'slug' => 'tsvet',
                     'type' => 'select', // Одна характеристика - одно значение (один цвет)
@@ -41,6 +42,7 @@ class PropertySeeder extends Seeder
                 ],
                 [
                     'property_group_id' => $groupDesign?->id,
+                    'locale' => 'ru',
                     'name' => 'Материал корпуса',
                     'slug' => 'material-korpusa',
                     'type' => 'checkbox', // У товара может быть несколько материалов
@@ -51,6 +53,7 @@ class PropertySeeder extends Seeder
                 ],
                 [
                     'property_group_id' => $groupMain?->id,
+                    'locale' => 'ru',
                     'name' => 'Оперативная память',
                     'slug' => 'operativnaya-pamyat',
                     'type' => 'select',
@@ -61,6 +64,7 @@ class PropertySeeder extends Seeder
                 ],
                 [
                     'property_group_id' => $groupDimensions?->id,
+                    'locale' => 'ru',
                     'name' => 'Вес',
                     'slug' => 'ves',
                     'type' => 'number', // Для числовых значений без списка вариантов
@@ -71,6 +75,7 @@ class PropertySeeder extends Seeder
                 ],
                 [
                     'property_group_id' => null, // Пример характеристики без группы
+                    'locale' => 'ru',
                     'name' => 'Гарантия',
                     'slug' => 'garantiya',
                     'type' => 'text',

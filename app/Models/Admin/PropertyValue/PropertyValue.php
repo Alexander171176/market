@@ -28,8 +28,10 @@ class PropertyValue extends Model
     protected $fillable = [
         'property_id',
         'sort',
-        'value',
+        'activity',
+        'name',
         'slug',
+        'locale',
     ];
 
     /**
@@ -39,6 +41,7 @@ class PropertyValue extends Model
      */
     protected $casts = [
         'sort' => 'integer',
+        'activity'     => 'boolean',
     ];
 
     /**

@@ -28,7 +28,7 @@ return [
     'locale.required' => 'Тіл қажет.',
     'locale.string' => 'Тіл жол болуы керек.',
     'locale.size' => 'Тіл коды 2 таңбадан тұруы керек (мысалы, «ru», «en», «kz»).',
-    'locale.in' => 'Қол жетімді тілдер: ru, en, kk.',
+    'locale.in' => 'Жарамсыз тіл',
 
     // Аты
     'title.required' => 'Тақырып қажет.',
@@ -161,6 +161,10 @@ return [
     'options.array' => 'Параметрлер массив болуы керек.',
 
     // Сипаттамалар
+    'properties.array' => 'Сипаттар өрісі массив болуы керек.',
+    'properties.*.id.required_with' => 'Меншік идентификаторы қажет.',
+    'properties.*.id.integer' => 'Меншік идентификаторы сан болуы керек.',
+    'properties.*.id.exists' => 'Көрсетілген сипат табылмады.',
     'property_group_id.integer' => 'Топ идентификаторы бүтін сан болуы керек.',
     'property_group_id.exists' => 'Таңдалған топ табылмады.',
     'property_values.array' => 'Сипаттар өрісі массив болуы керек.',

@@ -26,16 +26,18 @@ class ProductRequest extends FormRequest
             'is_new'       => ['required', 'boolean'],
             'is_hit'       => ['required', 'boolean'],
             'is_sale'      => ['required', 'boolean'],
-            'locale'       => ['required', 'string', 'size:2', Rule::in(['ru', 'en', 'kk'])],
+            'locale'       => ['required', 'string', 'size:2'],
             'sku'          => ['nullable', 'string', 'max:255'],
             'title'        => [
                 'required', 'string', 'max:255',
-                Rule::unique('products')->where(fn ($q) => $q->where('locale', $this->input('locale')))->ignore($productId),
+                Rule::unique('products')->where(fn ($q) => $q
+                    ->where('locale', $this->input('locale')))->ignore($productId),
             ],
             'url'          => [
                 'required', 'string', 'max:500',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::unique('products')->where(fn ($q) => $q->where('locale', $this->input('locale')))->ignore($productId),
+                Rule::unique('products')->where(fn ($q) => $q
+                    ->where('locale', $this->input('locale')))->ignore($productId),
             ],
             'short'        => ['nullable', 'string', 'max:255'],
             'description'  => ['nullable', 'string'],

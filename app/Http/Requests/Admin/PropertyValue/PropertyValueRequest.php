@@ -29,19 +29,18 @@ class PropertyValueRequest extends FormRequest
                 'integer',
                 'min:0',
             ],
-            'value' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('property_values')
-                    ->where(fn ($query) => $query->where('property_id', $propertyId))
-                    ->ignore($propertyValueId),
+            'activity'     => ['required', 'boolean'],
+            'locale'       => ['required', 'string', 'size:2'],
+            'name'        => [
+                'required', 'string', 'max:255',
+                Rule::unique('property_values')->where(fn ($q) => $q
+                    ->where('locale', $this->input('locale')))->ignore($propertyValueId),
             ],
-            'slug' => [
-                'nullable',
-                'string',
-                'max:255',
+            'slug'          => [
+                'required', 'string', 'max:255',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
+                Rule::unique('property_values')->where(fn ($q) => $q
+                    ->where('locale', $this->input('locale')))->ignore($propertyValueId),
             ],
         ];
     }

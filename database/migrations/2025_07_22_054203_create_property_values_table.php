@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('property_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained()->cascadeOnDelete(); // связь с характеристикой
-            $table->unsignedInteger('sort')->default(0)->index(); // порядок
-            $table->string('value'); // значение, например: Чёрный, Дерево
-            $table->string('slug')->nullable()->index()->comment('Опциональный системный ключ значения');
+            $table->foreignId('property_id')->constrained('properties')->cascadeOnDelete();
+            $table->unsignedInteger('sort')->default(0)->index();
+            $table->boolean('activity')->default(true)->index();
+
+            $table->string('locale', 2)->index();
+            $table->string('name', 255);           // например: «Чёрный», «Дерево»
+            $table->string('slug', 255)->index(); // системный ключ (опционально)
             $table->timestamps();
 
-            $table->unique(['property_id', 'value']); // уникальность значений в рамках характеристики
+            // имя и slug уникальны в рамках характеристики + локали
+            $table->unique(['property_id', 'locale', 'name']);
+            $table->unique(['property_id', 'locale', 'slug']);
         });
     }
 

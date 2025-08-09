@@ -104,7 +104,7 @@ const deleteGroup = () => {
     const idToDelete = groupToDeleteId.value;
     const titleToDelete = groupToDeleteTitle.value;
 
-    router.delete(route('admin.property-groups.destroy', {product: idToDelete}), {
+    router.delete(route('admin.property-groups.destroy', { property_group: idToDelete }), {
         preserveScroll: true,
         preserveState: false,
         onSuccess: (page) => {
@@ -176,6 +176,14 @@ const sortGroups = (groups) => {
     if (sortParam.value === 'inactive') {
         return groups.filter(group => !group.activity);
     }
+    if (sortParam.value === 'locale') {
+        // Сортировка по locale в обратном порядке
+        return groups.slice().sort((a, b) => {
+            if (a.locale < b.locale) return 1;
+            if (a.locale > b.locale) return -1;
+            return 0;
+        });
+    }
     // Для остальных полей — стандартное сравнение:
     return groups.slice().sort((a, b) => {
         if (a[sortParam.value] < b[sortParam.value]) return -1
@@ -192,7 +200,7 @@ const filteredGroups = computed(() => {
 
     if (searchQuery.value) {
         filtered = filtered.filter(group =>
-            group.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+            group.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
     }
 

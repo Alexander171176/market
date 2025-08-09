@@ -25,10 +25,7 @@ class ArticleRequest extends FormRequest
             'left'               => 'required|boolean',
             'main'               => 'required|boolean',
             'right'              => 'required|boolean',
-            'locale'             => [
-                'required','string','size:2',
-                Rule::in(['ru','en','kk']),
-            ],
+            'locale'             => ['required','string','size:2'],
             'title'              => [
                 'required','string','max:255',
                 Rule::unique('articles')->where(fn($q) => $q->where('locale', $this->input('locale')))

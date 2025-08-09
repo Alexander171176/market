@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('property_groups', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('sort')->default(0)->index(); // порядок отображения
-            $table->boolean('activity')->default(true)->index(); // активность
-            $table->string('name'); // Название группы, например: "Основные"
-            $table->timestamps();;
+            $table->unsignedInteger('sort')->default(0)->index();
+            $table->boolean('activity')->default(true)->index();
+            $table->string('locale', 2)->index();
+            $table->string('name', 255);
+            $table->timestamps();
+
+            // имя группы уникально в рамках локали
+            $table->unique(['locale', 'name']);
         });
+
     }
 
     /**

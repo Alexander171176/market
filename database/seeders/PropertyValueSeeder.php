@@ -7,7 +7,7 @@ use App\Models\Admin\PropertyValue\PropertyValue;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Schema; // <-- 1. ДОБАВИТЬ
+use Illuminate\Support\Facades\Schema;
 
 class PropertyValueSeeder extends Seeder
 {
@@ -38,7 +38,8 @@ class PropertyValueSeeder extends Seeder
                     foreach ($values as $index => $value) {
                         PropertyValue::create([
                             'property_id' => $property->id,
-                            'value' => $value,
+                            'locale' => 'ru',
+                            'name' => $value,
                             'slug' => Str::slug($value),
                             'sort' => ($index + 1) * 10, // Сортировка 10, 20, 30...
                         ]);

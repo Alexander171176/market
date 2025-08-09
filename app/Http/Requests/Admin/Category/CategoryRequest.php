@@ -32,10 +32,7 @@ class CategoryRequest extends FormRequest
             'sort'               => 'nullable|integer|min:0',
             'activity'           => 'required|boolean',
 
-            'locale'             => [
-                'required', 'string', 'size:2',
-                Rule::in(['ru', 'en', 'kk']),
-            ],
+            'locale'             => ['required', 'string', 'size:2'],
 
             'title'              => [
                 'required', 'string', 'max:255',

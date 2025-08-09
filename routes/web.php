@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\Admin\ProductVariant\ProductVariantController;
 use App\Http\Controllers\Admin\Property\PropertyController;
 use App\Http\Controllers\Admin\PropertyGroup\PropertyGroupController;
+use App\Http\Controllers\Admin\PropertyValue\PropertyValueController;
 use App\Http\Controllers\Admin\System\DatabaseBackupController;
 use App\Http\Controllers\Admin\System\FileBackupController;
 use App\Http\Controllers\Admin\System\RobotController;
@@ -415,6 +416,9 @@ Route::group([
                 Route::put('/update-count/property-groups',
                     [SettingController::class, 'updateAdminCountPropertyGroups'])
                     ->name('updateAdminCountPropertyGroups');
+                Route::put('/update-count/property-values',
+                    [SettingController::class, 'updateAdminCountPropertyValues'])
+                    ->name('updateAdminCountPropertyValues');
                 Route::put('/update-count/rubrics', [SettingController::class, 'updateAdminCountRubrics'])
                     ->name('updateAdminCountRubrics');
                 Route::put('/update-count/sections', [SettingController::class, 'updateAdminCountSections'])
@@ -448,6 +452,9 @@ Route::group([
                 Route::put('/update-sort/property-groups',
                     [SettingController::class, 'updateAdminSortPropertyGroups'])
                     ->name('updateAdminSortPropertyGroups');
+                Route::put('/update-sort/property-values',
+                    [SettingController::class, 'updateAdminSortPropertyValues'])
+                    ->name('updateAdminSortPropertyValues');
                 Route::put('/update-sort/rubrics', [SettingController::class, 'updateAdminSortRubrics'])
                     ->name('updateAdminSortRubrics');
                 Route::put('/update-sort/sections', [SettingController::class, 'updateAdminSortSections'])
@@ -484,6 +491,7 @@ Route::group([
             Route::resource('/products', ProductController::class);
             Route::resource('/property-groups', PropertyGroupController::class);
             Route::resource('/properties', PropertyController::class);
+            Route::resource('/property-values', PropertyValueController::class);
             Route::resource('/rubrics', RubricController::class);
             Route::resource('/sections', SectionController::class);
             Route::resource('/articles', ArticleController::class);
@@ -500,14 +508,6 @@ Route::group([
             Route::resource('/plugins', PluginController::class);
             Route::get('/reports/download', [ReportController::class, 'download'])
                 ->name('reports.download'); // Выносим отдельно
-
-            // Маршруты для управления значениями в контексте характеристики
-            Route::post('/properties/{property}/values', [PropertyController::class, 'storeValue'])
-                ->name('properties.values.store');
-            Route::put('/property-values/{property_value}', [PropertyController::class, 'updateValue'])
-                ->name('properties.values.update');
-            Route::delete('/property-values/{property_value}', [PropertyController::class, 'destroyValue'])
-                ->name('properties.values.destroy');
 
             // Маршрут для получения всех вариантов для конкретного товара
             Route::get('/products/{product}/variants', [ProductController::class, 'getVariants'])
@@ -579,6 +579,9 @@ Route::group([
                 Route::put('/property-groups/{propertyGroup}/activity',
                     [PropertyGroupController::class, 'updateActivity'])
                     ->name('property-groups.updateActivity');
+                Route::put('/property-values/{propertyValue}/activity',
+                    [PropertyValueController::class, 'updateActivity'])
+                    ->name('property-values.updateActivity');
                 Route::put('/rubrics/{rubric}/activity',
                     [RubricController::class, 'updateActivity'])
                     ->name('rubrics.updateActivity');
@@ -617,6 +620,9 @@ Route::group([
                 Route::put('/property-groups/bulk-activity',
                     [PropertyGroupController::class, 'bulkUpdateActivity'])
                     ->name('property-groups.bulkUpdateActivity');
+                Route::put('/property-values/bulk-activity',
+                    [PropertyValueController::class, 'bulkUpdateActivity'])
+                    ->name('property-values.bulkUpdateActivity');
                 Route::put('/rubrics/bulk-activity',
                     [RubricController::class, 'bulkUpdateActivity'])
                     ->name('rubrics.bulkUpdateActivity');
@@ -705,7 +711,9 @@ Route::group([
                 Route::put('/product-variants/update-sort-bulk', [ProductVariantController::class, 'updateSortBulk'])
                     ->name('product-variants.updateSortBulk');
                 Route::put('/property-groups/update-sort-bulk', [PropertyGroupController::class, 'updateSortBulk'])
-                    ->name('property-groups.updateSortBulk'); // проверить маршрут
+                    ->name('property-groups.updateSortBulk');
+                Route::put('/property-values/update-sort-bulk', [PropertyValueController::class, 'updateSortBulk'])
+                    ->name('property-values.updateSortBulk');
                 Route::put('/rubrics/update-sort-bulk', [RubricController::class, 'updateSortBulk'])
                     ->name('rubrics.updateSortBulk');
                 Route::put('/sections/update-sort-bulk', [SectionController::class, 'updateSortBulk'])
@@ -729,7 +737,9 @@ Route::group([
                 Route::put('/products/{product}/sort', [ProductController::class, 'updateSort'])
                     ->name('products.updateSort');
                 Route::put('/property-groups/{group}/sort', [PropertyGroupController::class, 'updateSort'])
-                    ->name('property-groups.updateSort'); // проверить маршрут
+                    ->name('property-groups.updateSort');
+                Route::put('/property-values/{value}/sort', [PropertyValueController::class, 'updateSort'])
+                    ->name('property-values.updateSort');
                 Route::put('/rubrics/{rubric}/sort', [RubricController::class, 'updateSort'])
                     ->name('rubrics.updateSort');
                 Route::put('/sections/{section}/sort', [SectionController::class, 'updateSort'])
@@ -754,8 +764,10 @@ Route::group([
                 // Массовое удаление
                 Route::delete('/products/bulk-delete', [ProductController::class, 'bulkDestroy'])
                     ->name('products.bulkDestroy');
-                Route::delete('/property-groups/bulk-delete', [ProductController::class, 'bulkDestroy'])
-                    ->name('property-groups.bulkDestroy'); // проверить маршрут
+                Route::delete('/property-groups/bulk-delete', [PropertyGroupController::class, 'bulkDestroy'])
+                    ->name('property-groups.bulkDestroy');
+                Route::delete('/property-values/bulk-delete', [PropertyValueController::class, 'bulkDestroy'])
+                    ->name('property-values.bulkDestroy');
                 Route::delete('/rubrics/bulk-delete', [RubricController::class, 'bulkDestroy'])
                     ->name('rubrics.bulkDestroy');
                 Route::delete('/sections/bulk-delete', [SectionController::class, 'bulkDestroy'])

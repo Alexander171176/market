@@ -46,18 +46,26 @@ export const sidebarIcons = {
         <path class="fill-current text-cyan-600" d="M2,20a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V11H2Z"></path>
         <path class="fill-current text-cyan-400" d="M23,7H19.58L15.868.5a1,1,0,1,0-1.736.992L17.277,7H6.723L9.868,1.5A1,1,0,1,0,8.132.5L4.42,7H1A1,1,0,0,0,1,9H23a1,1,0,0,0,0-2Z"></path>
     `,
-    properties: `
-        <rect class="fill-current text-cyan-600" x="1" y="1" width="10" height="10" rx="2"></rect>
-        <path class="fill-current text-cyan-400" d="M23.428,4.618,19.381.572h0a1.957,1.957,0,0,0-2.762,0L12.572,4.618a1.959,1.959,0,0,0,0,2.764l4.047,4.047a1.957,1.957,0,0,0,2.762,0l4.047-4.046A1.959,1.959,0,0,0,23.428,4.618Z"></path>
-        <rect class="fill-current text-cyan-600" x="13" y="13" width="10" height="10" rx="2"></rect>
-        <rect class="fill-current text-cyan-600" x="1" y="13" width="10" height="10" rx="2"></rect>
-    `,
     propertyGroups: `
         <path class="fill-current text-cyan-400" d="M3,7C1.346,7,0,5.654,0,4s1.346-3,3-3s3,1.346,3,3S4.654,7,3,7z"></path>
         <path class="fill-current text-cyan-400" d="M3,19c-1.654,0-3-1.346-3-3s1.346-3,3-3s3,1.346,3,3S4.654,19,3,19z"></path>
         <path class="fill-current text-cyan-400" d="M23,5H9C8.448,5,8,4.552,8,4s0.448-1,1-1h14c0.552,0,1,0.448,1,1S23.552,5,23,5z"></path>
         <path class="fill-current text-cyan-600" d="M23,11H9c-0.552,0-1-0.448-1-1s0.448-1,1-1h14c0.552,0,1,0.448,1,1S23.552,11,23,11z"></path>
         <path class="fill-current text-cyan-400" d="M23,17H9c-0.552,0-1-0.448-1-1s0.448-1,1-1h14c0.552,0,1,0.448,1,1S23.552,17,23,17z"></path>
+    `,
+    properties: `
+        <rect class="fill-current text-cyan-600" x="1" y="1" width="10" height="10" rx="2"></rect>
+        <path class="fill-current text-cyan-400" d="M23.428,4.618,19.381.572h0a1.957,1.957,0,0,0-2.762,0L12.572,4.618a1.959,1.959,0,0,0,0,2.764l4.047,4.047a1.957,1.957,0,0,0,2.762,0l4.047-4.046A1.959,1.959,0,0,0,23.428,4.618Z"></path>
+        <rect class="fill-current text-cyan-600" x="13" y="13" width="10" height="10" rx="2"></rect>
+        <rect class="fill-current text-cyan-600" x="1" y="13" width="10" height="10" rx="2"></rect>
+    `,
+    propertyValues: `
+        <path class="fill-current text-cyan-400" d="M9,10H2c-.552,0-1-.448-1-1V2c0-.552,.448-1,1-1h7c.552,0,1,.448,1,1v7c0,.552-.448,1-1,1Z"></path>
+        <path class="fill-current text-cyan-400" d="M9,23H2c-.552,0-1-.448-1-1v-7c0-.552,.448-1,1-1h7c.552,0,1,.448,1,1v7c0,.552-.448,1-1,1Z"></path>
+        <path class="fill-current text-cyan-600" d="M22,4H14c-.552,0-1-.447-1-1s.448-1,1-1h8c.552,0,1,.447,1,1s-.448,1-1,1Z"></path>
+        <path class="fill-current text-cyan-600" d="M22,9H14c-.552,0-1-.447-1-1s.448-1,1-1h8c.552,0,1,.447,1,1s-.448,1-1,1Z"></path>
+        <path class="fill-current text-cyan-600" d="M22,17H14c-.552,0-1-.447-1-1s.448-1,1-1h8c.552,0,1,.447,1,1s-.448,1-1,1Z"></path>
+        <path class="fill-current text-cyan-600" d="M22,22H14c-.552,0-1-.447-1-1s.448-1,1-1h8c.552,0,1,.447,1,1s-.448,1-1,1Z"></path>
     `,
     rubrics: `
         <circle class="fill-current text-cyan-600" cx="16" cy="8" r="8"></circle>

@@ -239,10 +239,10 @@ const deleteValue = (valueId) => {
                                                            :disabled="valueForm.processing">
                                                 ✓
                                             </PrimaryButton>
-                                            <DefaultButton type="button"
+                                            <PrimaryButton type="button"
                                                            @click="cancelEditValue">
                                                 ✗
-                                            </DefaultButton>
+                                            </PrimaryButton>
                                         </form>
                                     </template>
                                     <template v-else>

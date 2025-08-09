@@ -24,6 +24,7 @@ class PropertyGroupResource extends JsonResource
             'id'       => $this->id,
             'sort'     => $this->sort,
             'activity' => $this->activity,
+            'locale'   => $this->locale,
             'name'     => $this->name,
 
             // Опционально: если загружены характеристики группы

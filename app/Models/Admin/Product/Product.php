@@ -153,8 +153,7 @@ class Product extends Model
     public function propertyValues(): BelongsToMany
     {
         return $this->belongsToMany(PropertyValue::class, 'product_property_value')
-            ->withPivot('property_id')
-            ->withTimestamps();
+            ->withPivot('property_id');
     }
 
     /**

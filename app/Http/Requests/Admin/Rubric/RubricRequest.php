@@ -34,12 +34,7 @@ class RubricRequest extends FormRequest
             'sort' => 'nullable|integer|min:0', // Добавлено min:0
             'activity' => 'required|boolean',
             'icon' => 'nullable|string|max:65535', // Увеличено max для TEXT
-            'locale' => [
-                'required',
-                'string',
-                'size:2',
-                Rule::in(['ru', 'en', 'kk']), // TODO: Актуализировать список локалей
-            ],
+            'locale' => ['required','string','size:2'],
             'title' => [
                 'required',
                 'string',

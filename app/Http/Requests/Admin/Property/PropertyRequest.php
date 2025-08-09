@@ -21,14 +21,18 @@ class PropertyRequest extends FormRequest
             'property_group_id' => ['nullable', 'integer', 'exists:property_groups,id'],
             'sort'              => ['nullable', 'integer', 'min:0'],
             'activity'          => ['required', 'boolean'],
+            'locale'            => ['required', 'string', 'size:2'],
             'type'              => ['required', 'string', 'max:50'],
-            'name'              => ['required', 'string', 'max:50'],
-            'slug'              => [
-                'required',
-                'string',
-                'max:255',
+            'name'        => [
+                'required', 'string', 'max:255',
+                Rule::unique('properties')->where(fn ($q) => $q
+                    ->where('locale', $this->input('locale')))->ignore($propertyId),
+            ],
+            'slug'          => [
+                'required', 'string', 'max:255',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::unique('properties')->ignore($propertyId),
+                Rule::unique('properties')->where(fn ($q) => $q
+                    ->where('locale', $this->input('locale')))->ignore($propertyId),
             ],
             'description'       => ['nullable', 'string', 'max:255'],
             'all_categories'    => ['required', 'boolean'],

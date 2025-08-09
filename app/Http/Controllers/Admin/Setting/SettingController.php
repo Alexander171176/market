@@ -324,6 +324,25 @@ class SettingController extends Controller
     }
 
     /**
+     * Обновление количества элементов в значениях характеристик
+     *
+     * @param UpdateCountSettingRequest $request
+     * @return RedirectResponse
+     */
+    public function updateAdminCountPropertyValues(UpdateCountSettingRequest $request): RedirectResponse
+    {
+        return $this->updateSettingAndRedirect(
+            $request,
+            'AdminCountPropertyValues',
+            'site_settings.AdminCountPropertyValues',
+            'number',
+            'admin',
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
+        );
+    }
+
+    /**
      * Обновление количества элементов в рубриках
      *
      * @param UpdateCountSettingRequest $request
@@ -624,6 +643,25 @@ class SettingController extends Controller
             $request,
             'AdminSortPropertyGroups',
             'site_settings.AdminSortPropertyGroups',
+            'string',
+            'admin',
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
+        );
+    }
+
+    /**
+     * Обновляет сортировку элементов в значениях характеристик
+     *
+     * @param UpdateSortRequest $request
+     * @return RedirectResponse
+     */
+    public function updateAdminSortPropertyValues(UpdateSortRequest $request): RedirectResponse
+    {
+        return $this->updateSettingAndRedirect(
+            $request,
+            'AdminSortPropertyValues',
+            'site_settings.AdminSortPropertyValues',
             'string',
             'admin',
             __('admin/controllers.sort_pages_updated_success'),

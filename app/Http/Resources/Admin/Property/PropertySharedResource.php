@@ -17,9 +17,11 @@ class PropertySharedResource extends JsonResource
     {
         return [
             'id'     => $this->id,
+            'locale' => $this->locale,
             'name'   => $this->name,
             'slug'   => $this->slug,
             'type'   => $this->type,
+            'sort'   => $this->sort,
             'activity' => $this->activity,
             'is_filterable' => $this->is_filterable,
         ];

@@ -75,9 +75,9 @@ class PropertyGroupController extends Controller
     public function create(): Response
     {
         // TODO: Проверка прав $this->authorize('create-property-groups', PropertyGroup::class);
-        $properties = Property::select('id', 'name')->orderBy('name')->get(); // характеристики
+        $properties = Property::select('id', 'name', 'locale')->orderBy('name')->get(); // характеристики
 
-        return Inertia::render('Admin/Products/Create', [
+        return Inertia::render('Admin/PropertyGroups/Create', [
             'properties' => PropertyResource::collection($properties),
         ]);
     }
@@ -92,17 +92,39 @@ class PropertyGroupController extends Controller
      */
     public function store(PropertyGroupRequest $request): RedirectResponse
     {
-        // TODO: $this->authorize('create', PropertyGroup::class);
         $data = $request->validated();
 
+        // ожидаем, что из формы приходит либо массив объектов {id,...},
+        // либо сразу массив id — поддержим оба варианта
+        $propertyIds = collect($data['properties'] ?? [])
+            ->map(fn($v) => is_array($v) ? ($v['id'] ?? null) : $v)
+            ->filter()
+            ->values()
+            ->all();
+
+        unset($data['properties']);
+
         try {
-            PropertyGroup::create($data);
-            Log::info('Группа характеристик создана', $data);
+            DB::beginTransaction();
+
+            $group = PropertyGroup::create($data);
+
+            if (!empty($propertyIds)) {
+                // привязываем выбранные характеристики к созданной группе
+                Property::whereIn('id', $propertyIds)
+                    ->update(['property_group_id' => $group->id]);
+            }
+
+            DB::commit();
+
+            Log::info('Группа характеристик создана', $group->toArray());
             return redirect()->route('admin.property-groups.index')
                 ->with('success', __('admin/controllers.created_success'));
+
         } catch (Throwable $e) {
-            Log::error('Ошибка создания группы характеристик', ['error' => $e->getMessage()]);
-            return back()->with('error', __('admin/controllers.created_error'));
+            DB::rollBack();
+            Log::error("Ошибка при создании группы характеристик: ".$e->getMessage(), ['trace'=>$e->getTraceAsString()]);
+            return back()->withInput()->with('error', __('admin/controllers.created_error'));
         }
     }
 
@@ -122,12 +144,9 @@ class PropertyGroupController extends Controller
             'properties',
         ]);
 
-        $properties = Property::with(['values' => fn($q) => $q->orderBy('sort')])
-            ->where('activity', true)
-            ->orderBy('sort')
-            ->get();
+        $properties = Property::select('id', 'name', 'locale')->orderBy('name')->get();
 
-        return Inertia::render('Admin/Products/Edit', [
+        return Inertia::render('Admin/PropertyGroups/Edit', [
             'propertyGroup' => new PropertyGroupResource($propertyGroup),
             'properties' => PropertyResource::collection($properties),
         ]);
@@ -144,16 +163,43 @@ class PropertyGroupController extends Controller
      */
     public function update(PropertyGroupRequest $request, PropertyGroup $propertyGroup): RedirectResponse
     {
-        // TODO: $this->authorize('update', $propertyGroup);
         $data = $request->validated();
 
+        $propertyIds = collect($data['properties'] ?? [])
+            ->map(fn($v) => is_array($v) ? ($v['id'] ?? null) : $v)
+            ->filter()
+            ->values()
+            ->all();
+
+        unset($data['properties']);
+
         try {
+            DB::beginTransaction();
+
             $propertyGroup->update($data);
-            Log::info("Группа характеристик ID {$propertyGroup->id} обновлена", $data);
+
+            if (is_array($propertyIds)) {
+                // 1) отвяжем все свойства, которые были в группе, но не выбраны сейчас
+                Property::where('property_group_id', $propertyGroup->id)
+                    ->whereNotIn('id', $propertyIds ?: [-1])
+                    ->update(['property_group_id' => null]);
+
+                // 2) привяжем выбранные
+                if (!empty($propertyIds)) {
+                    Property::whereIn('id', $propertyIds)
+                        ->update(['property_group_id' => $propertyGroup->id]);
+                }
+            }
+
+            DB::commit();
+
+            Log::info("Группа характеристик ID {$propertyGroup->id} обновлена");
             return redirect()->route('admin.property-groups.index')
                 ->with('success', __('admin/controllers.updated_success'));
+
         } catch (Throwable $e) {
-            Log::error("Ошибка обновления группы характеристик ID {$propertyGroup->id}", ['error' => $e->getMessage()]);
+            DB::rollBack();
+            Log::error("Ошибка обновления группы характеристик ID {$propertyGroup->id}", ['error'=>$e->getMessage()]);
             return back()->with('error', __('admin/controllers.updated_error'));
         }
     }
@@ -234,7 +280,7 @@ class PropertyGroupController extends Controller
             $propertyGroup->activity = $validated['activity'];
             $propertyGroup->save();
 
-            Log::info("Обновлено activity товара ID {$propertyGroup->id} на {$propertyGroup->activity}");
+            Log::info("Обновлено activity группы характеристик ID {$propertyGroup->id} на {$propertyGroup->activity}");
             return back()
                 ->with('success', __('admin/controllers.activity_updated_success'));
 
@@ -300,12 +346,12 @@ class PropertyGroupController extends Controller
         try {
             $propertyGroup->sort = $validated['sort'];
             $propertyGroup->save();
-            Log::info("Обновлено sort товара ID {$propertyGroup->id} на {$propertyGroup->sort}");
+            Log::info("Обновлено sort группы характеристик ID {$propertyGroup->id} на {$propertyGroup->sort}");
             return back()
                 ->with('success', __('admin/controllers.sort_updated_success'));
 
         } catch (Throwable $e) {
-            Log::error("Ошибка обновления сортировки товара ID {$propertyGroup->id}: "
+            Log::error("Ошибка обновления сортировки группы характеристик ID {$propertyGroup->id}: "
                 . $e->getMessage());
             return back()
                 ->with('error', __('admin/controllers.sort_updated_error'));

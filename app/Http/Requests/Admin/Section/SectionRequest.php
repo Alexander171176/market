@@ -39,12 +39,7 @@ class SectionRequest extends FormRequest
             'activity' => 'required|boolean',
             'icon' => 'nullable|string|max:65535', // Изменено на max:65535, если может быть SVG кодом (text в миграции)
             // 'icon_file' => ['nullable', 'image', 'mimes:svg,png,jpg', 'max:512'], // <--- ЕСЛИ иконка - загружаемый ФАЙЛ, добавить правила для него
-            'locale' => [
-                'required',
-                'string',
-                'size:2',
-                Rule::in(['ru', 'en', 'kk']), // TODO: Актуализировать список локалей
-            ],
+            'locale' => ['required','string','size:2',],
             'title' => [
                 'required',
                 'string',

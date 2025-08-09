@@ -28,7 +28,7 @@ return [
     'locale.required' => 'Language is required.',
     'locale.string' => 'Language must be a string.',
     'locale.size' => 'Language code must consist of 2 characters (for example, "ru", "en", "kz").',
-    'locale.in' => 'Accepted languages: ru, en, kk.',
+    'locale.in' => 'Invalid language',
 
     // Title
     'title.required' => 'Title is required.',
@@ -161,6 +161,10 @@ return [
     'options.array' => 'Options must be an array.',
 
     // Properties
+    'properties.array' => 'The Properties field must be an array.',
+    'properties.*.id.required_with' => 'Property ID is required.',
+    'properties.*.id.integer' => 'Property ID must be a number.',
+    'properties.*.id.exists' => 'The specified property was not found.',
     'property_group_id.integer' => 'Group ID must be an integer.',
     'property_group_id.exists' => 'The selected group was not found.',
     'property_values.array' => 'The Properties field must be an array.',

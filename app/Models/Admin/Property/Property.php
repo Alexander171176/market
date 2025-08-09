@@ -22,6 +22,7 @@ class Property extends Model
         'sort',
         'activity',
         'type',
+        'locale',
         'name',
         'slug',
         'description',

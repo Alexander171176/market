@@ -492,7 +492,7 @@ const submitForm = () => {
                         <InputError class="mt-2" :message="form.errors.description" />
                     </div>
 
-                    <!-- Мультиселект для связанных статей -->
+                    <!-- Мультиселект для связанных товаров -->
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="related_products" :value="t('relatedProducts')"
                                     class="mb-1" />

@@ -24,21 +24,25 @@ class PropertyGroupSeeder extends Seeder
             // 3. Наполняем данными
             $groups = [
                 [
+                    'locale' => 'ru',
                     'name' => 'Основные характеристики',
                     'sort' => 10,
                     'activity' => true,
                 ],
                 [
+                    'locale' => 'ru',
                     'name' => 'Дизайн и материалы',
                     'sort' => 20,
                     'activity' => true,
                 ],
                 [
+                    'locale' => 'ru',
                     'name' => 'Габариты и вес',
                     'sort' => 30,
                     'activity' => true,
                 ],
                 [
+                    'locale' => 'ru',
                     'name' => 'Питание',
                     'sort' => 40,
                     'activity' => false, // Пример неактивной группы

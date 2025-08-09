@@ -24,6 +24,7 @@ class PropertyResource extends JsonResource
             'sort'            => $this->sort,
             'activity'        => $this->activity,
             'type'            => $this->type,
+            'locale'          => $this->locale,
             'name'            => $this->name,
             'slug'            => $this->slug,
             'description'     => $this->description,

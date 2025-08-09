@@ -153,6 +153,19 @@ const {t} = useI18n();
             {{ t('products') }}
         </template>
     </SidebarLink>
+    <SidebarLink :href="route('admin.property-groups.index')"
+                 :active="route().current('property-groups.index')"
+                 :expanded="props.expanded">
+        <template #default>
+            <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                <circle class="fill-current text-blue-600" cx="16" cy="8" r="8"></circle>
+                <circle class="fill-current text-blue-400" cx="8" cy="16" r="8"></circle>
+            </svg>
+        </template>
+        <template #text>
+            {{ t('propertyGroups') }}
+        </template>
+    </SidebarLink>
     <SidebarLink :href="route('admin.properties.index')"
                  :active="route().current('properties.index')"
                  :expanded="props.expanded">
@@ -166,8 +179,8 @@ const {t} = useI18n();
             {{ t('properties') }}
         </template>
     </SidebarLink>
-    <SidebarLink :href="route('admin.property-groups.index')"
-                 :active="route().current('property-groups.index')"
+    <SidebarLink :href="route('admin.property-values.index')"
+                 :active="route().current('property-values.index')"
                  :expanded="props.expanded">
         <template #default>
             <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
@@ -176,7 +189,7 @@ const {t} = useI18n();
             </svg>
         </template>
         <template #text>
-            {{ t('propertyGroups') }}
+            {{ t('propertyValues') }}
         </template>
     </SidebarLink>
     <SidebarLink :href="route('admin.rubrics.index')"

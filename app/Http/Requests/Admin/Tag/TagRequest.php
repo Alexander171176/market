@@ -34,12 +34,7 @@ class TagRequest extends FormRequest
             'sort' => 'nullable|integer|min:0', // <--- Добавлено
             'activity' => 'required|boolean',    // <--- Добавлено
             'icon' => 'nullable|string|max:65535', // Увеличено max для TEXT
-            'locale' => [
-                'required',
-                'string',
-                'size:2',
-                Rule::in(['ru', 'en', 'kk']), // TODO: Актуализировать список локалей
-            ],
+            'locale' => ['required','string','size:2',],
             'name' => [
                 'required',
                 'string',

@@ -16,6 +16,7 @@ class PropertyGroup extends Model
     protected $fillable = [
         'sort',
         'activity',
+        'locale',
         'name',
     ];
 

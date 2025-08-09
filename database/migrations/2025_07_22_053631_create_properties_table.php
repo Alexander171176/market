@@ -11,57 +11,28 @@ return new class extends Migration
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('property_group_id')
-                ->nullable()
-                ->comment('Группа характеристики');
+            $table->unsignedBigInteger('property_group_id')->nullable()->index();
+            $table->unsignedInteger('sort')->default(0)->index();
+            $table->boolean('activity')->default(true)->index();
 
-            $table->unsignedInteger('sort')
-                ->default(0)
-                ->index()
-                ->comment('Сортировка');
+            $table->string('locale', 2)->index();
+            $table->string('type', 50)->default('text');
 
-            $table->boolean('activity')
-                ->default(true)
-                ->index()
-                ->comment('Активность характеристики');
+            $table->string('name', 255);
+            $table->string('slug', 255)->index(); // если нужен строгий запрет дублей — сделай NOT NULL
 
-            $table->string('type', 50)
-                ->default('text')
-                ->comment('Тип значения: text, number, boolean, select и т.п.');
-
-            $table->string('name', 50)
-                ->comment('Название характеристики, например: Цвет, Материал');
-
-            $table->string('slug', 255)
-                ->unique()
-                ->comment('Уникальный системный идентификатор (slug)');
-
-            $table->string('description', 255)
-                ->nullable()
-                ->comment('Описание или подсказка');
-
-            $table->boolean('all_categories')
-                ->default(true)
-                ->index()
-                ->comment('Привязывать ко всем категориям по умолчанию');
-
-            $table->boolean('is_filterable')
-                ->default(true)
-                ->index()
-                ->comment('Можно ли использовать характеристику в фильтрах');
-
-            $table->string('filter_type', 50)
-                ->default('checkbox')
-                ->index()
-                ->comment('Тип фильтра: checkbox, select, range и т.п.');
+            $table->string('description', 255)->nullable();
+            $table->boolean('all_categories')->default(true)->index();
+            $table->boolean('is_filterable')->default(true)->index();
+            $table->string('filter_type', 50)->default('checkbox')->index();
 
             $table->timestamps();
 
-            // Внешний ключ
-            $table->foreign('property_group_id')
-                ->references('id')
-                ->on('property_groups')
-                ->nullOnDelete();
+            $table->foreign('property_group_id')->references('id')->on('property_groups')->nullOnDelete();
+
+            // имя и slug уникальны в рамках локали
+            $table->unique(['locale', 'name']);
+            $table->unique(['locale', 'slug']);
         });
     }
 
