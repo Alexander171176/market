@@ -185,6 +185,14 @@ return [
     'property_id.integer' => 'The property field must be a number.',
     'property_id.exists' => 'The specified property was not found.',
     'value.unique' => 'This value already exists within this property.',
+    'values.array' => 'The list of values must be an array.',
+    'values.*.integer' => 'The value ID must be a number.',
+    'values.*.exists' => 'The specified feature value was not found.',
+    'values.*.id.required_with' => 'A value ID is required for each item in the list.',
+    'values.*.id.integer' => 'The value ID must be a number.',
+    'values.*.id.exists' => 'The specified feature value was not found.',
+    'values.*.sort.integer' => 'The value order must be an integer.',
+    'values.*.sort.min' => 'The value order cannot be negative.',
 
     // Permissions and Roles
     'permissions.array' => 'Permissions must be an array.',

@@ -5,6 +5,7 @@ import draggable from 'vuedraggable'
 import ActivityToggle from '@/Components/Admin/Buttons/ActivityToggle.vue'
 import DeleteIconButton from '@/Components/Admin/Buttons/DeleteIconButton.vue'
 import EditIconButton from '@/Components/Admin/Buttons/EditIconButton.vue'
+import IconEdit from '@/Components/Admin/Buttons/IconEdit.vue'
 
 const { t } = useI18n()
 
@@ -130,8 +131,9 @@ const toggleAll = (event) => {
                                         @toggle-activity="$emit('toggle-activity', value)"
                                         :title="value.activity ? t('enabled') : t('disabled')"
                                     />
-                                    <EditIconButton
-                                        :href="route('admin.property-values.edit', value.id)" />
+                                    <IconEdit
+                                        :href="route('admin.property-values.edit',
+                                        { property_value: value.id })" />
                                     <DeleteIconButton @delete="$emit('delete', value.id)" />
                                 </div>
                             </td>

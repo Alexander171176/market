@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('property_id')->constrained()->cascadeOnDelete();
             $table->foreignId('property_value_id')->constrained()->cascadeOnDelete();
+            $table->timestamps(); // created_at, updated_at
 
             $table->unique(['product_id', 'property_id', 'property_value_id'], 'ppv_unique'); // исключаем дубли
         });

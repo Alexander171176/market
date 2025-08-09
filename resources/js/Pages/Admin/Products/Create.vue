@@ -3,28 +3,28 @@
  * @version PulsarCMS 1.0
  * @author Александр Косолапов <kosolapov1976@gmail.com>
  */
-import { useToast } from 'vue-toastification'
-import { useI18n } from 'vue-i18n'
-import { transliterate } from '@/utils/transliteration'
-import { defineProps, onMounted } from 'vue'
-import { useForm } from '@inertiajs/vue3'
-import AdminLayout from '@/Layouts/AdminLayout.vue'
-import TitlePage from '@/Components/Admin/Headlines/TitlePage.vue'
-import DefaultButton from '@/Components/Admin/Buttons/DefaultButton.vue'
-import PrimaryButton from '@/Components/Admin/Buttons/PrimaryButton.vue'
-import MetatagsButton from '@/Components/Admin/Buttons/MetatagsButton.vue'
-import LabelCheckbox from '@/Components/Admin/Checkbox/LabelCheckbox.vue'
-import ActivityCheckbox from '@/Components/Admin/Checkbox/ActivityCheckbox.vue'
-import CKEditor from '@/Components/Admin/CKEditor/CKEditor.vue'
-import TinyEditor from '@/Components/Admin/TinyEditor/TinyEditor.vue'
-import MetaDescTextarea from '@/Components/Admin/Textarea/MetaDescTextarea.vue'
-import InputNumber from '@/Components/Admin/Input/InputNumber.vue'
-import LabelInput from '@/Components/Admin/Input/LabelInput.vue'
-import InputText from '@/Components/Admin/Input/InputText.vue'
-import InputError from '@/Components/Admin/Input/InputError.vue'
-import SelectLocale from '@/Components/Admin/Select/SelectLocale.vue'
-import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue'
-import VueMultiselect from 'vue-multiselect'
+import { useToast } from 'vue-toastification';
+import { useI18n } from 'vue-i18n';
+import { transliterate } from '@/utils/transliteration';
+import { defineProps, onMounted } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+import TitlePage from '@/Components/Admin/Headlines/TitlePage.vue';
+import DefaultButton from '@/Components/Admin/Buttons/DefaultButton.vue';
+import PrimaryButton from '@/Components/Admin/Buttons/PrimaryButton.vue';
+import MetatagsButton from '@/Components/Admin/Buttons/MetatagsButton.vue';
+import LabelCheckbox from '@/Components/Admin/Checkbox/LabelCheckbox.vue';
+import ActivityCheckbox from '@/Components/Admin/Checkbox/ActivityCheckbox.vue';
+import CKEditor from '@/Components/Admin/CKEditor/CKEditor.vue';
+import TinyEditor from '@/Components/Admin/TinyEditor/TinyEditor.vue';
+import MetaDescTextarea from '@/Components/Admin/Textarea/MetaDescTextarea.vue';
+import InputNumber from '@/Components/Admin/Input/InputNumber.vue';
+import LabelInput from '@/Components/Admin/Input/LabelInput.vue';
+import InputText from '@/Components/Admin/Input/InputText.vue';
+import InputError from '@/Components/Admin/Input/InputError.vue';
+import SelectLocale from '@/Components/Admin/Select/SelectLocale.vue';
+import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue';
+import VueMultiselect from 'vue-multiselect';
 
 // --- Инициализация ---
 const toast = useToast()

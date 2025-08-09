@@ -6,27 +6,15 @@ use App\Models\Admin\Product\Product;
 use App\Models\Admin\Property\Property;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PropertyValue extends Model
 {
     use HasFactory;
 
-    /**
-     * Название таблицы.
-     *
-     * @var string
-     */
     protected $table = 'property_values';
 
-    /**
-     * Поля, разрешённые для массового заполнения.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'property_id',
         'sort',
         'activity',
         'name',
@@ -34,31 +22,35 @@ class PropertyValue extends Model
         'locale',
     ];
 
-    /**
-     * Приведение типов.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'sort' => 'integer',
-        'activity'     => 'boolean',
+        'sort'     => 'integer',
+        'activity' => 'boolean',
     ];
 
     /**
-     * Связь: Значение характеристики принадлежит характеристике.
+     * Характеристики, к которым привязано это значение (many-to-many).
      */
-    public function property(): BelongsTo
+    public function properties(): BelongsToMany
     {
-        return $this->belongsTo(Property::class, 'property_id');
+        return $this->belongsToMany(
+            Property::class,
+            'property_has_property_value',
+            'property_value_id',
+            'property_id'
+        )->withPivot('sort');
     }
 
     /**
-     * Связь: Значение характеристики принадлежит многим товарам.
+     * Товары, у которых установлено это значение.
+     * (оставляем, как было; timestamps на пивоте не используем)
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_property_value')
-            ->withPivot('property_id')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            Product::class,
+            'product_property_value',
+            'property_value_id',
+            'product_id'
+        )->withPivot('property_id'); // без ->withTimestamps()
     }
 }

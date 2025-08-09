@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->foreignId('property_id')->constrained()->cascadeOnDelete();
             $table->unique(['category_id', 'property_id']); // одна характеристика на категорию
+            $table->timestamps(); // created_at, updated_at
         });
     }
 

@@ -23,21 +23,27 @@ class PropertyRequest extends FormRequest
             'activity'          => ['required', 'boolean'],
             'locale'            => ['required', 'string', 'size:2'],
             'type'              => ['required', 'string', 'max:50'],
-            'name'        => [
-                'required', 'string', 'max:255',
+
+            'name' => [
+                'required','string','max:255',
                 Rule::unique('properties')->where(fn ($q) => $q
                     ->where('locale', $this->input('locale')))->ignore($propertyId),
             ],
-            'slug'          => [
-                'required', 'string', 'max:255',
+            'slug' => [
+                'required','string','max:255',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
                 Rule::unique('properties')->where(fn ($q) => $q
                     ->where('locale', $this->input('locale')))->ignore($propertyId),
             ],
-            'description'       => ['nullable', 'string', 'max:255'],
-            'all_categories'    => ['required', 'boolean'],
-            'is_filterable'     => ['required', 'boolean'],
-            'filter_type'       => ['required', 'string', 'max:50'],
+
+            'description'     => ['nullable', 'string', 'max:255'],
+            'all_categories'  => ['required', 'boolean'],
+            'is_filterable'   => ['required', 'boolean'],
+            'filter_type'     => ['required', 'string', 'max:50'],
+
+            // ⬇️ Привязка значений (опционально)
+            'values'   => ['nullable','array'],
+            'values.*' => ['integer','exists:property_values,id'],
         ];
     }
 

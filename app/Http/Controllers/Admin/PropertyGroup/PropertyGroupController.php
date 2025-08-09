@@ -38,10 +38,9 @@ class PropertyGroupController extends Controller
      * Передает данные для отображения и настройки пагинации/сортировки.
      * Пагинация и сортировка выполняются на фронтенде.
      *
-     * @param Request $request
      * @return Response
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
         // TODO: Проверка прав $this->authorize('show-property-groups', PropertyGroup::class);
 
@@ -68,7 +67,7 @@ class PropertyGroupController extends Controller
 
     /**
      * Отображение формы создания новой группы.
-     * Передает список хапвктеристик для выбора.
+     * Передает список характеристик для выбора.
      *
      * @return Response
      */

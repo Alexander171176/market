@@ -15,32 +15,29 @@ class PropertyValueRequest extends FormRequest
 
     public function rules(): array
     {
+        // имя параметра зависит от твоего Route Model Binding.
+        // В контроллере у тебя метод: edit(PropertyValue $property_value)
+        // => параметр называется 'property_value'
         $propertyValueId = $this->route('property_value')?->id;
-        $propertyId = $this->input('property_id');
 
         return [
-            'property_id' => [
-                'required',
-                'integer',
-                'exists:properties,id',
-            ],
-            'sort' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
-            'activity'     => ['required', 'boolean'],
-            'locale'       => ['required', 'string', 'size:2'],
-            'name'        => [
+            'sort'     => ['nullable', 'integer', 'min:0'],
+            'activity' => ['required', 'boolean'],
+            'locale'   => ['required', 'string', 'size:2'],
+
+            'name' => [
                 'required', 'string', 'max:255',
-                Rule::unique('property_values')->where(fn ($q) => $q
-                    ->where('locale', $this->input('locale')))->ignore($propertyValueId),
+                Rule::unique('property_values')
+                    ->where(fn ($q) => $q->where('locale', $this->input('locale')))
+                    ->ignore($propertyValueId),
             ],
-            'slug'          => [
+
+            'slug' => [
                 'required', 'string', 'max:255',
                 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/',
-                Rule::unique('property_values')->where(fn ($q) => $q
-                    ->where('locale', $this->input('locale')))->ignore($propertyValueId),
+                Rule::unique('property_values')
+                    ->where(fn ($q) => $q->where('locale', $this->input('locale')))
+                    ->ignore($propertyValueId),
             ],
         ];
     }

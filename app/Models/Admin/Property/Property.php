@@ -8,7 +8,6 @@ use App\Models\Admin\PropertyValue\PropertyValue;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Property extends Model
@@ -32,14 +31,14 @@ class Property extends Model
     ];
 
     protected $casts = [
-        'sort' => 'integer',
-        'activity' => 'boolean',
-        'all_categories' => 'boolean',
+        'sort'          => 'integer',
+        'activity'      => 'boolean',
+        'all_categories'=> 'boolean',
         'is_filterable' => 'boolean',
     ];
 
     /**
-     * Связь: Характеристика принадлежит группе характеристик.
+     * Характеристика принадлежит группе.
      */
     public function group(): BelongsTo
     {
@@ -47,15 +46,24 @@ class Property extends Model
     }
 
     /**
-     * Связь: Характеристика имеет множество значений.
+     * Значения характеристики (many-to-many через пивот).
      */
-    public function values(): HasMany
+    public function values(): BelongsToMany
     {
-        return $this->hasMany(PropertyValue::class, 'property_id');
+        return $this->belongsToMany(
+            PropertyValue::class,
+            'property_has_property_value',   // имя пивот-таблицы с has
+            'property_id',
+            'property_value_id'
+        )
+            ->withPivot('sort')
+            // безопасная сортировка по колонке пивота:
+            ->orderBy('property_has_property_value.sort');
+        // (если используешь Laravel 10.43+, можно ->orderByPivot('sort'))
     }
 
     /**
-     * Связь: Характеристика принадлежит множеству категорий.
+     * Характеристика принадлежит множеству категорий.
      */
     public function categories(): BelongsToMany
     {

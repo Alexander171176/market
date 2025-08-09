@@ -4,37 +4,35 @@ namespace Database\Seeders;
 
 use App\Models\Admin\Property\Property;
 use App\Models\Admin\PropertyGroup\PropertyGroup;
+use App\Models\Admin\PropertyValue\PropertyValue;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Schema; // <-- 1. ДОБАВИТЬ ЭТОТ use
 
 class PropertySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 2. ОТКЛЮЧИТЬ ПРОВЕРКУ КЛЮЧЕЙ
         Schema::disableForeignKeyConstraints();
 
         try {
-            // Теперь эта команда выполнится без ошибок
+            // чистим характеристики и пивот (значения не трогаем — их сидит PropertyValueSeeder)
             DB::table('properties')->truncate();
+            DB::table('property_has_property_value')->truncate();
 
-            // Находим группы по имени, чтобы не зависеть от ID
-            $groupMain = PropertyGroup::where('name', 'Основные характеристики')->first();
-            $groupDesign = PropertyGroup::where('name', 'Дизайн и материалы')->first();
+            $groupMain       = PropertyGroup::where('name', 'Основные характеристики')->first();
+            $groupDesign     = PropertyGroup::where('name', 'Дизайн и материалы')->first();
             $groupDimensions = PropertyGroup::where('name', 'Габариты и вес')->first();
 
-            $properties = [
+            // 1) создаём характеристики
+            $propertiesData = [
                 [
                     'property_group_id' => $groupDesign?->id,
                     'locale' => 'ru',
                     'name' => 'Цвет',
                     'slug' => 'tsvet',
-                    'type' => 'select', // Одна характеристика - одно значение (один цвет)
+                    'type' => 'select',
                     'is_filterable' => true,
                     'filter_type' => 'checkbox',
                     'sort' => 10,
@@ -45,7 +43,7 @@ class PropertySeeder extends Seeder
                     'locale' => 'ru',
                     'name' => 'Материал корпуса',
                     'slug' => 'material-korpusa',
-                    'type' => 'checkbox', // У товара может быть несколько материалов
+                    'type' => 'checkbox',
                     'is_filterable' => true,
                     'filter_type' => 'checkbox',
                     'sort' => 20,
@@ -67,14 +65,14 @@ class PropertySeeder extends Seeder
                     'locale' => 'ru',
                     'name' => 'Вес',
                     'slug' => 'ves',
-                    'type' => 'number', // Для числовых значений без списка вариантов
+                    'type' => 'number',
                     'is_filterable' => true,
-                    'filter_type' => 'range', // Фильтр по диапазону
+                    'filter_type' => 'range',
                     'sort' => 40,
                     'activity' => true,
                 ],
                 [
-                    'property_group_id' => null, // Пример характеристики без группы
+                    'property_group_id' => null,
                     'locale' => 'ru',
                     'name' => 'Гарантия',
                     'slug' => 'garantiya',
@@ -86,15 +84,47 @@ class PropertySeeder extends Seeder
                 ],
             ];
 
-            foreach ($properties as $property) {
-                // Устанавливаем значения по умолчанию, если они не заданы
-                $property['all_categories'] = $property['all_categories'] ?? true;
-                $property['description'] = $property['description'] ?? 'Описание для '
-                . strtolower($property['name']);
-                Property::create($property);
+            $properties = [];
+            foreach ($propertiesData as $p) {
+                $p['all_categories'] = $p['all_categories'] ?? true;
+                $p['description']    = $p['description'] ?? ('Описание для '.mb_strtolower($p['name']));
+                $properties[$p['slug']] = Property::create($p);
+            }
+
+            // 2) привязываем значения к нужным характеристикам через пивот
+            // карта: slug характеристики => список названий значений
+            $map = [
+                'tsvet' => ['Красный', 'Синий', 'Зеленый', 'Черный', 'Белый', 'Серебристый'],
+                'material-korpusa' => ['Пластик', 'Металл', 'Стекло', 'Керамика'],
+                'operativnaya-pamyat' => ['4 ГБ', '8 ГБ', '16 ГБ', '32 ГБ', '64 ГБ'],
+                // 'ves' — числовая, без списка вариантов
+                // 'garantiya' — текстовая, без списка вариантов
+            ];
+
+            foreach ($map as $propSlug => $names) {
+                /** @var Property|null $prop */
+                $prop = $properties[$propSlug] ?? null;
+                if (!$prop) continue;
+
+                $attach = [];
+                foreach ($names as $i => $name) {
+                    // находим значение (оно уже сидировано PropertyValueSeeder'ом)
+                    $value = PropertyValue::firstOrCreate(
+                        ['locale' => 'ru', 'name' => $name],
+                        [
+                            'slug'     => Str::slug($name),
+                            'activity' => true,
+                            'sort'     => ($i + 1) * 10,
+                        ]
+                    );
+
+                    $attach[$value->id] = ['sort' => ($i + 1) * 10];
+                }
+
+                // привязываем без потери уже добавленных (на всякий случай)
+                $prop->values()->syncWithoutDetaching($attach);
             }
         } finally {
-            // 3. ВСЕГДА ВКЛЮЧАТЬ ПРОВЕРКУ ОБРАТНО
             Schema::enableForeignKeyConstraints();
         }
     }

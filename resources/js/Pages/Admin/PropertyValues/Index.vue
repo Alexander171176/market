@@ -109,12 +109,12 @@ const deleteValue = () => {
         preserveState: false,
         onSuccess: (page) => {
             closeModal();
-            toast.success(`Группа "${titleToDelete || 'ID: ' + idToDelete}" удалена.`);
+            toast.success(`Значение "${titleToDelete || 'ID: ' + idToDelete}" удалено.`);
         },
         onError: (errors) => {
             closeModal();
             const errorMsg = errors.general || errors[Object.keys(errors)[0]] || 'Произошла ошибка при удалении.';
-            toast.error(`${errorMsg} (Группа: ${titleToDelete || 'ID: ' + idToDelete})`);
+            toast.error(`${errorMsg} (Значение: ${titleToDelete || 'ID: ' + idToDelete})`);
             console.error('Ошибка удаления:', errors);
         },
         onFinish: () => {
@@ -140,7 +140,7 @@ const toggleActivity = (value) => {
             onSuccess: () => {
                 // Это нужно, чтобы переключатель сразу обновился в таблице
                 value.activity = newActivity;
-                toast.success(`Группа "${value.name}" ${actionText}.`);
+                toast.success(`Значение "${value.name}" ${actionText}.`);
             },
             onError: (errors) => {
                 toast.error(errors.activity || errors.general || `Ошибка изменения активности для "${value.name}".`);
@@ -244,13 +244,13 @@ const handleSortOrderUpdate = (orderedIds) => {
             preserveScroll: true,
             preserveState: true, // Сохраняем состояние, т.к. на сервере нет редиректа
             onSuccess: () => {
-                toast.success("Порядок групп успешно обновлен.");
+                toast.success("Порядок Значений успешно обновлен.");
                 // Обновляем локальные данные (если нужно, но Inertia должна прислать обновленные props)
                 // Возможно, лучше сделать preserveState: false и дождаться обновления props
             },
             onError: (errors) => {
                 console.error("Ошибка обновления сортировки:", errors);
-                toast.error(errors.general || errors.values || "Не удалось обновить порядок товаров.");
+                toast.error(errors.general || errors.values || "Не удалось обновить порядок значений.");
                 // TODO: Откатить порядок на фронтенде? Сложно без сохранения исходного состояния.
                 // Проще сделать preserveState: false или router.reload при ошибке.
                 router.reload({only: ['values'], preserveScroll: true}); // Перезагружаем данные при ошибке
@@ -322,7 +322,7 @@ const bulkToggleActivity = (newActivity) => {
  */
 const bulkDelete = () => {
     if (selectedValues.value.length === 0) {
-        toast.warning('Выберите хотя бы одну группу для удаления.'); // <--- Используем toast
+        toast.warning('Выберите хотя бы одно значение для удаления.'); // <--- Используем toast
         return;
     }
     if (!confirm(`Вы уверены, что хотите их удалить ?`)) {
@@ -334,14 +334,14 @@ const bulkDelete = () => {
         preserveState: false, // Перезагружаем данные страницы
         onSuccess: (page) => {
             selectedValues.value = []; // Очищаем выбор
-            toast.success('Массовое удаление групп успешно завершено.');
-            // console.log('Массовое удаление статей успешно завершено.');
+            toast.success('Массовое удаление значений успешно завершено.');
+            // console.log('Массовое удаление начений успешно завершено.');
         },
         onError: (errors) => {
             console.error("Ошибка массового удаления:", errors);
             // Отображаем первую ошибку
             const errorKey = Object.keys(errors)[0];
-            const errorMessage = errors[errorKey] || 'Произошла ошибка при удалении групп.';
+            const errorMessage = errors[errorKey] || 'Произошла ошибка при удалении начений.';
             toast.error(errorMessage);
         },
     });

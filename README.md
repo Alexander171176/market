@@ -341,15 +341,18 @@
     `docker exec market-php-app php artisan make:migration create_property_groups_table` <br>
     `docker exec market-php-app php artisan make:migration create_properties_table` <br>
     `docker exec market-php-app php artisan make:migration create_property_values_table` <br>
-    `docker exec market-php-app php artisan make:migration create_product_property_value_table` <br>
+    `docker exec market-php-app php artisan make:migration create_properties_table` <br>
+    `docker exec market-php-app php artisan make:migration create_property_has_property_value_table --create=property_has_property_value` <br>
     `docker exec market-php-app php artisan make:migration create_category_property_table` <br>
+    `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:seeder PropertyGroupSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=PropertyGroupSeeder` <br>
     `docker exec market-php-app php artisan make:seeder PropertySeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=PropertySeeder` <br>
     `docker exec market-php-app php artisan make:seeder PropertyValueSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=PropertyValueSeeder` <br>
-    `docker exec market-php-app php artisan migrate` <br>
+    `docker exec market-php-app php artisan make:seeder PropertyHasPropertyValueSeeder` <br>
+    `docker exec market-php-app php artisan db:seed --class=PropertyHasPropertyValueSeeder` <br>
     `docker exec market-php-app php artisan make:model Admin/PropertyGroup/PropertyGroup` <br>
     `docker exec market-php-app php artisan make:resource Admin/PropertyGroup/PropertyGroupResource` <br>
     `docker exec market-php-app php artisan make:resource Admin/PropertyGroup/PropertyGroupSharedResource` <br>
