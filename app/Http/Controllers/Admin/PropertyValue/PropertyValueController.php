@@ -107,13 +107,13 @@ class PropertyValueController extends Controller
      * Отображение формы редактирования существующего значения характеристики.
      * Использует Route Model Binding для получения модели.
      *
-     * @param PropertyValue $property_value
+     * @param PropertyValue $propertyValue
      * @return Response
      */
-    public function edit(PropertyValue $property_value): Response
+    public function edit(PropertyValue $propertyValue): Response
     {
         return Inertia::render('Admin/PropertyValues/Edit', [
-            'propertyValue' => new PropertyValueResource($property_value),
+            'propertyValue' => new PropertyValueResource($propertyValue),
         ]);
     }
 
@@ -122,24 +122,24 @@ class PropertyValueController extends Controller
      * Использует PropertyValueRequest и Route Model Binding.
      *
      * @param PropertyValueRequest $request
-     * @param PropertyValue $property_value
+     * @param PropertyValue $propertyValue
      * @return RedirectResponse
      */
-    public function update(PropertyValueRequest $request, PropertyValue $property_value): RedirectResponse
+    public function update(PropertyValueRequest $request, PropertyValue $propertyValue): RedirectResponse
     {
         $data = $request->validated();
 
         try {
             DB::beginTransaction();
-            $property_value->update($data);
+            $propertyValue->update($data);
             DB::commit();
 
-            Log::info("Значение характеристики ID {$property_value->id} обновлено");
+            Log::info("Значение характеристики ID {$propertyValue->id} обновлено");
             return to_route('admin.property-values.index')
                 ->with('success', __('admin/controllers.updated_success'));
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка обновления значения ID {$property_value->id}: ".$e->getMessage(), ['data' => $data]);
+            Log::error("Ошибка обновления значения ID {$propertyValue->id}: ".$e->getMessage(), ['data' => $data]);
             return back()->with('error', __('admin/controllers.updated_error'));
         }
     }
@@ -148,22 +148,22 @@ class PropertyValueController extends Controller
      * Удаление указанного значения характеристики.
      * Использует Route Model Binding.
      *
-     * @param PropertyValue $property_value
+     * @param PropertyValue $propertyValue
      * @return RedirectResponse
      */
-    public function destroy(PropertyValue $property_value): RedirectResponse
+    public function destroy(PropertyValue $propertyValue): RedirectResponse
     {
         try {
             DB::beginTransaction();
-            $property_value->delete();
+            $propertyValue->delete();
             DB::commit();
 
-            Log::info("Значение характеристики ID {$property_value->id} удалено");
+            Log::info("Значение характеристики ID {$propertyValue->id} удалено");
             return to_route('admin.property-values.index')
                 ->with('success', __('admin/controllers.deleted_success'));
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка удаления значения ID {$property_value->id}: ".$e->getMessage());
+            Log::error("Ошибка удаления значения ID {$propertyValue->id}: ".$e->getMessage());
             return back()->with('error', __('admin/controllers.deleted_error'));
         }
     }
@@ -203,24 +203,24 @@ class PropertyValueController extends Controller
      * Использует Route Model Binding и UpdateActivityRequest.
      *
      * @param UpdateActivityRequest $request
-     * @param PropertyValue $property_value
+     * @param PropertyValue $propertyValue
      * @return RedirectResponse
      */
-    public function updateActivity(UpdateActivityRequest $request, PropertyValue $property_value): RedirectResponse
+    public function updateActivity(UpdateActivityRequest $request, PropertyValue $propertyValue): RedirectResponse
     {
         $validated = $request->validated();
 
         try {
             DB::beginTransaction();
-            $property_value->activity = $validated['activity'];
-            $property_value->save();
+            $propertyValue->activity = $validated['activity'];
+            $propertyValue->save();
             DB::commit();
 
-            Log::info("Обновлено activity значения ID {$property_value->id}");
+            Log::info("Обновлено activity значения ID {$propertyValue->id}");
             return back()->with('success', __('admin/controllers.activity_updated_success'));
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка обновления активности значения ID {$property_value->id}: ".$e->getMessage());
+            Log::error("Ошибка обновления активности значения ID {$propertyValue->id}: ".$e->getMessage());
             return back()->with('error', __('admin/controllers.activity_updated_error'));
         }
     }
@@ -263,24 +263,24 @@ class PropertyValueController extends Controller
      * Использует Route Model Binding и UpdateSortEntityRequest.
      *
      * @param UpdateSortEntityRequest $request
-     * @param PropertyValue $property_value
+     * @param PropertyValue $propertyValue
      * @return RedirectResponse
      */
-    public function updateSort(UpdateSortEntityRequest $request, PropertyValue $property_value): RedirectResponse
+    public function updateSort(UpdateSortEntityRequest $request, PropertyValue $propertyValue): RedirectResponse
     {
         $validated = $request->validated();
 
         try {
             DB::beginTransaction();
-            $property_value->sort = $validated['sort'];
-            $property_value->save();
+            $propertyValue->sort = $validated['sort'];
+            $propertyValue->save();
             DB::commit();
 
-            Log::info("Обновлено sort значения ID {$property_value->id}");
+            Log::info("Обновлено sort значения ID {$propertyValue->id}");
             return back()->with('success', __('admin/controllers.sort_updated_success'));
         } catch (Throwable $e) {
             DB::rollBack();
-            Log::error("Ошибка обновления сортировки значения ID {$property_value->id}: ".$e->getMessage());
+            Log::error("Ошибка обновления сортировки значения ID {$propertyValue->id}: ".$e->getMessage());
             return back()->with('error', __('admin/controllers.sort_updated_error'));
         }
     }

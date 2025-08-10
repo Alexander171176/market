@@ -131,7 +131,6 @@ const toggleActivity = (group) => {
     const newActivity = !group.activity;
     const actionText = newActivity ? t('activated') : t('deactivated');
 
-    // Ключевое исправление здесь: {propertyGroup: group.id}
     router.put(route('admin.actions.property-groups.updateActivity', {propertyGroup: group.id}),
         {activity: newActivity},
         {

@@ -80,9 +80,9 @@ const valueToDeleteTitle = ref('');
 /**
  * Открывает модальное окно подтверждения удаления с входными переменными.
  */
-const confirmDelete = (id, title) => {
+const confirmDelete = (id, name) => {
     valueToDeleteId.value = id;
-    valueToDeleteTitle.value = title;
+    valueToDeleteTitle.value = name;
     showConfirmDeleteModal.value = true;
 };
 
@@ -104,7 +104,7 @@ const deleteValue = () => {
     const idToDelete = valueToDeleteId.value;
     const titleToDelete = valueToDeleteTitle.value;
 
-    router.delete(route('admin.property-values.destroy', {product: idToDelete}), {
+    router.delete(route('admin.property-values.destroy', { property_value: idToDelete }), {
         preserveScroll: true,
         preserveState: false,
         onSuccess: (page) => {
@@ -131,7 +131,6 @@ const toggleActivity = (value) => {
     const newActivity = !value.activity;
     const actionText = newActivity ? t('activated') : t('deactivated');
 
-    // Ключевое исправление здесь: {propertyValue: value.id}
     router.put(route('admin.actions.property-values.updateActivity', {propertyValue: value.id}),
         {activity: newActivity},
         {
@@ -200,7 +199,7 @@ const filteredValues = computed(() => {
 
     if (searchQuery.value) {
         filtered = filtered.filter(value =>
-            value.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+            value.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
     }
 
@@ -341,7 +340,7 @@ const bulkDelete = () => {
             console.error("Ошибка массового удаления:", errors);
             // Отображаем первую ошибку
             const errorKey = Object.keys(errors)[0];
-            const errorMessage = errors[errorKey] || 'Произошла ошибка при удалении начений.';
+            const errorMessage = errors[errorKey] || 'Произошла ошибка при удалении значений.';
             toast.error(errorMessage);
         },
     });

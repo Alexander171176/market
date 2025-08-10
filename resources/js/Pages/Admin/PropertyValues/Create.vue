@@ -155,7 +155,7 @@ const submit = () => {
                     <!-- Slug (опционально) -->
                     <div class="mb-3 flex flex-col items-start">
                         <div class="flex justify-between w-full">
-                            <LabelInput for="slug">Slug</LabelInput>
+                            <LabelInput for="slug">{{ t('alias')}}</LabelInput>
                             <div class="text-md text-gray-900 dark:text-gray-400 mt-1">
                                 {{ (form.slug || '').length }} / 255 {{ t('characters') }}
                             </div>
