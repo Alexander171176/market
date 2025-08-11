@@ -26,7 +26,6 @@ class PropertyResource extends JsonResource
             'name'             => $this->name,
             'slug'             => $this->slug,
             'description'      => $this->description,
-            'all_categories'   => $this->all_categories,
             'is_filterable'    => $this->is_filterable,
             'filter_type'      => $this->filter_type,
 

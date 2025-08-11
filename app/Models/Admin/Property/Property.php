@@ -25,7 +25,6 @@ class Property extends Model
         'name',
         'slug',
         'description',
-        'all_categories',
         'is_filterable',
         'filter_type',
     ];
@@ -33,7 +32,6 @@ class Property extends Model
     protected $casts = [
         'sort'          => 'integer',
         'activity'      => 'boolean',
-        'all_categories'=> 'boolean',
         'is_filterable' => 'boolean',
     ];
 

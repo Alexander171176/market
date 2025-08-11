@@ -368,6 +368,7 @@
     `docker exec market-php-app php artisan make:controller Admin/PropertyGroup/PropertyGroupController --resource` <br>
     `docker exec market-php-app php artisan make:controller Admin/Property/PropertyController --resource` <br>
     `docker exec market-php-app php artisan make:controller Admin/PropertyValue/PropertyValueController --resource` <br>
+    `docker exec market-php-app php artisan make:migration remove_all_categories_from_properties_table --table=properties` <br>
 
 41) creating business logic app API <br>
     `composer require "darkaonline/l5-swagger` <br>

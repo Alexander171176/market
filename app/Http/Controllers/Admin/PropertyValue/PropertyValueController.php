@@ -42,7 +42,7 @@ class PropertyValueController extends Controller
      */
     public function index(): Response
     {
-        $adminCountValues = (int) config('site_settings.AdminCountPropertyValues', 15);
+        $adminCountValues = config('site_settings.AdminCountPropertyValues', 15);
         $adminSortValues  = config('site_settings.AdminSortPropertyValues', 'idDesc');
 
         try {
@@ -62,7 +62,7 @@ class PropertyValueController extends Controller
         return Inertia::render('Admin/PropertyValues/Index', [
             'values'           => PropertyValueResource::collection($values),
             'valuesCount'      => $valuesCount,
-            'adminCountValues' => $adminCountValues,
+            'adminCountValues' => (int) $adminCountValues,
             'adminSortValues'  => $adminSortValues,
         ]);
     }

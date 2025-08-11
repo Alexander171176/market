@@ -37,13 +37,12 @@ class PropertyRequest extends FormRequest
             ],
 
             'description'     => ['nullable', 'string', 'max:255'],
-            'all_categories'  => ['required', 'boolean'],
             'is_filterable'   => ['required', 'boolean'],
             'filter_type'     => ['required', 'string', 'max:50'],
 
             // ⬇️ Привязка значений (опционально)
-            'values'   => ['nullable','array'],
-            'values.*' => ['integer','exists:property_values,id'],
+            'values'       => ['nullable', 'array'],
+            'values.*.id'  => ['integer', 'exists:property_values,id'],
         ];
     }
 
