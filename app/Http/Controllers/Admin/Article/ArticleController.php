@@ -51,31 +51,26 @@ class ArticleController extends Controller
      */
     public function index(): Response
     {
-        // TODO: Проверка прав $this->authorize('show-articles', Article::class);
-
-        $adminCountArticles = config('site_settings.AdminCountArticles', 15);
-        $adminSortArticles = config('site_settings.AdminSortArticles', 'idDesc');
+        $perPage = (int) config('site_settings.AdminCountArticles', 15);
+        $sortKey = config('site_settings.AdminSortArticles', 'idDesc');
 
         try {
-            // Загружаем ВСЕ статьи с секциями и изображениями, счётчики тегов, комментариев, лайков
             $articles = Article::withCount(['sections', 'tags', 'images', 'comments', 'likes'])
-                                    ->with(['images', 'sections'])
-                                    ->get();
-
-            $articlesCount = $articles->count(); // Считаем из загруженной коллекции
-
+                ->with(['images', 'sections'])
+                ->orderBy($sortKey) // ← теперь напрямую
+                ->paginate($perPage)
+                ->withQueryString();
         } catch (Throwable $e) {
-            Log::error("Ошибка загрузки постов для Index: " . $e->getMessage());
-            $articles = collect(); // Пустая коллекция в случае ошибки
-            $articlesCount = 0;
+            Log::error("Ошибка загрузки постов для Index: ".$e->getMessage());
+            $articles = Article::query()->paginate($perPage);
             session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Articles/Index', [
-            'articles' => ArticleResource::collection($articles),
-            'articlesCount' => $articlesCount,
-            'adminCountArticles' => (int)$adminCountArticles,
-            'adminSortArticles' => $adminSortArticles,
+            'articles'            => ArticleResource::collection($articles),
+            'adminCountArticles'  => $perPage,
+            'adminSortArticles'   => $sortKey,
+            'articlesCount'       => $articles->total(),
         ]);
     }
 
