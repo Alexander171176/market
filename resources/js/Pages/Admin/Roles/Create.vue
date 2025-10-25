@@ -107,11 +107,14 @@ const submit = () => {
                             v-model="form.permissions"
                             :options="permissions"
                             :multiple="true"
-                            :close-on-select="true"
+                            :close-on-select="false"
                             :placeholder="t('select')"
                             label="name"
                             track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.permissions"/>
+                        <InputError v-if="form.errors['permissions.0.id']" class="mt-1"
+                                    :message="form.errors['permissions.0.id']"/>
                     </div>
 
                     <div class="flex items-center justify-center mt-4">

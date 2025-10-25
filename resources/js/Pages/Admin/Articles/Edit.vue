@@ -306,10 +306,14 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.sections"
                                         :options="sections"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title" />
+                                        track-by="id"
+                        />
+                        <InputError class="mt-2" :message="form.errors.sections"/>
+                        <InputError v-if="form.errors['sections.0.id']" class="mt-1"
+                                    :message="form.errors['sections.0.id']"/>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">
@@ -387,10 +391,14 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.tags"
                                         :options="tags"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="name"
-                                        track-by="name" />
+                                        track-by="id"
+                        />
+                        <InputError class="mt-2" :message="form.errors.tags"/>
+                        <InputError v-if="form.errors['tags.0.id']" class="mt-1"
+                                    :message="form.errors['tags.0.id']"/>
                     </div>
 
                     <!-- Мультиселект для связанных статей -->
@@ -400,11 +408,13 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.related_articles"
                                         :options="related_articles"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title" />
-                        <InputError class="mt-2" :message="form.errors.related_articles" />
+                                        track-by="id" />
+                        <InputError class="mt-2" :message="form.errors.related_articles"/>
+                        <InputError v-if="form.errors['related_articles.0.id']" class="mt-1"
+                                    :message="form.errors['related_articles.0.id']"/>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">

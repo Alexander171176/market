@@ -160,14 +160,18 @@ const submit = () => {
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="properties" :value="t('properties')" class="mb-1" />
-                        <VueMultiselect v-model="form.properties"
-                                        :options="properties"
-                                        :multiple="true"
-                                        :close-on-select="true"
-                                        :placeholder="t('select')"
-                                        label="name"
-                                        track-by="name"
+                        <VueMultiselect
+                            v-model="form.properties"
+                            :options="properties"
+                            :multiple="true"
+                            :close-on-select="false"
+                            :placeholder="t('select')"
+                            label="name"
+                            track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.properties" />
+                        <InputError v-if="form.errors['properties.0.id']" class="mt-1"
+                                    :message="form.errors['properties.0.id']"/>
                     </div>
 
                     <div class="flex items-center justify-center mt-4">

@@ -271,7 +271,7 @@ const submit = () => {
                         <VueMultiselect v-model="form.properties"
                                         :options="properties"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="name"
                                         track-by="id"

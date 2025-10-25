@@ -270,11 +270,14 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.sections"
                                         :options="sections"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title"
+                                        track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.sections"/>
+                        <InputError v-if="form.errors['sections.0.id']" class="mt-1"
+                                    :message="form.errors['sections.0.id']"/>
                     </div>
 
                     <!-- Выбрать статьи для показа -->
@@ -283,11 +286,14 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.articles"
                                         :options="articles"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title"
+                                        track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.articles"/>
+                        <InputError v-if="form.errors['articles.0.id']" class="mt-1"
+                                    :message="form.errors['articles.0.id']"/>
                     </div>
 
                     <!-- Название -->
@@ -430,11 +436,13 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.related_videos"
                                         :options="related_videos"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title"/>
+                                        track-by="id"/>
                         <InputError class="mt-2" :message="form.errors.related_videos"/>
+                        <InputError v-if="form.errors['related_videos.0.id']" class="mt-1"
+                                    :message="form.errors['related_videos.0.id']"/>
                     </div>
 
                     <!-- meta title -->

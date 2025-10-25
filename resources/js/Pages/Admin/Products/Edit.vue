@@ -32,7 +32,8 @@ import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue'; //
 import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue';
 import VariantList from '@/Components/Admin/ProductVariant/VariantList.vue'
 import CreateVariantModal from '@/Components/Admin/ProductVariant/CreateVariantModal.vue'
-import EditVariantModal from '@/Components/Admin/ProductVariant/EditVariantModal.vue'     // для редактирования существующих
+import EditVariantModal from '@/Components/Admin/ProductVariant/EditVariantModal.vue'
+import SelectParentCategory from '@/Components/Admin/Category/Select/SelectParentCategory.vue'     // для редактирования существующих
 
 // --- Инициализация ---
 const toast = useToast();
@@ -44,7 +45,8 @@ const { t } = useI18n();
 const props = defineProps({
     product: { type: Object, required: true },
     categories: Array,
-    related_products: { type: Array, default: () => [] } // задаём дефолтное значение
+    related_products: { type: Array, default: () => [] }, // задаём дефолтное значение
+    properties: Array,
 });
 
 // --- Логика вариантов ---
@@ -107,7 +109,8 @@ const form = useForm({
     is_sale: Boolean(props.product.is_sale),
     categories: props.product.categories ?? [],
     related_products: props.product.related_products ?? [],
-    deletedImages: []
+    deletedImages: [],
+    properties: props.product.properties ?? [],
 });
 
 /**
@@ -576,11 +579,29 @@ const toggleActivity = (variant) => {
                         <VueMultiselect v-model="form.categories"
                                         :options="categories"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title"
+                                        track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.categories"/>
+                        <InputError v-if="form.errors['categories.0.id']" class="mt-1"
+                                    :message="form.errors['categories.0.id']"/>
+                    </div>
+
+                    <div class="mb-3 flex flex-col items-start">
+                        <LabelInput for="properties" :value="t('properties')" class="mb-1" />
+                        <VueMultiselect v-model="form.properties"
+                                        :options="properties"
+                                        :multiple="true"
+                                        :close-on-select="false"
+                                        :placeholder="t('select')"
+                                        label="name"
+                                        track-by="id"
+                        />
+                        <InputError class="mt-2" :message="form.errors.properties"/>
+                        <InputError v-if="form.errors['properties.0.id']" class="mt-1"
+                                    :message="form.errors['properties.0.id']"/>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">
@@ -639,11 +660,13 @@ const toggleActivity = (variant) => {
                         <VueMultiselect v-model="form.related_products"
                                         :options="related_products"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title" />
-                        <InputError class="mt-2" :message="form.errors.related_products" />
+                                        track-by="id" />
+                        <InputError class="mt-2" :message="form.errors.related_products"/>
+                        <InputError v-if="form.errors['related_products.0.id']" class="mt-1"
+                                    :message="form.errors['related_products.0.id']"/>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">

@@ -36,7 +36,8 @@ const { t } = useI18n()
 defineProps({
     categories: Array,
     images: Array, // Добавляем этот пропс для передачи списка изображений
-    related_products: { type: Array, default: () => [] } // задаём дефолтное значение
+    related_products: { type: Array, default: () => [] }, // задаём дефолтное значение
+    properties: Array,
 })
 
 /**
@@ -74,6 +75,7 @@ const form = useForm({
     categories: [],
     related_products: [],
     images: [], // для изображений
+    properties: [],
 })
 
 /**
@@ -435,12 +437,32 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.categories"
                                         :options="categories"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title"
+                                        track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.categories"/>
+                        <InputError v-if="form.errors['categories.0.id']" class="mt-1"
+                                    :message="form.errors['categories.0.id']"/>
                     </div>
+
+                    <div class="mb-3 flex flex-col items-start">
+                        <LabelInput for="properties" :value="t('properties')" class="mb-1" />
+                        <VueMultiselect
+                            v-model="form.properties"
+                            :options="properties"
+                            :multiple="true"
+                            :close-on-select="false"
+                            :placeholder="t('select')"
+                            label="name"
+                            track-by="id"
+                        />
+                        <InputError class="mt-2" :message="form.errors.properties" />
+                        <InputError v-if="form.errors['properties.0.id']" class="mt-1"
+                                    :message="form.errors['properties.0.id']"/>
+                    </div>
+
 
                     <div class="mb-3 flex flex-col items-start">
                         <LabelInput for="title">
@@ -498,11 +520,13 @@ const submitForm = () => {
                         <VueMultiselect v-model="form.related_products"
                                         :options="related_products"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title" />
-                        <InputError class="mt-2" :message="form.errors.related_products" />
+                                        track-by="id" />
+                        <InputError class="mt-2" :message="form.errors.properties"/>
+                        <InputError v-if="form.errors['properties.0.id']" class="mt-1"
+                                    :message="form.errors['properties.0.id']"/>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">

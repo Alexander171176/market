@@ -223,11 +223,14 @@ const submitForm = async () => {
                         <VueMultiselect v-model="form.sections"
                                         :options="sections"
                                         :multiple="true"
-                                        :close-on-select="true"
+                                        :close-on-select="false"
                                         :placeholder="t('select')"
                                         label="title"
-                                        track-by="title"
+                                        track-by="id"
                         />
+                        <InputError class="mt-2" :message="form.errors.sections"/>
+                        <InputError v-if="form.errors['sections.0.id']" class="mt-1"
+                                    :message="form.errors['sections.0.id']"/>
                     </div>
 
                     <div class="mb-3 flex flex-col items-start">

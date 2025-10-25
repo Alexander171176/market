@@ -128,12 +128,15 @@ const submit = () => {
                             <VueMultiselect v-model="form.roles"
                                             :options="props.roles"
                                             :multiple="true"
-                                            :close-on-select="true"
+                                            :close-on-select="false"
                                             :placeholder="t('select')"
                                             label="name"
-                                            track-by="name"
+                                            track-by="id"
                                             class="pb-16"
                             />
+                            <InputError class="mt-2" :message="form.errors.roles"/>
+                            <InputError v-if="form.errors['roles.0.id']" class="mt-1"
+                                        :message="form.errors['roles.0.id']"/>
                         </div>
 
                         <div class="mb-3 flex flex-col items-start">
@@ -141,12 +144,15 @@ const submit = () => {
                             <VueMultiselect v-model="form.permissions"
                                             :options="props.permissions"
                                             :multiple="true"
-                                            :close-on-select="true"
+                                            :close-on-select="false"
                                             :placeholder="t('select')"
                                             label="name"
-                                            track-by="name"
+                                            track-by="id"
                                             class="pb-16"
                             />
+                            <InputError class="mt-2" :message="form.errors.permissions"/>
+                            <InputError v-if="form.errors['permissions.0.id']" class="mt-1"
+                                        :message="form.errors['permissions.0.id']"/>
                         </div>
                     </div>
 

@@ -39,11 +39,23 @@ const props = defineProps({
     groups: { type: Array, default: () => [] },
 })
 
-/** выбранная группа (объект) */
-const selectedGroup = ref(props.property.group ?? null)
+/** найти объект группы среди options по id */
+const selectedGroup = ref(
+    props.property.group
+        ? (props.groups.find(g => g.id === props.property.group.id) ?? null)
+        : null
+)
 
-/** выбранные значения (массив объектов) */
-const selectedValues = ref(Array.isArray(props.property.values) ? props.property.values : [])
+/** выбранные значения приводим к объектам из списка options по id */
+const selectedValues = ref(
+    Array.isArray(props.property.values)
+        ? props.property.values
+            .map(v => typeof v === 'object' ? v.id : v)
+            .filter(Boolean)
+            .map(id => props.propertyValues.find(o => o.id === id))
+            .filter(Boolean)
+        : []
+)
 
 /** форма */
 const form = useForm({
@@ -84,23 +96,19 @@ const submitForm = () => {
             activity: data.activity ? 1 : 0,
             is_filterable: data.is_filterable ? 1 : 0,
             property_group_id: selectedGroup.value ? selectedGroup.value.id : null,
-            // отправляем как values (у тебя контроллер поддерживает values/propertyValues)
-            values: valueIds,
+            values: valueIds, // массив ID (под rules: 'values.* exists:property_values,id')
         }
     })
 
-    form.post(route('admin.properties.update', { property: props.property.id }), {
+    // было form.post(..., { _method: 'PUT' })
+    form.put(route('admin.properties.update', { property: props.property.id }), {
         errorBag: 'editProperty',
         preserveScroll: true,
-        onSuccess: () => {
-            toast.success('Характеристика успешно обновлена!')
-        },
-        onError: (errors) => {
-            const first = errors[Object.keys(errors)[0]]
-            toast.error('Проверьте корректность полей.')
-        },
+        onSuccess: () => toast.success('Характеристика успешно обновлена!'),
+        onError: () => toast.error('Проверьте корректность полей.'),
     })
 }
+
 </script>
 
 <template>
@@ -242,12 +250,13 @@ const submitForm = () => {
                             v-model="selectedValues"
                             :options="propertyValues"
                             :multiple="true"
-                            :close-on-select="true"
+                            :close-on-select="false"
                             :placeholder="t('select')"
                             label="name"
                             track-by="id"
                         />
                         <InputError class="mt-2" :message="form.errors.values" />
+                        <InputError v-if="form.errors['values.0']" class="mt-1" :message="form.errors['values.0']" />
                     </div>
 
                     <div class="flex items-center justify-center mt-4">
