@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('slug', 255)->index(); // если нужен строгий запрет дублей — сделай NOT NULL
 
             $table->string('description', 255)->nullable();
-            $table->boolean('all_categories')->default(true)->index();
             $table->boolean('is_filterable')->default(true)->index();
             $table->string('filter_type', 50)->default('checkbox')->index();
 

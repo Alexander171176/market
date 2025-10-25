@@ -22,7 +22,7 @@ class SettingSeeder extends Seeder
                 'category' => 'system',
                 'description' => 'Версия движка сайта',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 1,
             ],
             [
                 'type' => 'string',
@@ -32,7 +32,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Шаблон публичной части сайта',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 2,
             ],
             [
                 'type' => 'checkbox',
@@ -42,7 +42,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Включение/Выключение публичной части сайта на технические работы',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 3,
             ],
             [
                 'type' => 'number',
@@ -52,7 +52,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Рубрик в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 4,
             ],
             [
                 'type' => 'string',
@@ -62,7 +62,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Рубрик по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 5,
             ],
             [
                 'type' => 'number',
@@ -72,7 +72,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Секций в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 6,
             ],
             [
                 'type' => 'string',
@@ -82,7 +82,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Секций по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 7,
             ],
             [
                 'type' => 'number',
@@ -92,7 +92,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Постов в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 8,
             ],
             [
                 'type' => 'string',
@@ -102,7 +102,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Постов по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 9,
             ],
             [
                 'type' => 'number',
@@ -112,7 +112,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Тегов в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 10,
             ],
             [
                 'type' => 'string',
@@ -122,7 +122,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Тегов по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 11,
             ],
             [
                 'type' => 'number',
@@ -132,7 +132,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Комментариев в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 12,
             ],
             [
                 'type' => 'string',
@@ -142,7 +142,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Комментариев по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 13,
             ],
             [
                 'type' => 'number',
@@ -152,7 +152,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Баннеров в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 14,
             ],
             [
                 'type' => 'string',
@@ -162,7 +162,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Баннеров по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 15,
             ],
             [
                 'type' => 'number',
@@ -172,7 +172,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Видео в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 16,
             ],
             [
                 'type' => 'string',
@@ -182,7 +182,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Видео по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 17,
             ],
             [
                 'type' => 'number',
@@ -192,7 +192,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Пользователей в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 18,
             ],
             [
                 'type' => 'string',
@@ -202,7 +202,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Пользователей по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 19,
             ],
             [
                 'type' => 'number',
@@ -212,7 +212,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Релей в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 20,
             ],
             [
                 'type' => 'string',
@@ -222,7 +222,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Релей по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 21,
             ],
             [
                 'type' => 'number',
@@ -232,7 +232,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Разрешений в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 22,
             ],
             [
                 'type' => 'string',
@@ -242,7 +242,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Разрешений по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 23,
             ],
             [
                 'type' => 'number',
@@ -252,7 +252,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Модулей в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 24,
             ],
             [
                 'type' => 'string',
@@ -262,7 +262,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Модулей по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 25,
             ],
             [
                 'type' => 'number',
@@ -272,7 +272,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Категорий в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 26,
             ],
             [
                 'type' => 'string',
@@ -282,7 +282,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Категорий по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 27,
             ],
             [
                 'type' => 'number',
@@ -292,7 +292,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество товаров в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 28,
             ],
             [
                 'type' => 'string',
@@ -302,7 +302,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у товаров по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 29,
             ],
             [
                 'type' => 'number',
@@ -312,7 +312,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество групп характеристик в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 30,
             ],
             [
                 'type' => 'string',
@@ -322,7 +322,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у групп характеристик по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 31,
             ],
             [
                 'type' => 'number',
@@ -332,7 +332,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество характеристик в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 32,
             ],
             [
                 'type' => 'string',
@@ -342,7 +342,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у характеристик по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 33,
             ],
             [
                 'type' => 'number',
@@ -352,7 +352,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество значений характеристик в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 34,
             ],
             [
                 'type' => 'string',
@@ -362,7 +362,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у значений характеристик по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 35,
             ],
             [
                 'type' => 'number',
@@ -372,7 +372,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Показывать количество Параметров в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 36,
             ],
             [
                 'type' => 'string',
@@ -382,7 +382,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Сортировка по полю у Параметров по умолчанию в таблице Панели Администратора',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 37,
             ],
             [
                 'type' => 'string',
@@ -392,7 +392,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS фонового цвета светлого режима',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 38,
             ],
             [
                 'type' => 'string',
@@ -402,7 +402,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS фонового цвета тёмного режима',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 39,
             ],
             [
                 'type' => 'string',
@@ -412,7 +412,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS цвета светлого режима для header',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 40,
             ],
             [
                 'type' => 'string',
@@ -422,7 +422,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS цвета тёмного режима для header',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 41,
             ],
             [
                 'type' => 'checkbox',
@@ -432,7 +432,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Включение/Выключение левой колонки в публичной части',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 42,
             ],
             [
                 'type' => 'checkbox',
@@ -442,7 +442,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Включение/Выключение правой колонки в публичной части',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 43,
             ],
             [
                 'type' => 'string',
@@ -452,7 +452,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Вид показа блоков Статей в секциях grid/horizontal',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 44,
             ],
             [
                 'type' => 'number',
@@ -462,7 +462,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Показывать количество Статей в секциях по умолчанию',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 45,
             ],
             [
                 'type' => 'string',
@@ -472,7 +472,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS цвета тёмного режима для левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 46,
             ],
             [
                 'type' => 'string',
@@ -482,7 +482,7 @@ class SettingSeeder extends Seeder
                 'category' => 'public',
                 'description' => 'Класс Tailwind CSS цвета светлого режима для левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 47,
             ],
             [
                 'type' => 'string',
@@ -492,7 +492,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Класс Tailwind CSS цвета текста тёмного режима для левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 48,
             ],
             [
                 'type' => 'string',
@@ -502,7 +502,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Класс Tailwind CSS цвета текста светлого режима для левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 49,
             ],
             [
                 'type' => 'string',
@@ -512,7 +512,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Класс Tailwind CSS цвета при наведении на текст в тёмном режиме левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 50,
             ],
             [
                 'type' => 'string',
@@ -522,7 +522,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Класс Tailwind CSS цвета при наведении на текст в светлом режиме левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 51,
             ],
             [
                 'type' => 'string',
@@ -532,7 +532,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Класс Tailwind CSS цвета активной ссылки в тёмном режиме левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 52,
             ],
             [
                 'type' => 'string',
@@ -542,7 +542,7 @@ class SettingSeeder extends Seeder
                 'category' => 'admin',
                 'description' => 'Класс Tailwind CSS цвета активной ссылки в светлом режиме левого Сайдбара',
                 'activity' => true,
-                'sort' => 0,
+                'sort' => 53,
             ],
 
             // Добавьте остальные параметры

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Admin\Category;
 
+use App\Http\Resources\Admin\Property\PropertyResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -58,6 +59,10 @@ class CategoryResource extends JsonResource
             // Более простой вариант, если контроллер всегда загружает хотя бы первый уровень детей:
             // 'has_children' => $this->whenLoaded('children', fn() => $this->children->isNotEmpty()),
             // Самый надежный вариант часто - просто проверять children.length во фронтенде
+
+            // 👇 ID привязанных характеристик для инициализации мультиселекта
+
+            'properties' => PropertyResource::collection($this->whenLoaded('properties')),
         ];
     }
 }

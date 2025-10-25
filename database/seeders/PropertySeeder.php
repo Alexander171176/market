@@ -86,7 +86,6 @@ class PropertySeeder extends Seeder
 
             $properties = [];
             foreach ($propertiesData as $p) {
-                $p['all_categories'] = $p['all_categories'] ?? true;
                 $p['description']    = $p['description'] ?? ('Описание для '.mb_strtolower($p['name']));
                 $properties[$p['slug']] = Property::create($p);
             }

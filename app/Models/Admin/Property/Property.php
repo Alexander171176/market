@@ -3,6 +3,7 @@
 namespace App\Models\Admin\Property;
 
 use App\Models\Admin\Category\Category;
+use App\Models\Admin\Product\Product;
 use App\Models\Admin\PropertyGroup\PropertyGroup;
 use App\Models\Admin\PropertyValue\PropertyValue;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,5 +67,16 @@ class Property extends Model
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_property', 'property_id', 'category_id');
+    }
+
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'product_has_property',
+            'property_id',
+            'product_id'
+        )->withTimestamps()
+            ->withPivot('sort');
     }
 }

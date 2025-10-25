@@ -28,7 +28,8 @@ import SelectParentCategory from "@/Components/Admin/Category/Select/SelectParen
 
 // Импорт двух отдельных компонентов для работы с изображениями:
 import MultiImageUpload from '@/Components/Admin/Image/MultiImageUpload.vue'; // для загрузки новых изображений
-import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue';     // для редактирования существующих
+import MultiImageEdit from '@/Components/Admin/Image/MultiImageEdit.vue';
+import VueMultiselect from 'vue-multiselect'     // для редактирования существующих
 
 // --- Инициализация ---
 const toast = useToast();
@@ -42,13 +43,14 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    properties: Array,
 });
 
 /**
  * Формируем форму редактирования.
  */
 const form = useForm({
-    _method: 'POST',
+    _method: 'PUT', // или 'PATCH' — главное не POST
     parent_id: props.category.parent_id ?? null,
     sort: props.category.sort ?? 0,
     title: props.category?.title,
@@ -60,7 +62,8 @@ const form = useForm({
     meta_keywords: props.category.meta_keywords ?? '',
     meta_desc: props.category.meta_desc ?? '',
     activity: Boolean(props.category.activity ?? false),
-    deletedImages: [] // массив для хранения ID удалённых изображений
+    deletedImages: [] ,// массив для хранения ID удалённых изображений
+    properties: props.category.properties ?? [],
 });
 
 /**
@@ -216,42 +219,53 @@ const generateMetaFields = () => {
  * Отправляет данные формы для обновления.
  */
 const submit = () => {
-    form.transform((data) => ({
-        ...data,
-        parent_id: data.parent_id ?? '', // важно!
-        activity: data.activity ? '1' : '0', // как строка
-        locale: data.locale || '',
-        title: data.title || '',
-        url: data.url || '',
-        sort: String(data.sort ?? '0'),
-        images: [
-            ...newImages.value.map(img => ({
-                file: img.file,
-                order: img.order,
-                alt: img.alt,
-                caption: img.caption
-            })),
-            ...existingImages.value.map(img => ({
-                id: img.id,
-                order: img.order,
-                alt: img.alt,
-                caption: img.caption
-            }))
-        ],
-        deletedImages: form.deletedImages
-    }));
+    form.transform((data) => {
+        const out = {
+            ...data,
+            parent_id: data.parent_id ?? '',
+            activity: data.activity ? '1' : '0',
+            locale: data.locale || '',
+            title: data.title || '',
+            url: data.url || '',
+            sort: String(data.sort ?? '0'),
+            images: [
+                ...newImages.value.map(img => ({
+                    file: img.file,
+                    order: img.order,
+                    alt: img.alt,
+                    caption: img.caption
+                })),
+                ...existingImages.value.map(img => ({
+                    id: img.id,
+                    order: img.order,
+                    alt: img.alt,
+                    caption: img.caption
+                }))
+            ],
+            deletedImages: form.deletedImages
+        };
+
+        // --- ВАЖНО: разложить properties в FormData-вид ---
+        if (Array.isArray(data.properties)) {
+            data.properties.forEach((p, i) => {
+                out[`properties[${i}][id]`] = p?.id ?? '';
+            });
+            // Можно удалить исходный массив, чтобы не уехал как JSON-строка:
+            delete out.properties;
+        }
+
+        return out;
+    });
+
     form.post(route('admin.categories.update', props.category.id), {
         errorBag: 'editCategory',
         preserveScroll: true,
-        forceFormData: true, // Принудительно отправляем как FormData
-        onSuccess: () => {
-            // console.log("Форма успешно отправлена.");
-            toast.success('Категория успешно обновлена!'); // Можно добавить, если нужно кастомное
-        },
+        forceFormData: true,
+        onSuccess: () => toast.success('Категория успешно обновлена!'),
         onError: (errors) => {
-            console.error("Не удалось отправить форму:", errors);
+            console.error(errors);
             const firstError = errors[Object.keys(errors)[0]];
-            toast.error(firstError || 'Пожалуйста, проверьте правильность заполнения полей.')
+            toast.error(firstError || 'Проверьте правильность заполнения полей.');
         }
     });
 };
@@ -326,6 +340,21 @@ const submit = () => {
                         :options="parentOptions"
                         :errorMessage="form.errors.parent_id"
                     />
+
+                    <div class="mb-3 flex flex-col items-start">
+                        <LabelInput for="properties" :value="t('properties')" class="mb-1" />
+                        <VueMultiselect v-model="form.properties"
+                                        :options="properties"
+                                        :multiple="true"
+                                        :close-on-select="true"
+                                        :placeholder="t('select')"
+                                        label="name"
+                                        track-by="id"
+                        />
+                        <InputError class="mt-2" :message="form.errors.properties"/>
+                        <InputError v-if="form.errors['properties.0.id']" class="mt-1"
+                                    :message="form.errors['properties.0.id']"/>
+                    </div>
 
                     <div class="mb-3 flex flex-col items-start">
                         <div class="flex justify-between w-full">
@@ -488,3 +517,5 @@ const submit = () => {
         </div>
     </AdminLayout>
 </template>
+
+<style src="../../../../css/vue-multiselect.min.css"></style>

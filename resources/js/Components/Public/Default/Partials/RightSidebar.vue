@@ -88,14 +88,14 @@ const formatDate = (dateString) => {
 <template>
     <div class="relative">
         <!-- одна ветка поверх левой колонки -->
-        <img
-            src="./../../../../../images/tree.png"
-            alt="Vine frame"
-            loading="lazy"
-            class="hidden md:block absolute top-0 h-full w-auto opacity-60 pointer-events-none z-10
-                   filter contrast-125 brightness-90 saturate-150"
-            style="left: -80px"
-        />
+<!--        <img-->
+<!--            src="./../../../../../images/tree.png"-->
+<!--            alt="Vine frame"-->
+<!--            loading="lazy"-->
+<!--            class="hidden md:block absolute top-0 h-full w-auto opacity-60 pointer-events-none z-10-->
+<!--                   filter contrast-125 brightness-90 saturate-150"-->
+<!--            style="left: -80px"-->
+<!--        />-->
         <aside v-if="articles.length > 0" :class="[sidebarClasses, bgColorClass]">
             <div class="flex items-center justify-end">
                 <!--            <h2 v-if="!isCollapsed"-->

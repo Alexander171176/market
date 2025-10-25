@@ -34,8 +34,6 @@ class PropertyResource extends JsonResource
 
             // Значения many-to-many; внутри каждого значения вернём pivot_sort
             'values'     => PropertyValueResource::collection($this->whenLoaded('values')),
-
-            'categories' => CategorySharedResource::collection($this->whenLoaded('categories')),
         ];
     }
 }

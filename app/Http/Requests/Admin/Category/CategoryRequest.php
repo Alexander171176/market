@@ -85,8 +85,9 @@ class CategoryRequest extends FormRequest
             'deletedImages'      => ['sometimes', 'array'],
             'deletedImages.*'    => ['integer', 'exists:category_images,id'],
 
-            'property_ids'   => ['nullable', 'array'],
-            'property_ids.*' => ['integer', 'exists:properties,id'],
+            // Характеристики — массив объектов вида [{ id: <property_id> }, ...]
+            'properties'        => ['nullable', 'array'],
+            'properties.*.id'   => ['required_with:properties', 'integer', 'exists:properties,id'],
         ];
     }
 

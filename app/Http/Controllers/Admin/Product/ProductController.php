@@ -66,7 +66,7 @@ class ProductController extends Controller
             $productsCount = $products->count(); // Считаем из загруженной коллекции
 
         } catch (Throwable $e) {
-            Log::error("Ошибка загрузки постов для Index: " . $e->getMessage());
+            Log::error("Ошибка загрузки товаров для Index: " . $e->getMessage());
             $products = collect(); // Пустая коллекция в случае ошибки
             $productsCount = 0;
             session()->flash('error', __('admin/controllers.index_error'));
@@ -91,12 +91,13 @@ class ProductController extends Controller
         // TODO: Проверка прав $this->authorize('create-products', Product::class);
 
         $allProducts = Product::select('id', 'title', 'locale')->orderBy('title')->get(); // связанные товары
-
         $categories = Category::select('id', 'title', 'locale')->orderBy('title')->get(); // категории
+        $properties = Property::select('id', 'name')->orderBy('sort')->get(); // характеристики
 
         return Inertia::render('Admin/Products/Create', [
             'related_products' => ProductSharedResource::collection($allProducts), // Используем Shared
             'categories' => CategoryResource::collection($categories),
+            'properties'    => PropertyResource::collection($properties),
         ]);
     }
 
@@ -114,17 +115,12 @@ class ProductController extends Controller
         $imagesData   = $data['images'] ?? [];
         $categoryIds   = collect($data['categories'] ?? [])->pluck('id')->toArray();
         $relatedIds   = collect($data['related_products'] ?? [])->pluck('id')->toArray();
-        $propertyValueIds = $data['property_values'] ?? [];
-        unset($data['images'], $data['related_products'], $data['property_values']);
+        $propertyIds   = collect($data['properties'] ?? [])->pluck('id')->toArray();
+        unset($data['images'], $data['related_products'], $data['properties'], $data['categories']);
 
         try {
             DB::beginTransaction();
             $product = Product::create($data);
-
-            // Связи
-            $product->categories()->sync($categoryIds);
-            $product->relatedProducts()->sync($relatedIds);
-            $product->propertyValues()->sync($propertyValueIds);
 
             // Обработка изображений
             $imageSyncData = [];
@@ -174,7 +170,11 @@ class ProductController extends Controller
                 $imageIndex++;
             }
 
+            // Связи
             $product->images()->sync($imageSyncData);
+            $product->relatedProducts()->sync($relatedIds);
+            $product->categories()->sync($categoryIds);
+            $product->properties()->sync($propertyIds);
 
             DB::commit();
 
@@ -208,7 +208,7 @@ class ProductController extends Controller
             'categories',
             'images',
             'relatedProducts',
-            'propertyValues',
+            'properties',
             'variants' => function ($query) {
                 // Загружаем сами варианты и для каждого из них - его изображения
                 $query->with('images')->orderBy('sort', 'asc');
@@ -217,20 +217,15 @@ class ProductController extends Controller
 
         // Загружаем данные для селектов
         $categories = Category::select('id', 'title', 'locale')->orderBy('title')->get();
-
-        // Загружаем данные для селектов
+        $properties = Property::select('id', 'name')->orderBy('sort')->get();
         $allProducts = Product::where('id', '<>', $product->id)->select('id', 'title', 'locale')->orderBy('title')->get(); // Исключаем текущую
 
-        $allProperties = Property::with(['values' => fn($q) => $q->orderBy('sort')])
-            ->where('activity', true)
-            ->orderBy('sort')
-            ->get();
 
         return Inertia::render('Admin/Products/Edit', [
             'product' => new ProductResource($product),
             'categories' => CategoryResource::collection($categories),
             'related_products' => ProductSharedResource::collection($allProducts), // Используем Shared
-            'allProperties' => PropertyResource::collection($allProperties),
+            'properties' => PropertyResource::collection($properties),
         ]);
     }
 
@@ -252,7 +247,7 @@ class ProductController extends Controller
         $deletedImageIds  = $data['deletedImages'] ?? [];
         $categoryIds      = collect($data['categories'] ?? [])->pluck('id')->toArray();
         $relatedIds       = collect($data['related_products'] ?? [])->pluck('id')->toArray();
-        $propertyValueIds = $data['property_values'] ?? [];
+        $propertyIds      = collect($data['properties'] ?? [])->pluck('id')->toArray();
 
         // Убираем ненужные ключи из $data
         unset(
@@ -260,7 +255,7 @@ class ProductController extends Controller
             $data['deletedImages'],
             $data['categories'],
             $data['related_products'],
-            $data['property_values'],
+            $data['properties'],
             $data['_method']
         );
 
@@ -281,7 +276,7 @@ class ProductController extends Controller
             // 3) Синхронизация связей
             $product->categories()->sync($categoryIds);
             $product->relatedProducts()->sync($relatedIds);
-            $product->propertyValues()->sync($propertyValueIds);
+            $product->properties()->sync($propertyIds);
 
             // 4) Обработка изображений
             $syncData = [];

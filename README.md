@@ -305,6 +305,8 @@
     `docker exec market-php-app php artisan make:request Admin/Category/CategoryRequest` <br>
     `docker exec market-php-app php artisan make:controller Admin/Category/CategoryController --resource` <br>
     `docker exec market-php-app php artisan make:controller Public/Default/CategoryController` <br>
+    `docker exec market-php-app php artisan make:migration create_category_has_property_table --create=category_has_property` <br>
+    `docker exec market-php-app php artisan migrate` <br>
 
 38) creating business logic ap Product
     `docker exec market-php-app php artisan make:model Admin/Product/Product -mf` <br>
@@ -341,16 +343,15 @@
     `docker exec market-php-app php artisan make:migration create_property_groups_table` <br>
     `docker exec market-php-app php artisan make:migration create_properties_table` <br>
     `docker exec market-php-app php artisan make:migration create_property_values_table` <br>
-    `docker exec market-php-app php artisan make:migration create_properties_table` <br>
     `docker exec market-php-app php artisan make:migration create_property_has_property_value_table --create=property_has_property_value` <br>
-    `docker exec market-php-app php artisan make:migration create_category_property_table` <br>
+    `docker exec market-php-app php artisan make:migration create_product_has_property_table --create=product_has_property` <br>
     `docker exec market-php-app php artisan migrate` <br>
     `docker exec market-php-app php artisan make:seeder PropertyGroupSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=PropertyGroupSeeder` <br>
-    `docker exec market-php-app php artisan make:seeder PropertySeeder` <br>
-    `docker exec market-php-app php artisan db:seed --class=PropertySeeder` <br>
     `docker exec market-php-app php artisan make:seeder PropertyValueSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=PropertyValueSeeder` <br>
+    `docker exec market-php-app php artisan make:seeder PropertySeeder` <br>
+    `docker exec market-php-app php artisan db:seed --class=PropertySeeder` <br>
     `docker exec market-php-app php artisan make:seeder PropertyHasPropertyValueSeeder` <br>
     `docker exec market-php-app php artisan db:seed --class=PropertyHasPropertyValueSeeder` <br>
     `docker exec market-php-app php artisan make:model Admin/PropertyGroup/PropertyGroup` <br>
@@ -368,7 +369,6 @@
     `docker exec market-php-app php artisan make:controller Admin/PropertyGroup/PropertyGroupController --resource` <br>
     `docker exec market-php-app php artisan make:controller Admin/Property/PropertyController --resource` <br>
     `docker exec market-php-app php artisan make:controller Admin/PropertyValue/PropertyValueController --resource` <br>
-    `docker exec market-php-app php artisan make:migration remove_all_categories_from_properties_table --table=properties` <br>
 
 41) creating business logic app API <br>
     `composer require "darkaonline/l5-swagger` <br>

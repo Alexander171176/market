@@ -5,6 +5,7 @@ namespace App\Models\Admin\Product;
 use App\Models\Admin\Category\Category;
 use App\Models\Admin\Comment\Comment;
 use App\Models\Admin\ProductVariant\ProductVariant;
+use App\Models\Admin\Property\Property;
 use App\Models\Admin\PropertyValue\PropertyValue;
 use App\Models\User\Like\ProductLike;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -149,13 +150,6 @@ class Product extends Model
         );
     }
 
-    /** Связь: характеристики и значения */
-    public function propertyValues(): BelongsToMany
-    {
-        return $this->belongsToMany(PropertyValue::class, 'product_property_value')
-            ->withPivot('property_id')->withTimestamps();
-    }
-
     /**
      * Связь: Товар - Категория
      */
@@ -167,5 +161,18 @@ class Product extends Model
             'product_id',                // внешний ключ этой модели
             'category_id'                // внешний ключ связанной модели
         );
+    }
+
+    /** Связь: характеристики */
+    public function properties(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Property::class,
+            'product_has_property',
+            'product_id',
+            'property_id'
+        )->withTimestamps()
+            ->withPivot('sort')
+            ->orderBy('product_has_property.sort'); // опционально
     }
 }

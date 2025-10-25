@@ -173,7 +173,7 @@ class Category extends Model
     {
         return $this->belongsToMany(
             Property::class,
-            'category_property',
+            'category_has_property',
             'category_id',
             'property_id'
         );

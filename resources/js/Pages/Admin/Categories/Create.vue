@@ -25,6 +25,7 @@ import TinyEditor from "@/Components/Admin/TinyEditor/TinyEditor.vue";
 import SelectParentCategory from "@/Components/Admin/Category/Select/SelectParentCategory.vue";
 import MultiImageUpload from "@/Components/Admin/Image/MultiImageUpload.vue";
 import { ref } from 'vue'
+import VueMultiselect from 'vue-multiselect'
 
 // --- Инициализация ---
 const toast = useToast();
@@ -35,6 +36,7 @@ const {t} = useI18n();
  */
 defineProps({
     images: Array, // Добавляем этот пропс для передачи списка изображений
+    properties: Array,
 })
 
 /**
@@ -53,6 +55,7 @@ const form = useForm({
     meta_desc: '', // meta description
     activity: false,
     images: [], // Добавляем массив для загруженных изображений
+    properties: [],
 });
 
 const newImages = ref([]);
@@ -264,6 +267,21 @@ const submit = () => {
                     />
 
                     <div class="mb-3 flex flex-col items-start">
+                        <LabelInput for="properties" :value="t('properties')" class="mb-1" />
+                        <VueMultiselect v-model="form.properties"
+                                        :options="properties"
+                                        :multiple="true"
+                                        :close-on-select="true"
+                                        :placeholder="t('select')"
+                                        label="name"
+                                        track-by="id"
+                        />
+                        <InputError class="mt-2" :message="form.errors.properties"/>
+                        <InputError v-if="form.errors['properties.0.id']" class="mt-1"
+                                    :message="form.errors['properties.0.id']"/>
+                    </div>
+
+                    <div class="mb-3 flex flex-col items-start">
                         <div class="flex justify-between w-full">
                             <LabelInput for="title">
                                 <span class="text-red-500 dark:text-red-300 font-semibold">*</span> {{ t('title') }}
@@ -407,3 +425,5 @@ const submit = () => {
         </div>
     </AdminLayout>
 </template>
+
+<style src="../../../../css/vue-multiselect.min.css"></style>

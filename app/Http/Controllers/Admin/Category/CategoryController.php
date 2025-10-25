@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Category\CategoryRequest;
 use App\Http\Requests\Admin\UpdateActivityRequest;
 use App\Http\Resources\Admin\Category\CategoryResource;
 use App\Http\Resources\Admin\Category\CategorySharedResource;
+use App\Http\Resources\Admin\Property\PropertyResource;
 use App\Models\Admin\Category\Category;
 use App\Models\Admin\Category\CategoryImage;
 use App\Models\Admin\Property\Property;
@@ -123,10 +124,13 @@ class CategoryController extends Controller
             session()->flash('error', __('admin/categories.parent_load_error'));
         }
 
+        $properties = Property::select('id', 'name')->orderBy('sort')->get(); // характеристики
+
         return Inertia::render('Admin/Categories/Create', [
             'targetLocale' => $targetLocale,
             'potentialParents' => CategorySharedResource::collection($potentialParents),
             'availableLocales' => $this->availableLocales,
+            'properties'    => PropertyResource::collection($properties),
         ]);
     }
 
@@ -142,7 +146,7 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         $imagesData = $data['images'] ?? [];
-        $propertyIds = $data['property_ids'] ?? [];
+        $propertyIds   = collect($data['properties'] ?? [])->pluck('id')->toArray();
 
         unset($data['images'], $data['property_ids']);
 
@@ -159,8 +163,6 @@ class CategoryController extends Controller
             }
 
             $category = Category::create($data);
-
-            $category->properties()->sync($propertyIds);
 
             // Обработка изображений
             $imageSyncData = [];
@@ -208,6 +210,7 @@ class CategoryController extends Controller
             }
 
             $category->images()->sync($imageSyncData);
+            $category->properties()->sync($propertyIds);
 
             DB::commit();
 
@@ -265,7 +268,7 @@ class CategoryController extends Controller
 
         // Log::info('Потенциальные родители:', $potentialParents->toArray());
 
-        $allProperties = Property::orderBy('name')->get(['id', 'name']); // Загружаем все характеристики
+        $properties = Property::select('id', 'name')->orderBy('sort')->get();
 
         return Inertia::render('Admin/Categories/Edit', [
             'targetLocale' => $targetLocale,
@@ -273,13 +276,13 @@ class CategoryController extends Controller
                 $category->loadMissing([
                     'parent',
                     'images' => fn($q) => $q->orderBy('order'),
-                    'properties' // <-- Загружаем привязанные характеристики
+                    'properties',
                 ])
             ),
             'potentialParents' => CategorySharedResource::collection($potentialParents),
             'availableLocales' => $this->availableLocales,
             'currentLocale' => $category->locale,
-            'allProperties' => $allProperties,
+            'properties' => PropertyResource::collection($properties),
         ]);
     }
 
@@ -301,19 +304,19 @@ class CategoryController extends Controller
         $originalParentId = $category->parent_id;
         $originalLocale   = $category->locale;
         $categoryId       = $category->id;
-        $propertyIds = $data['property_ids'] ?? [];
+        $propertyIds      = collect($data['properties'] ?? [])->pluck('id')->toArray();
 
         unset(
             $data['images'],
             $data['deletedImages'],
-            $data['property_ids'],
-            $data['_method']
+            $data['_method'],
+            $data['properties'],
         );
 
         try {
             DB::transaction(function () use (
-                $category, $data, $propertyIds, $originalParentId, $originalLocale,
-                $request, $imagesData, $deletedImageIds
+                $category, $data, $originalParentId, $originalLocale,
+                $request, $imagesData, $deletedImageIds, $propertyIds
             ) {
                 // Удаляем изображения
                 if (!empty($deletedImageIds)) {
@@ -344,8 +347,6 @@ class CategoryController extends Controller
                 }
 
                 $category->update($data);
-
-                $category->properties()->sync($propertyIds);
 
                 // Обработка изображений
                 $syncData = [];
@@ -388,6 +389,7 @@ class CategoryController extends Controller
                 }
 
                 $category->images()->sync($syncData);
+                $category->properties()->sync($propertyIds);
             });
 
             Log::info("Категория обновлена (ID: {$categoryId})", $category->refresh()->toArray());

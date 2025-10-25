@@ -51,26 +51,31 @@ class ArticleController extends Controller
      */
     public function index(): Response
     {
-        $perPage = (int) config('site_settings.AdminCountArticles', 15);
-        $sortKey = config('site_settings.AdminSortArticles', 'idDesc');
+        // TODO: Проверка прав $this->authorize('show-articles', Article::class);
+
+        $adminCountArticles = config('site_settings.AdminCountArticles', 15);
+        $adminSortArticles = config('site_settings.AdminSortArticles', 'idDesc');
 
         try {
+            // Загружаем ВСЕ статьи с секциями и изображениями, счётчики тегов, комментариев, лайков
             $articles = Article::withCount(['sections', 'tags', 'images', 'comments', 'likes'])
                 ->with(['images', 'sections'])
-                ->orderBy($sortKey) // ← теперь напрямую
-                ->paginate($perPage)
-                ->withQueryString();
+                ->get();
+
+            $articlesCount = $articles->count(); // Считаем из загруженной коллекции
+
         } catch (Throwable $e) {
-            Log::error("Ошибка загрузки постов для Index: ".$e->getMessage());
-            $articles = Article::query()->paginate($perPage);
+            Log::error("Ошибка загрузки постов для Index: " . $e->getMessage());
+            $articles = collect(); // Пустая коллекция в случае ошибки
+            $articlesCount = 0;
             session()->flash('error', __('admin/controllers.index_error'));
         }
 
         return Inertia::render('Admin/Articles/Index', [
-            'articles'            => ArticleResource::collection($articles),
-            'adminCountArticles'  => $perPage,
-            'adminSortArticles'   => $sortKey,
-            'articlesCount'       => $articles->total(),
+            'articles' => ArticleResource::collection($articles),
+            'articlesCount' => $articlesCount,
+            'adminCountArticles' => (int)$adminCountArticles,
+            'adminSortArticles' => $adminSortArticles,
         ]);
     }
 

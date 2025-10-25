@@ -74,7 +74,6 @@ const form = useForm({
     categories: [],
     related_products: [],
     images: [], // для изображений
-    category_ids: [] // для ID категорий (можно удалить, если categories используется)
 })
 
 /**

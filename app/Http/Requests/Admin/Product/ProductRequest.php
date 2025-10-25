@@ -58,6 +58,10 @@ class ProductRequest extends FormRequest
             'category_ids'     => ['nullable', 'array'],
             'categories.*.id'  => ['required_with:categories','integer','exists:categories,id'],
 
+            // Характеристики — массив объектов вида [{ id: <property_id> }, ...]
+            'properties'        => ['nullable', 'array'],
+            'properties.*.id'   => ['required_with:properties', 'integer', 'exists:properties,id'],
+
             'related_products' => ['nullable', 'array'],
             'related_products.*.id' => ['required_with:related_products', 'integer', 'exists:products,id'],
 
@@ -81,10 +85,6 @@ class ProductRequest extends FormRequest
 
             'deletedImages'      => ['sometimes', 'array'],
             'deletedImages.*'    => ['integer', Rule::exists('product_images', 'id')],
-
-            // Характеристики
-            'property_values'    => ['nullable', 'array'],
-            'property_values.*'  => ['integer', 'exists:property_values,id'],
         ];
     }
 

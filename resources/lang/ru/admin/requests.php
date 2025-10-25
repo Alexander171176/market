@@ -161,10 +161,10 @@ return [
     'options.array' => 'Опции должны быть массивом.',
 
     // Характеристики
-    'properties.array'             => 'Поле «Характеристики» должно быть массивом.',
-    'properties.*.id.required_with'=> 'ID характеристики обязателен.',
-    'properties.*.id.integer'      => 'ID характеристики должен быть числом.',
-    'properties.*.id.exists'       => 'Указанная характеристика не найдена.',
+    'properties.array'               => 'Поле «Характеристики» должно быть массивом.',
+    'properties.*.id.required_with'  => 'ID характеристики обязателен.',
+    'properties.*.id.integer'        => 'ID характеристики должен быть числом.',
+    'properties.*.id.exists'         => 'Указанная характеристика не найдена.',
     'property_group_id.integer' => 'ID группы должен быть целым числом.',
     'property_group_id.exists' => 'Выбранная группа не найдена.',
     'property_values.array' => 'Поле «Характеристики» должно быть массивом.',
