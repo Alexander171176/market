@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Currency\CurrencyController;
 use App\Http\Controllers\Admin\Invokable\RemoveTagFromArticleController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\Admin\ProductVariant\ProductVariantController;
@@ -422,6 +423,8 @@ Route::group([
                 Route::put('/update-count/property-values',
                     [SettingController::class, 'updateAdminCountPropertyValues'])
                     ->name('updateAdminCountPropertyValues');
+                Route::put('/update-count/currencies', [SettingController::class, 'updateAdminCountCurrencies'])
+                    ->name('updateAdminCountCurrencies');
                 Route::put('/update-count/rubrics', [SettingController::class, 'updateAdminCountRubrics'])
                     ->name('updateAdminCountRubrics');
                 Route::put('/update-count/sections', [SettingController::class, 'updateAdminCountSections'])
@@ -461,6 +464,8 @@ Route::group([
                 Route::put('/update-sort/property-values',
                     [SettingController::class, 'updateAdminSortPropertyValues'])
                     ->name('updateAdminSortPropertyValues');
+                Route::put('/update-sort/currencies', [SettingController::class, 'updateAdminSortCurrencies'])
+                    ->name('updateAdminSortCurrencies');
                 Route::put('/update-sort/rubrics', [SettingController::class, 'updateAdminSortRubrics'])
                     ->name('updateAdminSortRubrics');
                 Route::put('/update-sort/sections', [SettingController::class, 'updateAdminSortSections'])
@@ -498,6 +503,7 @@ Route::group([
             Route::resource('/property-groups', PropertyGroupController::class);
             Route::resource('/properties', PropertyController::class);
             Route::resource('/property-values', PropertyValueController::class);
+            Route::resource('/currencies', CurrencyController::class);
             Route::resource('/rubrics', RubricController::class);
             Route::resource('/sections', SectionController::class);
             Route::resource('/articles', ArticleController::class);
@@ -560,6 +566,18 @@ Route::group([
                 Route::put('/settings/{setting}/value', [SettingController::class, 'updateValue'])
                     ->name('settings.updateValue');
 
+                // атомарное переключение основной валюты
+                Route::put('/currencies/{currency}/set-default', [
+                    CurrencyController::class, 'setDefault'
+                ])->name('currencies.setDefault');
+
+                Route::put('/currencies/{currency}/rate', [CurrencyController::class, 'updateRate'])
+                    ->name('currencies.updateRate'); // currency = QUOTE; BASE берём из is_default
+
+                Route::put('/currencies/{currency}/refresh-rates', [
+                    CurrencyController::class, 'refreshRates'
+                ])->name('currencies.refreshRates');
+
                 // Клонирование (Используем имена моделей для параметров RMB)
                 Route::post('/categories/{category}/clone', [RubricController::class, 'clone'])
                     ->name('categories.clone');
@@ -593,6 +611,9 @@ Route::group([
                 Route::put('/property-values/{propertyValue}/activity',
                     [PropertyValueController::class, 'updateActivity'])
                     ->name('property-values.updateActivity');
+                Route::put('/currencies/{currency}/activity',
+                    [CurrencyController::class, 'updateActivity'])
+                    ->name('currencies.updateActivity');
                 Route::put('/rubrics/{rubric}/activity',
                     [RubricController::class, 'updateActivity'])
                     ->name('rubrics.updateActivity');
@@ -637,6 +658,9 @@ Route::group([
                 Route::put('/property-values/bulk-activity',
                     [PropertyValueController::class, 'bulkUpdateActivity'])
                     ->name('property-values.bulkUpdateActivity');
+                Route::put('/currencies/bulk-activity',
+                    [CurrencyController::class, 'bulkUpdateActivity'])
+                    ->name('currencies.bulkUpdateActivity');
                 Route::put('/rubrics/bulk-activity',
                     [RubricController::class, 'bulkUpdateActivity'])
                     ->name('rubrics.bulkUpdateActivity');
@@ -730,6 +754,8 @@ Route::group([
                     ->name('properties.updateSortBulk');
                 Route::put('/property-values/update-sort-bulk', [PropertyValueController::class, 'updateSortBulk'])
                     ->name('property-values.updateSortBulk');
+                Route::put('/currencies/update-sort-bulk', [CurrencyController::class, 'updateSortBulk'])
+                    ->name('currencies.updateSortBulk');
                 Route::put('/rubrics/update-sort-bulk', [RubricController::class, 'updateSortBulk'])
                     ->name('rubrics.updateSortBulk');
                 Route::put('/sections/update-sort-bulk', [SectionController::class, 'updateSortBulk'])
@@ -758,6 +784,8 @@ Route::group([
                     ->name('properties.updateSort');
                 Route::put('/property-values/{value}/sort', [PropertyValueController::class, 'updateSort'])
                     ->name('property-values.updateSort');
+                Route::put('/currencies/{currency}/sort', [CurrencyController::class, 'updateSort'])
+                    ->name('currencies.updateSort');
                 Route::put('/rubrics/{rubric}/sort', [RubricController::class, 'updateSort'])
                     ->name('rubrics.updateSort');
                 Route::put('/sections/{section}/sort', [SectionController::class, 'updateSort'])
@@ -788,6 +816,8 @@ Route::group([
                     ->name('properties.bulkDestroy');
                 Route::delete('/property-values/bulk-delete', [PropertyValueController::class, 'bulkDestroy'])
                     ->name('property-values.bulkDestroy');
+                Route::delete('/currencies/bulk-delete', [CurrencyController::class, 'bulkDestroy'])
+                    ->name('currencies.bulkDestroy');
                 Route::delete('/rubrics/bulk-delete', [RubricController::class, 'bulkDestroy'])
                     ->name('rubrics.bulkDestroy');
                 Route::delete('/sections/bulk-delete', [SectionController::class, 'bulkDestroy'])

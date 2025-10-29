@@ -362,6 +362,25 @@ class SettingController extends Controller
     }
 
     /**
+     * Обновление количества элементов в валютах
+     *
+     * @param UpdateCountSettingRequest $request
+     * @return RedirectResponse
+     */
+    public function updateAdminCountCurrencies(UpdateCountSettingRequest $request): RedirectResponse
+    {
+        return $this->updateSettingAndRedirect(
+            $request,
+            'AdminCountCurrencies',
+            'site_settings.AdminCountCurrencies',
+            'number',
+            'admin',
+            __('admin/controllers.count_pages_updated_success'),
+            __('admin/controllers.count_pages_updated_error')
+        );
+    }
+
+    /**
      * Обновление количества элементов в рубриках
      *
      * @param UpdateCountSettingRequest $request
@@ -700,6 +719,25 @@ class SettingController extends Controller
             $request,
             'AdminSortPropertyValues',
             'site_settings.AdminSortPropertyValues',
+            'string',
+            'admin',
+            __('admin/controllers.sort_pages_updated_success'),
+            __('admin/controllers.sort_pages_updated_error')
+        );
+    }
+
+    /**
+     * Обновляет сортировку элементов в валютах
+     *
+     * @param UpdateSortRequest $request
+     * @return RedirectResponse
+     */
+    public function updateAdminSortCurrencies(UpdateSortRequest $request): RedirectResponse
+    {
+        return $this->updateSettingAndRedirect(
+            $request,
+            'AdminSortCurrencies',
+            'site_settings.AdminSortCurrencies',
             'string',
             'admin',
             __('admin/controllers.sort_pages_updated_success'),

@@ -4,12 +4,15 @@ namespace App\Models\Admin\Product;
 
 use App\Models\Admin\Category\Category;
 use App\Models\Admin\Comment\Comment;
+use App\Models\Admin\Currency\Currency;
+use App\Models\Admin\Currency\ProductPriceCache;
 use App\Models\Admin\ProductVariant\ProductVariant;
 use App\Models\Admin\Property\Property;
 use App\Models\Admin\PropertyValue\PropertyValue;
 use App\Models\User\Like\ProductLike;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -174,5 +177,17 @@ class Product extends Model
         )->withTimestamps()
             ->withPivot('sort')
             ->orderBy('product_has_property.sort'); // опционально
+    }
+
+    // внутри класса Product
+    public function priceCaches(): HasMany
+    {
+        return $this->hasMany(ProductPriceCache::class, 'product_id');
+    }
+
+    /** Если валюты товара хранятся строкой (code), то: */
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency', 'code');
     }
 }

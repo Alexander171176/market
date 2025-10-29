@@ -192,6 +192,19 @@ const {t} = useI18n();
             {{ t('propertyValues') }}
         </template>
     </SidebarLink>
+    <SidebarLink :href="route('admin.currencies.index')"
+                 :active="route().current('currencies.index')"
+                 :expanded="props.expanded">
+        <template #default>
+            <svg class="shrink-0 h-6 w-6" viewBox="0 0 24 24">
+                <circle class="fill-current text-blue-600" cx="16" cy="8" r="8"></circle>
+                <circle class="fill-current text-blue-400" cx="8" cy="16" r="8"></circle>
+            </svg>
+        </template>
+        <template #text>
+            {{ t('currencies') }}
+        </template>
+    </SidebarLink>
     <SidebarLink :href="route('admin.rubrics.index')"
                  :active="route().current('rubrics.index')"
                  :expanded="props.expanded">

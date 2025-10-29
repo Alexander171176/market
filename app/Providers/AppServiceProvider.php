@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Admin\Currency\Currency;
 use App\Models\Admin\Setting\Setting;
+use App\Observers\CurrencyObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Currency::observe(CurrencyObserver::class);
+
         JsonResource::withoutWrapping();
 
         if (Schema::hasTable('settings')) {

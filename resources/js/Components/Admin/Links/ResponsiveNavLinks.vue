@@ -17,6 +17,7 @@ const { t } = useI18n();
         <ResponsiveNavLink :href="route('admin.property-groups.index')" :active="route().current('admin.property-groups.index')">{{ t('propertyGroups') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.properties.index')" :active="route().current('admin.properties.index')">{{ t('properties') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.property-values.index')" :active="route().current('admin.property-values.index')">{{ t('propertyValues') }}</ResponsiveNavLink>
+        <ResponsiveNavLink :href="route('admin.currencies.index')" :active="route().current('admin.currencies.index')">{{ t('currencies') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.rubrics.index')" :active="route().current('admin.rubrics.index')">{{ t('rubrics') }}</ResponsiveNavLink>
         <ResponsiveNavLink :href="route('admin.sections.index')" :active="route().current('admin.sections.index')">{{ t('sections') }}</ResponsiveNavLink> <!-- ИСПРАВЛЕНО -->
         <ResponsiveNavLink :href="route('admin.articles.index')" :active="route().current('admin.articles.index')">{{ t('posts') }}</ResponsiveNavLink>

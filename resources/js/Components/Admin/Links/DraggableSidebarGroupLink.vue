@@ -50,6 +50,7 @@ const mainLinks = ref(JSON.parse(localStorage.getItem('mainLinks')) || [
     'propertyGroups',
     'properties',
     'propertyValues',
+    'currencies',
     'rubrics',
     'sections',
     'articles',

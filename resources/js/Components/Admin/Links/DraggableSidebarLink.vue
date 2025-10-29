@@ -68,6 +68,7 @@ const linkInfo = {
     propertyGroups: {label: t('propertyGroups'), route: 'admin.property-groups.index'},
     properties: {label: t('properties'), route: 'admin.properties.index'},
     propertyValues: {label: t('propertyValues'), route: 'admin.property-values.index'},
+    currencies: {label: t('currencies'), route: 'admin.currencies.index'},
     rubrics: {label: t('rubrics'), route: 'admin.rubrics.index'},
     sections: {label: t('sections'), route: 'admin.sections.index'},
     articles: {label: t('posts'), route: 'admin.articles.index'},

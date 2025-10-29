@@ -82,6 +82,7 @@
     `docker exec market-php-app php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"` <br>
     `docker exec market-php-app php artisan optimize:clear` <br>
     `docker exec market-php-app php artisan migrate`<br>
+    `docker exec market-php-app php artisan migrate:status`<br>
     `docker exec market-php-app php artisan migrate:rollback --path=database/migrations/2025_04_03_073100_create_video_likes_table.php`<br>
     `docker exec market-php-app php artisan migrate:rollback`<br>
     `docker exec market-php-app php artisan migrate` <br>
@@ -435,3 +436,26 @@
     `docker exec market-php-app php artisan make:controller Admin/System/FileBackupController` <br>
 ____________________________
 
+1) creating business logic Currency
+   `docker exec market-php-app php artisan make:model Admin/Currency/Currency -mfs` <br>
+   `docker exec market-php-app php artisan make:model Admin/Currency/CurrencyRate -mfs` <br>
+   `docker exec market-php-app php artisan make:model Admin/Currency/ProductPriceCache -mfs` <br>
+   `docker exec market-php-app php artisan make:migration update_products_add_currency_fk --table=products` <br>
+   `docker exec market-php-app php artisan make:seeder DefaultCurrenciesSeeder` <br>
+   `docker exec market-php-app php artisan migrate` <br>
+   `docker exec market-php-app php artisan db:seed --class=DefaultCurrenciesSeeder` <br>
+   `docker exec market-php-app php artisan make:resource Admin/Currency/CurrencyResource` <br>
+   `docker exec market-php-app php artisan make:resource Admin/Currency/CurrencySelectResource` <br>
+   `docker exec market-php-app php artisan make:resource Admin/Currency/CurrencyRateResource` <br>
+   `docker exec market-php-app php artisan make:resource Admin/Currency/ProductPriceCacheResource` <br>
+   `docker exec market-php-app php artisan make:resource Public/Currency/CurrencyResource` <br>
+   `docker exec market-php-app php artisan make:resource Public/Currency/ProductPriceResource` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/CurrencyRequest` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/DefaultCurrencyRequest` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/CurrencyActivityRequest` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/CurrencyRateRequest` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/BulkCurrencyRatesRequest` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/FetchRatesFromProviderRequest` <br>
+   `docker exec market-php-app php artisan make:request Admin/Currency/CurrencyInlineRateRequest` <br>
+   `docker exec market-php-app php artisan make:controller Admin/Currency/CurrencyController --resource` <br>
+   `docker exec market-php-app php artisan make:controller Admin/Currency/CurrencyRateController --resource` <br>
