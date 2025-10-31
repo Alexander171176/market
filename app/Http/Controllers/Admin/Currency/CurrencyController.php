@@ -16,14 +16,26 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
 
 class CurrencyController extends Controller
 {
+
+    private function decodeSepToken(?string $token): string
+    {
+        return match ($token) {
+            'space'      => ' ',
+            'nbsp'       => "\u{00A0}",   // неразрывный пробел
+            'thinspace'  => "\u{2009}",   // тонкий пробел
+            'comma'      => ',',
+            'dot'        => '.',
+            'apostrophe' => "'",
+            default      => (string) $token, // на всякий случай пропускаем как есть
+        };
+    }
+
     /**
      * @return Response
      */
@@ -110,18 +122,22 @@ class CurrencyController extends Controller
     {
         try {
             $data = $request->validated();
-            // чекбоксы в форме — булевы флаги
-            $data['activity'] = !empty($data['activity']);
+
+            // Конвертация токенов -> символы (ОБЯЗАТЕЛЬНО!)
+            $data['thousands_sep'] = $this->decodeSepToken($data['thousands_sep'] ?? 'space');
+            $data['decimal_sep']   = $this->decodeSepToken($data['decimal_sep'] ?? 'dot');
+
             // sort по умолчанию — в конец
             $data['sort'] = $data['sort'] ?? (int) (Currency::max('sort') + 1);
 
-            $currency = Currency::create($data);
+            Currency::create($data);
 
             session()->flash('success', __('admin/controllers.created_successfully'));
-            return redirect()->route('admin.currencies.edit', $currency->id);
-        } catch (Throwable $e) {
-            Log::error("Ошибка создания валюты [store]: {$e->getMessage()}");
-            session()->flash('error', __('admin/controllers.store_error'));
+            return redirect()->route('admin.currencies.index');
+        } catch (\Throwable $e) {
+            Log::error("Ошибка создания валюты [store]: {$e->getMessage()}", [
+                'trace' => $e->getTraceAsString(),
+            ]);
             return back()->withErrors(['general' => __('admin/controllers.store_error')])->withInput();
         }
     }
@@ -146,13 +162,16 @@ class CurrencyController extends Controller
     {
         try {
             $data = $request->validated();
-            $data['activity'] = !empty($data['activity']);
+
+            // Конвертация токенов -> символы (ОБЯЗАТЕЛЬНО!)
+            $data['thousands_sep'] = $this->decodeSepToken($data['thousands_sep'] ?? 'space');
+            $data['decimal_sep']   = $this->decodeSepToken($data['decimal_sep'] ?? 'dot');
 
             $currency->update($data);
 
             session()->flash('success', __('admin/controllers.updated_successfully'));
-            return back();
-        } catch (Throwable $e) {
+            return redirect()->route('admin.currencies.index');
+        } catch (\Throwable $e) {
             Log::error("Ошибка обновления валюты [update]: {$e->getMessage()}");
             return back()->withErrors(['general' => __('admin/controllers.update_error')])->withInput();
         }

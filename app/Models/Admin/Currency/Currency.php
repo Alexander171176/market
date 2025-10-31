@@ -11,17 +11,26 @@ class Currency extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sort','code','name','symbol','precision','symbol_first',
-        'thousands_sep','decimal_sep','activity','is_default','set_default_at',
+        'sort',
+        'code',
+        'name',
+        'symbol',
+        'precision',
+        'symbol_first',
+        'thousands_sep',
+        'decimal_sep',
+        'activity',
+        'is_default',
+        'set_default_at',
     ];
 
     protected $casts = [
-        'sort' => 'integer',
-        'symbol_first' => 'bool',
-        'activity'    => 'bool',
-        'is_default'   => 'bool',
+        'sort'         => 'integer',
+        'precision'    => 'integer',
+        'symbol_first' => 'boolean',
+        'activity'     => 'boolean',
+        'is_default'   => 'boolean',
         'set_default_at' => 'datetime',
-        'precision'    => 'int',
     ];
 
     // --- Связи курсов
