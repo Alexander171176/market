@@ -34,6 +34,11 @@ class Currency extends Model
     ];
 
     // --- Связи курсов
+    // алиас, чтобы не падало при child route binding
+    public function rates(): HasMany
+    {
+        return $this->baseRates();
+    }
     public function baseRates(): HasMany
     {
         return $this->hasMany(CurrencyRate::class, 'base_currency_id');

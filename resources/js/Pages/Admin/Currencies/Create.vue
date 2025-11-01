@@ -153,7 +153,7 @@ const submit = () => {
                         <div class="mb-3 flex flex-col items-start w-full lg:w-1/3">
                             <div class="flex justify-between w-full">
                                 <LabelInput for="name">
-                                    <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                                <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
                                     {{ t('name') }}
                                 </LabelInput>
                                 <div class="text-md text-gray-900 dark:text-gray-400 mt-1">
@@ -175,7 +175,7 @@ const submit = () => {
                         <div class="mb-3 flex flex-col items-start w-full lg:w-1/3">
                             <div class="flex justify-between w-full">
                                 <LabelInput for="code">
-                                    <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                                <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
                                     {{ t('code') }}
                                 </LabelInput>
                                 <div class="text-md text-gray-900 dark:text-gray-400 mt-1">
@@ -197,7 +197,7 @@ const submit = () => {
                         <div class="mb-3 flex flex-col items-start w-full lg:w-1/3">
                             <div class="flex justify-between w-full">
                                 <LabelInput for="symbol">
-                                    <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
+                                <span class="text-red-500 dark:text-red-300 font-semibold">*</span>
                                     {{ t('symbol') }}
                                 </LabelInput>
                                 <div class="text-md text-gray-900 dark:text-gray-400 mt-1">
@@ -223,7 +223,8 @@ const submit = () => {
                         <!-- Количество знаков после запятой -->
                         <div class="flex flex-row items-center gap-2">
                             <div class="h-8 flex items-center">
-                                <LabelInput for="precision" :value="t('precision')" class="text-sm" />
+                                <LabelInput for="precision" :value="t('precision')"
+                                            class="text-sm" />
                             </div>
                             <InputNumber
                                 id="precision"
@@ -283,10 +284,12 @@ const submit = () => {
                             </template>
                             {{ t('back') }}
                         </DefaultButton>
-                        <PrimaryButton class="ms-4 mb-0" :class="{ 'opacity-25': form.processing }"
+                        <PrimaryButton class="ms-4 mb-0"
+                                       :class="{ 'opacity-25': form.processing }"
                                        :disabled="form.processing">
                             <template #icon>
-                                <svg class="w-4 h-4 fill-current text-slate-100" viewBox="0 0 16 16">
+                                <svg class="w-4 h-4 fill-current text-slate-100"
+                                     viewBox="0 0 16 16">
                                     <path
                                         d="M14.3 2.3L5 11.6 1.7 8.3c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4 4c.2.2.4.3.7.3.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4-.4-.4-1-.4-1.4 0z"></path>
                                 </svg>

@@ -460,7 +460,8 @@ const saveRate = ({ id, value }) => {
                 <div class="sm:flex sm:justify-between sm:items-center mb-2">
                     <DefaultButton :href="route('admin.currencies.create')">
                         <template #icon>
-                            <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                            <svg class="w-4 h-4 fill-current opacity-50 shrink-0"
+                                 viewBox="0 0 16 16">
                                 <path
                                     d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z"></path>
                             </svg>
@@ -472,12 +473,13 @@ const saveRate = ({ id, value }) => {
                 <div class="flex justify-center items-center mb-2">
                     <!-- КНОПКА ОБНОВИТЬ КУРСЫ -->
                     <RefreshRatesButton
-                        :title="`Обновить курсы (${currentBase?.code || '—'})`"
+                        :title="`${t('currencyRefreshRates')} (${currentBase?.code || '—'})`"
                         :disabled="!currentBase"
                         @click="refreshFromProvider"
                     />
                 </div>
-                <SearchInput v-if="currenciesCount" v-model="searchQuery" :placeholder="t('searchByName')"/>
+                <SearchInput v-if="currenciesCount" v-model="searchQuery"
+                             :placeholder="t('searchByName')"/>
                 <CountTable v-if="currenciesCount"> {{ currenciesCount }} </CountTable>
                 <CurrencyTable
                     :currencies="paginatedCurrencies"
@@ -490,8 +492,10 @@ const saveRate = ({ id, value }) => {
                     @set-default="setDefault"
                     @save-rate="saveRate"
                 />
-                <div class="flex justify-between items-center flex-col md:flex-row my-1" v-if="currenciesCount">
-                    <ItemsPerPageSelect :items-per-page="itemsPerPage" @update:itemsPerPage="itemsPerPage = $event" />
+                <div class="flex justify-between items-center flex-col md:flex-row my-1"
+                     v-if="currenciesCount">
+                    <ItemsPerPageSelect :items-per-page="itemsPerPage"
+                                        @update:itemsPerPage="itemsPerPage = $event" />
                     <Pagination :current-page="currentPage"
                                 :items-per-page="itemsPerPage"
                                 :total-items="filteredCurrencies.length"

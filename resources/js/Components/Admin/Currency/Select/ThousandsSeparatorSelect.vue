@@ -48,9 +48,9 @@ const labelText = computed(() =>
             :value="modelValue"
             @change="e => emit('update:modelValue', e.target.value)"
             class="w-full px-3 py-0.5 form-select rounded-sm shadow-sm
-             bg-white dark:bg-cyan-800
-             dark:text-slate-100 font-semibold
-             border border-slate-500"
+                     bg-white dark:bg-cyan-800
+                     dark:text-slate-100 font-semibold
+                     border border-slate-500"
         >
             <option v-for="o in options" :key="o.value" :value="o.value">
                 {{ o.label }}

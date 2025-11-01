@@ -23,6 +23,10 @@ use Throwable;
 class CurrencyController extends Controller
 {
 
+    /**
+     * @param string|null $token
+     * @return string
+     */
     private function decodeSepToken(?string $token): string
     {
         return match ($token) {
@@ -452,6 +456,10 @@ class CurrencyController extends Controller
     /**
      * Провайдер ЦБ РФ: https://www.cbr-xml-daily.ru/daily_json.js
      * Возвращает нормализованные rates (QUOTE per 1 BASE).
+     *
+     * @param string $baseCode
+     * @param array $allowedUpper
+     * @return array
      */
     private function fetchFromCBR(string $baseCode, array $allowedUpper): array
     {
@@ -512,7 +520,12 @@ class CurrencyController extends Controller
         }
     }
 
-    /** Обновить курсы от ЦБ РФ для выбранной БАЗЫ */
+    /**
+     * Обновить курсы от ЦБ РФ для выбранной БАЗЫ
+     *
+     * @param Currency $currency
+     * @return RedirectResponse
+     */
     public function refreshRates(Currency $currency): RedirectResponse
     {
         try {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\Currency\CurrencyController;
+use App\Http\Controllers\Admin\Currency\CurrencyRateController;
 use App\Http\Controllers\Admin\Invokable\RemoveTagFromArticleController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\Admin\ProductVariant\ProductVariantController;
@@ -558,6 +559,24 @@ Route::group([
                 ->name('sections.videos.destroy');
             Route::delete('/articles/{article}/videos/{video}', RemoveArticleFromVideoController::class)
                 ->name('articles.videos.destroy');
+
+            // Курсы валют для конкретной валюты (вложенные маршруты)
+            Route::prefix('currencies/{currency}')
+                ->scopeBindings()
+                ->group(function () {
+                    Route::prefix('rates')
+                        ->name('currencies.rates.')
+                        ->controller(CurrencyRateController::class)
+                        ->group(function () {
+                            Route::get('/',            'index')->name('index');    // список курсов from_currency -> to_currency
+                            Route::post('/',           'store')->name('store');    // создать/обновить один курс (upsert по паре)
+                            Route::put('/{rate}',      'update')->name('update');  // обновить конкретный курс
+                            Route::delete('/{rate}',   'destroy')->name('destroy');// удалить конкретный курс
+
+                            Route::post('/bulk',       'bulkUpsert')->name('bulk'); // пакетное upsert
+                            Route::post('/refresh',    'refresh')->name('refresh'); // подтянуть с провайдера
+                        });
+                });
 
             // --- Маршруты для дополнительных действий ---
             Route::prefix('actions')->name('actions.')->group(function () { // Группируем доп. действия
